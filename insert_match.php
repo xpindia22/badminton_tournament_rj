@@ -1,43 +1,186 @@
-<!-- HTML and PHP: Insert Match -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Match</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        form { margin: 20px; }
+        label { display: block; margin-bottom: 5px; }
+        select, input, button { padding: 10px; margin-bottom: 10px; width: 100%; max-width: 300px; }
+        h1, h2 { text-align: center; }
+    </style>
 </head>
 <body>
-    <form method="post" action="insert_match.php">
-        Tournament ID: <input type="number" name="tournament_id" required><br>
-        Category ID: <input type="number" name="category_id" required><br>
-        Pool: 
-        <select name="pool" required>
-            <option value="A">Pool A</option>
-            <option value="B">Pool B</option>
-        </select><br>
-        Player 1 ID: <input type="number" name="player1_id" required><br>
-        Player 2 ID: <input type="number" name="player2_id" required><br>
+    <h1>Insert Match</h1>
+    <form method="post">
+        <label for="tournament_id">Tournament:</label>
+        <select name="tournament_id" id="tournament_id" required>
+            <option value="">Select Tournament</option>
+            <?php
+            $conn = new mysqli("localhost", "root", "xxx", "badminton_tournament");
+            $result = $conn->query("SELECT id, name FROM tournaments");
+            while ($row = $result->fetch_assoc()) {
+                echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            }
+            ?>
+        </select>
+
+        <label for="category_id">Category:</label>
+        <select name="category_id" id="category_id" required>
+            <option value="">Select Category</option>
+            <?php
+            $result = $conn->query("SELECT id, name FROM categories");
+            while ($row = $result->fetch_assoc()) {
+                echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            }
+            ?>
+        </select>
+
+        <label for="player1_id">Player 1:</label>
+        <select name="player1_id" id="player1_id" required>
+            <option value="">Select Player</option>
+            <?php
+            $result = $conn->query("SELECT id, name FROM players");
+            while ($row = $result->fetch_assoc()) {
+                echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            }
+            ?>
+        </select>
+
+        <label for="player2_id">Player 2:</label>
+        <select name="player2_id" id="player2_id" required>
+            <option value="">Select Player</option>
+            <?php
+            $result = $conn->query("SELECT id, name FROM players");
+            while ($row = $result->fetch_assoc()) {
+                echo "<option value='{$row['id']}'>{$row['name']}</option>";
+            }
+            ?>
+        </select>
+
+        <label for="pool">Pool:</label>
+        <select name="pool" id="pool">
+            <option value="">None</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+        </select>
+
+        <label for="stage">Match Stage:</label>
+        <select name="stage" id="stage" required>
+            <option value="Pre Quarter Finals">Pre Quarter Finals</option>
+            <option value="Quarter Finals">Quarter Finals</option>
+            <option value="Semi Finals">Semi Finals</option>
+            <option value="Finals">Finals</option>
+        </select>
+
+        <label for="set1_player1_points">Set 1 Player 1 Points:</label>
+        <input type="number" name="set1_player1_points" required>
+
+        <label for="set1_player2_points">Set 1 Player 2 Points:</label>
+        <input type="number" name="set1_player2_points" required>
+
+        <label for="set2_player1_points">Set 2 Player 1 Points:</label>
+        <input type="number" name="set2_player1_points" required>
+
+        <label for="set2_player2_points">Set 2 Player 2 Points:</label>
+        <input type="number" name="set2_player2_points" required>
+
+        <label for="set3_player1_points">Set 3 Player 1 Points:</label>
+        <input type="number" name="set3_player1_points">
+
+        <label for="set3_player2_points">Set 3 Player 2 Points:</label>
+        <input type="number" name="set3_player2_points">
+
         <button type="submit">Add Match</button>
     </form>
-</body>
-</html>
 
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tournament_id = $_POST['tournament_id'];
-    $category_id = $_POST['category_id'];
-    $pool = $_POST['pool'];
-    $player1_id = $_POST['player1_id'];
-    $player2_id = $_POST['player2_id'];
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $tournament_id = $_POST['tournament_id'];
+        $category_id = $_POST['category_id'];
+        $player1_id = $_POST['player1_id'];
+        $player2_id = $_POST['player2_id'];
+        $pool = $_POST['pool'];
+        $stage = $_POST['stage'];
 
-    $sql = "INSERT INTO matches (tournament_id, category_id, pool, player1_id, player2_id) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iisii", $tournament_id, $category_id, $pool, $player1_id, $player2_id);
+        $set1_p1 = $_POST['set1_player1_points'];
+        $set1_p2 = $_POST['set1_player2_points'];
+        $set2_p1 = $_POST['set2_player1_points'];
+        $set2_p2 = $_POST['set2_player2_points'];
+        $set3_p1 = $_POST['set3_player1_points'] ?? 0;
+        $set3_p2 = $_POST['set3_player2_points'] ?? 0;
 
-    if ($stmt->execute()) {
-        echo "Match added successfully!";
-    } else {
-        echo "Error: " . $stmt->error;
+        $stmt = $conn->prepare("
+            INSERT INTO matches (tournament_id, category_id, player1_id, player2_id, pool, pre_quarter, quarter, semi, final, 
+            set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points, stage)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $pre_quarter = ($stage == 'Pre Quarter Finals') ? 1 : 0;
+        $quarter = ($stage == 'Quarter Finals') ? 1 : 0;
+        $semi = ($stage == 'Semi Finals') ? 1 : 0;
+        $final = ($stage == 'Finals') ? 1 : 0;
+
+        $stmt->bind_param(
+            "iiiiisiiiiiiiss",
+            $tournament_id, $category_id, $player1_id, $player2_id, $pool,
+            $pre_quarter, $quarter, $semi, $final,
+            $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2, $stage
+        );
+
+        if ($stmt->execute()) {
+            echo "<p>Match added successfully!</p>";
+        } else {
+            echo "<p>Error: {$stmt->error}</p>";
+        }
+        $stmt->close();
     }
 
-    $stmt->close();
-}
-?>
+    // Fetch and display results
+    $result = $conn->query("
+        SELECT m.*, p1.name AS player1_name, p2.name AS player2_name 
+        FROM matches m
+        LEFT JOIN players p1 ON m.player1_id = p1.id
+        LEFT JOIN players p2 ON m.player2_id = p2.id
+    ");
+
+    if ($result->num_rows > 0) {
+        echo "<h2>Match Results</h2>";
+        echo "<table><tr>
+                <th>ID</th>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Set 1</th>
+                <th>Set 2</th>
+                <th>Set 3</th>
+                <th>Winner</th>
+                <th>Stage</th>
+              </tr>";
+        while ($row = $result->fetch_assoc()) {
+            $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
+            $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
+            $winner = ($p1_total > $p2_total) ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
+            echo "<tr>
+                    <td>{$row['id']}</td>
+                    <td>{$row['player1_name']}</td>
+                    <td>{$row['player2_name']}</td>
+                    <td>{$row['set1_player1_points']} - {$row['set1_player2_points']}</td>
+                    <td>{$row['set2_player1_points']} - {$row['set2_player2_points']}</td>
+                    <td>{$row['set3_player1_points']} - {$row['set3_player2_points']}</td>
+                    <td>{$winner}</td>
+                    <td>{$row['stage']}</td>
+                  </tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "<p>No matches recorded yet.</p>";
+    }
+
+    $conn->close();
+    ?>
+</body>
+</html>
