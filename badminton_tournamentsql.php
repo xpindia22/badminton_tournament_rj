@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 27, 2024 at 12:33 PM
+-- Generation Time: Dec 28, 2024 at 06:13 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -74,7 +74,10 @@ CREATE TABLE `matches` (
 --
 
 INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `stage`) VALUES
-(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pre Quarter Finals');
+(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 14, 14, 21, 21, 15, 'Pre Quarter Finals'),
+(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 'Quarter Finals'),
+(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 24, 22, 'Semi Finals'),
+(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 12, 21, 21, 12, 'Pre Quarter Finals');
 
 -- --------------------------------------------------------
 
@@ -85,6 +88,7 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 CREATE TABLE `players` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `dob` date NOT NULL,
   `age` int(11) NOT NULL,
   `sex` enum('M','F') NOT NULL,
   `uid` varchar(100) NOT NULL
@@ -94,10 +98,12 @@ CREATE TABLE `players` (
 -- Dumping data for table `players`
 --
 
-INSERT INTO `players` (`id`, `name`, `age`, `sex`, `uid`) VALUES
-(1, 'Sreesha', 16, 'F', '3'),
-(2, 'Eric James', 15, 'M', '1'),
-(3, 'Akshaj Tiwari', 13, 'M', '2');
+INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`) VALUES
+(1, 'Sreesha', '2008-01-01', 16, 'F', '3'),
+(2, 'Eric James', '2009-05-02', 15, 'M', '1'),
+(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2'),
+(4, 'Lakshmita', '2011-01-01', 13, 'F', '4'),
+(6, 'Lee', '2009-02-03', 15, 'M', '5');
 
 -- --------------------------------------------------------
 
@@ -165,13 +171,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tournaments`
