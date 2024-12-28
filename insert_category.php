@@ -1,3 +1,6 @@
+<?php
+//insert_category.php
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

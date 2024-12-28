@@ -1,3 +1,6 @@
+<?php
+//insert_tournament.php
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

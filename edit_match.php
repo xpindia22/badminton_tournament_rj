@@ -1,4 +1,5 @@
 <?php
+//edit_match.php
 $conn = new mysqli("localhost", "root", "xxx", "badminton_tournament");
 
 if ($conn->connect_error) {

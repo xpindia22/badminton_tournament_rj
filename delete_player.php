@@ -1,4 +1,5 @@
 <?php
+//delete_player.php
 $servername = "localhost";
 $username = "root";
 $password = "xxx";

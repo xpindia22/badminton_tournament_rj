@@ -1,4 +1,5 @@
 <?php
+//fetch_player.php
 header('Content-Type: application/json');
 
 $conn = new mysqli("localhost", "root", "xxx", "badminton_tournament");

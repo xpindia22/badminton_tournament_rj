@@ -1,3 +1,6 @@
+<?php
+//insert_player.php
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
