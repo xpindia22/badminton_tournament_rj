@@ -158,10 +158,12 @@
     }
 
     // Fetch and display results
-    $result = $conn->query("SELECT m.*, p1.name AS player1_name, p2.name AS player2_name 
-                            FROM matches m
-                            LEFT JOIN players p1 ON m.player1_id = p1.id
-                            LEFT JOIN players p2 ON m.player2_id = p2.id");
+    $result = $conn->query("
+        SELECT m.*, p1.name AS player1_name, p2.name AS player2_name 
+        FROM matches m
+        LEFT JOIN players p1 ON m.player1_id = p1.id
+        LEFT JOIN players p2 ON m.player2_id = p2.id
+    ");
 
     if ($result->num_rows > 0) {
         echo "<h2>Match Results</h2>";
@@ -172,14 +174,9 @@
                 <th>Set 1</th>
                 <th>Set 2</th>
                 <th>Set 3</th>
-                <th>Winner</th>
                 <th>Stage</th>
-                <th>Edit</th>
               </tr>";
         while ($row = $result->fetch_assoc()) {
-            $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
-            $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
-            $winner = ($p1_total > $p2_total) ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
             echo "<tr>
                     <td>{$row['id']}</td>
                     <td>{$row['player1_name']}</td>
@@ -187,9 +184,7 @@
                     <td>{$row['set1_player1_points']} - {$row['set1_player2_points']}</td>
                     <td>{$row['set2_player1_points']} - {$row['set2_player2_points']}</td>
                     <td>{$row['set3_player1_points']} - {$row['set3_player2_points']}</td>
-                    <td>{$winner}</td>
                     <td>{$row['stage']}</td>
-                    <td><a href='edit_match.php?id={$row['id']}'>Edit</a></td>
                   </tr>";
         }
         echo "</table>";
