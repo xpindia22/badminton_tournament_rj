@@ -1,4 +1,5 @@
 <?php
+//delete_category.php
 require 'auth.php';
 redirect_if_not_logged_in();
 if (!is_admin()) die("Access denied.");

@@ -1,4 +1,5 @@
 <?php
+//conn.php
 $servername = "localhost";
 $username = "root"; // Use your MySQL username
 $password = "xxx"; // Use your MySQL password

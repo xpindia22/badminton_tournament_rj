@@ -1,4 +1,5 @@
 <?php
+//insert_tournament.php
 require 'auth.php';
 redirect_if_not_logged_in();
 

@@ -1,10 +1,11 @@
 <?php
+//auth.php
 session_start();
-
-$servername = "localhost";
-$username = "root";
-$password = "xxx";
-$dbname = "badminton_tournament";
+require_once "conn.php";
+// $servername = "localhost";
+// $username = "root";
+// $password = "xxx";
+// $dbname = "badminton_tournament";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
