@@ -87,6 +87,7 @@ $result = $stmt->get_result();
                     <th>Sex</th>
                     <?php if (is_admin()): ?>
                     <th>Created By</th>
+                    <th>Actions</th>
                     <?php endif; ?>
                 </tr>
             </thead>
@@ -99,6 +100,10 @@ $result = $stmt->get_result();
                     <td><?= htmlspecialchars($row['sex']) ?></td>
                     <?php if (is_admin()): ?>
                     <td><?= htmlspecialchars($row['creator_name']) ?></td>
+                    <td>
+                        <a href="edit_category.php?id=<?= $row['id'] ?>">Edit</a> |
+                        <a href="delete_category.php?id=<?= $row['id'] ?>" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
+                    </td>
                     <?php endif; ?>
                 </tr>
                 <?php endwhile; ?>

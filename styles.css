@@ -149,3 +149,130 @@ tbody tr:hover {
     margin-bottom: 20px;
     border-radius: 4px;
 }
+
+/* Dashboard Styles */
+.container {
+    padding: 20px;
+    text-align: center;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: 15px;
+    padding: 20px;
+    text-align: center;
+}
+
+.card h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.card a {
+    text-decoration: none;
+    color: white;
+    background: #007bff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.card a:hover {
+    background: #0056b3;
+}
+/* Manage Users Buttons */
+.btn-small {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn-small:hover {
+    background: #0056b3;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #a71d2a;
+}
+
+/* Success/Error Messages */
+.message {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
+    z-index: 1000;
+    overflow-y: auto; /* Enable vertical scrolling for the modal */
+}
+
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 50%; /* Adjust modal width */
+    max-height: 90%; /* Ensure the modal doesn't exceed the screen height */
+    overflow-y: auto; /* Enable scrolling within the modal content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative; /* Required for the close button */
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+}
+
+body.modal-open {
+    overflow: hidden; /* Prevent scrolling of the main page when the modal is open */
+}
