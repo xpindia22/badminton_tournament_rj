@@ -38,20 +38,25 @@ $result = $conn->query($query);
             margin: auto;
         }
         table {
-            width: 100%;
+            width: 100%; /* Fit the table within the container */
             border-collapse: collapse;
             margin: 20px 0;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
+            word-wrap: break-word; /* Wrap text to fit cells */
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #007bff;
+            color: white;
         }
         th.set-col, td.set-col {
-            width: 120px; /* Widen Set columns */
+            width: 300px; /* Fixed width for set columns */
+        }
+        .actions-col {
+            width: 200px; /* Fixed width for Actions column */
         }
         .top-bar {
             background-color: #007bff;
@@ -92,7 +97,7 @@ $result = $conn->query($query);
                         <th class="set-col">Set 1</th>
                         <th class="set-col">Set 2</th>
                         <th class="set-col">Set 3</th>
-                        <th>Actions</th>
+                        <th class="actions-col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,7 +112,7 @@ $result = $conn->query($query);
                             <td class="set-col"><?= htmlspecialchars($row['set1_player1_points']) ?> - <?= htmlspecialchars($row['set1_player2_points']) ?></td>
                             <td class="set-col"><?= htmlspecialchars($row['set2_player1_points']) ?> - <?= htmlspecialchars($row['set2_player2_points']) ?></td>
                             <td class="set-col"><?= htmlspecialchars($row['set3_player1_points']) ?> - <?= htmlspecialchars($row['set3_player2_points']) ?></td>
-                            <td>
+                            <td class="actions-col">
                                 <a href="edit_match.php?id=<?= $row['id'] ?>" class="btn-edit">Edit</a>
                                 <a href="delete_match.php?id=<?= $row['id'] ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
                             </td>
