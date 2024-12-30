@@ -62,14 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all players
 $players = $conn->query("
-    SELECT p.*, 
-           GROUP_CONCAT(u.username) AS linked_users
+    SELECT p.*, pa.user_id 
     FROM players p
     LEFT JOIN player_access pa ON p.id = pa.player_id
-    LEFT JOIN users u ON pa.user_id = u.id
-    GROUP BY p.id
+    WHERE pa.user_id = {$_SESSION['user_id']}
 ");
 ?>
 <!DOCTYPE html>
@@ -129,7 +126,7 @@ $players = $conn->query("
             <button type="submit" class="btn-primary">Add Player</button>
         </form>
 
-        <h2>All Players</h2>
+        <h2>Your Players</h2>
         <table>
             <thead>
                 <tr>
@@ -139,7 +136,6 @@ $players = $conn->query("
                     <th>Age</th>
                     <th>Sex</th>
                     <th>UID</th>
-                    <th>Linked Users</th>
                 </tr>
             </thead>
             <tbody>
@@ -151,7 +147,6 @@ $players = $conn->query("
                         <td><?= htmlspecialchars($row['age']) ?></td>
                         <td><?= htmlspecialchars($row['sex']) ?></td>
                         <td><?= htmlspecialchars($row['uid']) ?></td>
-                        <td><?= htmlspecialchars($row['linked_users'] ?: 'No users linked') ?></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
