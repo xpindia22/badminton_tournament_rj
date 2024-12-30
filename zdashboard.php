@@ -66,7 +66,7 @@ $is_user = is_user();
             <div class="card">
                 <h2>Manage Users</h2>
                 <p>View, edit, or delete user accounts.</p>
-                <a href="register.php" class="btn-primary">Manage Users</a>
+                <a href="manage_users.php" class="btn-primary">Manage Users</a>
             </div>
             <div class="card">
                 <h2>View All Tournaments</h2>
