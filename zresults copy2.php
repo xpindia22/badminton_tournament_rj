@@ -33,13 +33,7 @@ $query = "
         c.name AS category_name,
         p1.name AS player1_name,
         p2.name AS player2_name,
-        m.stage,
-        m.set1_player1_points,
-        m.set1_player2_points,
-        m.set2_player1_points,
-        m.set2_player2_points,
-        m.set3_player1_points,
-        m.set3_player2_points
+        m.stage
     FROM matches m
     INNER JOIN tournaments t ON m.tournament_id = t.id
     INNER JOIN categories c ON m.category_id = c.id
@@ -129,16 +123,8 @@ $result = $conn->query($query);
                 <th>Player 1</th>
                 <th>Player 2</th>
                 <th>Stage</th>
-                <th>Set 1</th>
-                <th>Set 2</th>
-                <th>Set 3</th>
-                <th>Winner</th>
             </tr>
-            <?php while ($row = $result->fetch_assoc()): 
-                $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
-                $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
-                $winner = $p1_total > $p2_total ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
-            ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                     <td><?= $row['match_id'] ?></td>
                     <td><?= $row['tournament_name'] ?></td>
@@ -146,10 +132,6 @@ $result = $conn->query($query);
                     <td><?= $row['player1_name'] ?></td>
                     <td><?= $row['player2_name'] ?></td>
                     <td><?= $row['stage'] ?></td>
-                    <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
-                    <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
-                    <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>
-                    <td><?= $winner ?></td>
                 </tr>
             <?php endwhile; ?>
         </table>

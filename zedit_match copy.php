@@ -1,5 +1,5 @@
 <?php
-// edit_match.php
+//edit_match.php
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -42,8 +42,6 @@ if (!$match) {
     die("<p class='error'>Match not found.</p>");
 }
 
-$message = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tournament_id = intval($_POST['tournament_id']);
     $category_id = intval($_POST['category_id']);
@@ -82,17 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if ($stmt->execute()) {
-        $message = "<p class='success'>Match updated successfully!</p>";
-        // Refresh match data after update
-        $stmt = $conn->prepare("SELECT * FROM matches WHERE id = ?");
-        $stmt->bind_param("i", $match_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $match = $result->fetch_assoc();
-        $stmt->close();
+        echo "<p class='success'>Match updated successfully!</p>";
     } else {
-        $message = "<p class='error'>Error updating match: " . $stmt->error . "</p>";
+        die("<p class='error'>Error updating match: " . $stmt->error . "</p>");
     }
+    $stmt->close();
+    header("Location: matches.php?success=1");
+    exit;
 }
 
 // Fetch data for dropdowns
@@ -113,10 +107,8 @@ $players = $conn->query("SELECT id, name FROM players");
         <span>Welcome, <?= htmlspecialchars($username) ?></span>
         <a href="logout.php" class="logout-link">Logout</a>
     </div>
-
     <div class="container">
         <h1>Edit Match</h1>
-        <?= $message ?>
         <form method="post">
             <label for="tournament_id">Tournament:</label>
             <select name="tournament_id" id="tournament_id" required>
@@ -181,38 +173,8 @@ $players = $conn->query("SELECT id, name FROM players");
             <label for="set3_player2_points">Set 3 Player 2 Points:</label>
             <input type="number" name="set3_player2_points" id="set3_player2_points" value="<?= $match['set3_player2_points'] ?>">
 
-            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="submit">Save Changes</button>
         </form>
-
-        <h2>Match Details</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tournament</th>
-                    <th>Category</th>
-                    <th>Player 1</th>
-                    <th>Player 2</th>
-                    <th>Stage</th>
-                    <th>Set 1</th>
-                    <th>Set 2</th>
-                    <th>Set 3</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><?= $match['id'] ?></td>
-                    <td><?= htmlspecialchars($match['tournament_id']) ?></td>
-                    <td><?= htmlspecialchars($match['category_id']) ?></td>
-                    <td><?= htmlspecialchars($match['player1_id']) ?></td>
-                    <td><?= htmlspecialchars($match['player2_id']) ?></td>
-                    <td><?= htmlspecialchars($match['stage']) ?></td>
-                    <td><?= htmlspecialchars($match['set1_player1_points']) ?> - <?= htmlspecialchars($match['set1_player2_points']) ?></td>
-                    <td><?= htmlspecialchars($match['set2_player1_points']) ?> - <?= htmlspecialchars($match['set2_player2_points']) ?></td>
-                    <td><?= htmlspecialchars($match['set3_player1_points']) ?> - <?= htmlspecialchars($match['set3_player2_points']) ?></td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </body>
 </html>

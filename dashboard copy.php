@@ -1,5 +1,5 @@
 <?php
-// dashboard.php
+//dashboard.php
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -15,41 +15,6 @@ $is_user = is_user();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-        .card {
-            width: 300px;
-            background: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
-        }
-        .card h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        .card p {
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
     <div class="top-bar">
@@ -83,11 +48,6 @@ $is_user = is_user();
                 <p>View, edit, or delete matches created by all users.</p>
                 <a href="matches.php" class="btn-primary">Manage Matches</a>
             </div>
-            <div class="card">
-                <h2>Manage Players</h2>
-                <p>View all players and their details.</p>
-                <a href="insert_player.php" class="btn-primary">Manage Players</a>
-            </div>
             <?php endif; ?>
 
             <!-- User Links -->
@@ -106,11 +66,6 @@ $is_user = is_user();
                 <h2>Enter Matches</h2>
                 <p>Enter match scores for your tournaments.</p>
                 <a href="insert_match.php" class="btn-primary">Enter Matches</a>
-            </div>
-            <div class="card">
-                <h2>View Your Players</h2>
-                <p>Manage players you added to the system.</p>
-                <a href="insert_player.php" class="btn-primary">View Players</a>
             </div>
             <div class="card">
                 <h2>View Your Data</h2>

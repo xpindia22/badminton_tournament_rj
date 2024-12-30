@@ -1,12 +1,7 @@
 <?php
 // edit_match.php
-require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
-
-if (is_logged_in()) {
-    $username = $_SESSION['username'];
-}
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("<p class='error'>Invalid match ID.</p>");
@@ -15,20 +10,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $match_id = intval($_GET['id']);
 $user_id = $_SESSION['user_id'];
 $is_admin = is_admin();
-
-// Verify ownership or admin access
-$stmt = $conn->prepare("SELECT created_by FROM matches WHERE id = ?");
-$stmt->bind_param("i", $match_id);
-$stmt->execute();
-$stmt->bind_result($created_by);
-if (!$stmt->fetch()) {
-    die("<p class='error'>Match not found.</p>");
-}
-$stmt->close();
-
-if ($created_by !== $user_id && !$is_admin) {
-    die("<p class='error'>Access denied: You can only edit your own matches.</p>");
-}
 
 // Fetch match details
 $stmt = $conn->prepare("SELECT * FROM matches WHERE id = ?");
@@ -45,42 +26,33 @@ if (!$match) {
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tournament_id = intval($_POST['tournament_id']);
-    $category_id = intval($_POST['category_id']);
-    $player1_id = intval($_POST['player1_id']);
-    $player2_id = intval($_POST['player2_id']);
+    $tournament_id = $_POST['tournament_id'];
+    $category_id = $_POST['category_id'];
+    $player1_id = $_POST['player1_id'];
+    $player2_id = $_POST['player2_id'];
     $stage = $_POST['stage'];
-    $set1_p1 = intval($_POST['set1_player1_points']);
-    $set1_p2 = intval($_POST['set1_player2_points']);
-    $set2_p1 = intval($_POST['set2_player1_points']);
-    $set2_p2 = intval($_POST['set2_player2_points']);
-    $set3_p1 = isset($_POST['set3_player1_points']) ? intval($_POST['set3_player1_points']) : null;
-    $set3_p2 = isset($_POST['set3_player2_points']) ? intval($_POST['set3_player2_points']) : null;
+    $set1_p1 = $_POST['set1_player1_points'];
+    $set1_p2 = $_POST['set1_player2_points'];
+    $set2_p1 = $_POST['set2_player1_points'];
+    $set2_p2 = $_POST['set2_player2_points'];
+    $set3_p1 = $_POST['set3_player1_points'] ?? 0;
+    $set3_p2 = $_POST['set3_player2_points'] ?? 0;
 
-    $allowed_stages = ['Pre Quarter Finals', 'Quarter Finals', 'Semi Finals', 'Finals'];
-    if (!in_array($stage, $allowed_stages)) {
-        die("Invalid stage value.");
-    }
-
-    $query = "
+    $stmt = $conn->prepare("
         UPDATE matches 
         SET tournament_id = ?, category_id = ?, player1_id = ?, player2_id = ?, stage = ?, 
-            set1_player1_points = ?, set1_player2_points = ?, set2_player1_points = ?, 
-            set2_player2_points = ?, set3_player1_points = IFNULL(?, set3_player1_points), 
-            set3_player2_points = IFNULL(?, set3_player2_points)
+            set1_player1_points = ?, set1_player2_points = ?, set2_player1_points = ?, set2_player2_points = ?, 
+            set3_player1_points = ?, set3_player2_points = ? 
         WHERE id = ?
-    ";
-    $stmt = $conn->prepare($query);
+    ");
     if (!$stmt) {
         die("<p class='error'>Database error: " . $conn->error . "</p>");
     }
-
     $stmt->bind_param(
-        "iiiisiiiiiii", 
+        "iiiiiiiiiiii", 
         $tournament_id, $category_id, $player1_id, $player2_id, $stage,
         $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2, $match_id
     );
-
     if ($stmt->execute()) {
         $message = "<p class='success'>Match updated successfully!</p>";
         // Refresh match data after update
@@ -91,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $match = $result->fetch_assoc();
         $stmt->close();
     } else {
-        $message = "<p class='error'>Error updating match: " . $stmt->error . "</p>";
+        $message = "<p class='error'>Error updating match: {$stmt->error}</p>";
     }
 }
 
@@ -110,14 +82,14 @@ $players = $conn->query("SELECT id, name FROM players");
 </head>
 <body>
     <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($username) ?></span>
+        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
         <a href="logout.php" class="logout-link">Logout</a>
     </div>
 
     <div class="container">
         <h1>Edit Match</h1>
         <?= $message ?>
-        <form method="post">
+        <form method="post" class="form-styled">
             <label for="tournament_id">Tournament:</label>
             <select name="tournament_id" id="tournament_id" required>
                 <?php while ($row = $tournaments->fetch_assoc()): ?>
@@ -181,38 +153,8 @@ $players = $conn->query("SELECT id, name FROM players");
             <label for="set3_player2_points">Set 3 Player 2 Points:</label>
             <input type="number" name="set3_player2_points" id="set3_player2_points" value="<?= $match['set3_player2_points'] ?>">
 
-            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="submit" class="btn-primary">Update Match</button>
         </form>
-
-        <h2>Match Details</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tournament</th>
-                    <th>Category</th>
-                    <th>Player 1</th>
-                    <th>Player 2</th>
-                    <th>Stage</th>
-                    <th>Set 1</th>
-                    <th>Set 2</th>
-                    <th>Set 3</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><?= $match['id'] ?></td>
-                    <td><?= htmlspecialchars($match['tournament_id']) ?></td>
-                    <td><?= htmlspecialchars($match['category_id']) ?></td>
-                    <td><?= htmlspecialchars($match['player1_id']) ?></td>
-                    <td><?= htmlspecialchars($match['player2_id']) ?></td>
-                    <td><?= htmlspecialchars($match['stage']) ?></td>
-                    <td><?= htmlspecialchars($match['set1_player1_points']) ?> - <?= htmlspecialchars($match['set1_player2_points']) ?></td>
-                    <td><?= htmlspecialchars($match['set2_player1_points']) ?> - <?= htmlspecialchars($match['set2_player2_points']) ?></td>
-                    <td><?= htmlspecialchars($match['set3_player1_points']) ?> - <?= htmlspecialchars($match['set3_player2_points']) ?></td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </body>
 </html>

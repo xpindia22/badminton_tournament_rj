@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 29, 2024 at 04:05 PM
+-- Generation Time: Dec 30, 2024 at 05:07 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -85,7 +85,7 @@ CREATE TABLE `matches` (
   `set3_player1_points` int(11) DEFAULT 0,
   `set3_player2_points` int(11) DEFAULT 0,
   `created_by` int(11) NOT NULL,
-  `stage` varchar(22) NOT NULL
+  `stage` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -96,7 +96,9 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals'),
 (2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals'),
 (3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals'),
-(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 11, 11, 21, 21, 11, 1, 'Pre Quarter Finals');
+(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 11, 11, 21, 21, 11, 1, 'Pre Quarter Finals'),
+(5, 2, 1, NULL, 8, 3, 0, 0, 0, 0, 21, 1, 2, 21, 2, 21, 2, 'Pre Quarter Finals'),
+(6, 2, 1, NULL, 3, 8, 0, 0, 0, 0, 21, 1, 1, 21, 21, 1, 2, 'Pre Quarter Finals');
 
 -- --------------------------------------------------------
 
@@ -123,7 +125,8 @@ INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`) V
 (2, 'Eric James', '2009-05-02', 15, 'M', '1', 1),
 (3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1),
 (4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1),
-(6, 'Lee', '2009-02-03', 15, 'M', '5', 1);
+(6, 'Lee Chong Wei', '2009-02-03', 15, 'M', '5', 1),
+(8, 'Kento Momota', '2008-01-02', 16, 'M', '6', 2);
 
 -- --------------------------------------------------------
 
@@ -241,13 +244,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tournaments`

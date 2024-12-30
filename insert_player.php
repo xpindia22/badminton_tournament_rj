@@ -1,5 +1,5 @@
 <?php
-//insert_player.php
+// insert_player.php
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -7,27 +7,68 @@ if (!is_admin() && !is_user()) {
     die("Access denied.");
 }
 
+$message = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $dob = $_POST['dob'];
     $age = $_POST['age'];
     $sex = $_POST['sex'];
     $uid = $_POST['uid'];
-    $created_by = $_SESSION['user_id'];
+    $user_id = $_SESSION['user_id'];
 
-    $stmt = $conn->prepare("INSERT INTO players (name, dob, age, sex, uid, created_by) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssissi", $name, $dob, $age, $sex, $uid, $created_by);
-    if ($stmt->execute()) {
-        echo "<p>Player added successfully!</p>";
-    } else {
-        echo "<p>Error: {$stmt->error}</p>";
-    }
+    // Check if player exists
+    $stmt = $conn->prepare("SELECT id FROM players WHERE uid = ?");
+    $stmt->bind_param("s", $uid);
+    $stmt->execute();
+    $stmt->bind_result($player_id);
+    $player_exists = $stmt->fetch();
     $stmt->close();
+
+    if ($player_exists) {
+        // Link player to current user if not already linked
+        $stmt = $conn->prepare("SELECT id FROM player_access WHERE player_id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $player_id, $user_id);
+        $stmt->execute();
+        $access_exists = $stmt->fetch();
+        $stmt->close();
+
+        if (!$access_exists) {
+            $stmt = $conn->prepare("INSERT INTO player_access (player_id, user_id) VALUES (?, ?)");
+            $stmt->bind_param("ii", $player_id, $user_id);
+            $stmt->execute();
+            $stmt->close();
+            $message = "Player linked to your account.";
+        } else {
+            $message = "Player already linked to your account.";
+        }
+    } else {
+        // Add new player
+        $stmt = $conn->prepare("INSERT INTO players (name, dob, age, sex, uid) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssiss", $name, $dob, $age, $sex, $uid);
+        if ($stmt->execute()) {
+            $player_id = $stmt->insert_id;
+            $stmt->close();
+
+            // Link new player to the current user
+            $stmt = $conn->prepare("INSERT INTO player_access (player_id, user_id) VALUES (?, ?)");
+            $stmt->bind_param("ii", $player_id, $user_id);
+            $stmt->execute();
+            $stmt->close();
+            $message = "Player added and linked successfully.";
+        } else {
+            $message = "Error adding player: " . $stmt->error;
+        }
+    }
 }
 
-$result = $conn->query("SELECT * FROM players WHERE created_by = " . $_SESSION['user_id']);
+$players = $conn->query("
+    SELECT p.*, pa.user_id 
+    FROM players p
+    LEFT JOIN player_access pa ON p.id = pa.player_id
+    WHERE pa.user_id = {$_SESSION['user_id']}
+");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,60 +76,81 @@ $result = $conn->query("SELECT * FROM players WHERE created_by = " . $_SESSION['
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Player</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        function calculateAge() {
+            const dob = document.getElementById('dob').value;
+            const ageField = document.getElementById('age');
+            if (dob) {
+                const birthDate = new Date(dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                ageField.value = age;
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>Insert Player</h1>
-    <form method="post">
-        <label for="name">Player Name:</label>
-        <input type="text" name="name" id="name" required>
+    <div class="top-bar">
+        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+        <a href="logout.php" class="logout-link">Logout</a>
+    </div>
 
-        <label for="dob">Date of Birth:</label>
-        <input type="date" name="dob" id="dob" required>
+    <div class="container">
+        <h1>Insert Player</h1>
+        <?php if ($message): ?>
+            <p><?= htmlspecialchars($message) ?></p>
+        <?php endif; ?>
+        <form method="post" class="form-styled">
+            <label for="name">Player Name:</label>
+            <input type="text" name="name" id="name" required>
 
-        <label for="age">Age:</label>
-        <input type="number" name="age" id="age" required readonly>
+            <label for="dob">Date of Birth:</label>
+            <input type="date" name="dob" id="dob" onchange="calculateAge()" required>
 
-        <label for="sex">Sex:</label>
-        <select name="sex" id="sex" required>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
-        </select>
+            <label for="age">Age:</label>
+            <input type="number" name="age" id="age" readonly required>
 
-        <label for="uid">Unique ID:</label>
-        <input type="text" name="uid" id="uid" required>
+            <label for="sex">Sex:</label>
+            <select name="sex" id="sex" required>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+            </select>
 
-        <button type="submit">Add Player</button>
-    </form>
+            <label for="uid">Unique ID:</label>
+            <input type="text" name="uid" id="uid" required>
 
-    <?php if ($result->num_rows > 0): ?>
+            <button type="submit" class="btn-primary">Add Player</button>
+        </form>
+
         <h2>Your Players</h2>
         <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Date of Birth</th>
-                <th>Age</th>
-                <th>Sex</th>
-                <th>UID</th>
-                <th>Actions</th>
-            </tr>
-            <?php while ($row = $result->fetch_assoc()): ?>
+            <thead>
                 <tr>
-                    <td><?= $row['id'] ?></td>
-                    <td><?= $row['name'] ?></td>
-                    <td><?= $row['dob'] ?></td>
-                    <td><?= $row['age'] ?></td>
-                    <td><?= $row['sex'] ?></td>
-                    <td><?= $row['uid'] ?></td>
-                    <td>
-                        <a href="edit_player.php?id=<?= $row['id'] ?>">Edit</a> |
-                        <a href="delete_player.php?id=<?= $row['id'] ?>" onclick="return confirm('Are you sure you want to delete this player?')">Delete</a>
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Date of Birth</th>
+                    <th>Age</th>
+                    <th>Sex</th>
+                    <th>UID</th>
                 </tr>
-            <?php endwhile; ?>
+            </thead>
+            <tbody>
+                <?php while ($row = $players->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['name']) ?></td>
+                        <td><?= htmlspecialchars($row['dob']) ?></td>
+                        <td><?= htmlspecialchars($row['age']) ?></td>
+                        <td><?= htmlspecialchars($row['sex']) ?></td>
+                        <td><?= htmlspecialchars($row['uid']) ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
         </table>
-    <?php else: ?>
-        <p>No players found.</p>
-    <?php endif; ?>
+    </div>
 </body>
 </html>
