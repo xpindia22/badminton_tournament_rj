@@ -71,7 +71,7 @@ $is_user = is_user();
             <div class="card">
                 <h2>View All Tournaments</h2>
                 <p>See all tournaments created by all users.</p>
-                <a href="tournaments.php" class="btn-primary">View Tournaments</a>
+                <a href="insert_tournament.php" class="btn-primary">View Tournaments</a>
             </div>
             <div class="card">
                 <h2>Manage Categories</h2>
