@@ -1,3 +1,81 @@
+<?php
+// insert_player.php
+require 'auth.php';
+redirect_if_not_logged_in();
+
+if (!is_admin() && !is_user()) {
+    die("Access denied.");
+}
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'];
+    $dob = $_POST['dob'];
+    $age = $_POST['age'];
+    $sex = $_POST['sex'];
+    $uid = $_POST['uid'];
+    $user_id = $_SESSION['user_id'];
+
+    // Check if player exists
+    $stmt = $conn->prepare("SELECT id FROM players WHERE uid = ?");
+    $stmt->bind_param("s", $uid);
+    $stmt->execute();
+    $stmt->bind_result($player_id);
+    $player_exists = $stmt->fetch();
+    $stmt->close();
+
+    if ($player_exists) {
+        // Link player to current user if not already linked
+        $stmt = $conn->prepare("SELECT id FROM player_access WHERE player_id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $player_id, $user_id);
+        $stmt->execute();
+        $access_exists = $stmt->fetch();
+        $stmt->close();
+
+        if (!$access_exists) {
+            $stmt = $conn->prepare("INSERT INTO player_access (player_id, user_id) VALUES (?, ?)");
+            $stmt->bind_param("ii", $player_id, $user_id);
+            $stmt->execute();
+            $stmt->close();
+            $message = "Player linked to your account.";
+        } else {
+            $message = "Player already linked to your account.";
+        }
+    } else {
+        // Add new player
+        $stmt = $conn->prepare("INSERT INTO players (name, dob, age, sex, uid) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssiss", $name, $dob, $age, $sex, $uid);
+        if ($stmt->execute()) {
+            $player_id = $stmt->insert_id;
+            $stmt->close();
+
+            // Link new player to the current user
+            $stmt = $conn->prepare("INSERT INTO player_access (player_id, user_id) VALUES (?, ?)");
+            $stmt->bind_param("ii", $player_id, $user_id);
+            $stmt->execute();
+            $stmt->close();
+            $message = "Player added and linked successfully.";
+        } else {
+            $message = "Error adding player: " . $stmt->error;
+        }
+    }
+}
+
+// Fetch players linked to the current user
+$players = $conn->query("
+    SELECT p.*, GROUP_CONCAT(u.username) AS linked_users
+    FROM players p
+    LEFT JOIN player_access pa ON p.id = pa.player_id
+    LEFT JOIN users u ON pa.user_id = u.id
+    GROUP BY p.id
+");
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,18 +98,6 @@
                 ageField.value = age;
             }
         }
-
-        function populateForm(player) {
-            document.getElementById('player_id').value = player.id;
-            document.getElementById('name').value = player.name;
-            document.getElementById('dob').value = player.dob;
-            document.getElementById('age').value = player.age;
-            document.getElementById('sex').value = player.sex;
-            document.getElementById('uid').value = player.uid;
-
-            // Scroll to the form for better user experience
-            document.getElementById('player-form').scrollIntoView({ behavior: 'smooth' });
-        }
     </script>
 </head>
 <body>
@@ -43,12 +109,9 @@
     <div class="container">
         <h1>Insert Player</h1>
         <?php if ($message): ?>
-            <p class="message"><?= htmlspecialchars($message) ?></p>
+            <p><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
-
-        <!-- Player Form -->
-        <form method="post" class="form-styled" id="player-form">
-            <input type="hidden" name="player_id" id="player_id">
+        <form method="post" class="form-styled">
             <label for="name">Player Name:</label>
             <input type="text" name="name" id="name" required>
 
@@ -67,10 +130,9 @@
             <label for="uid">Unique ID:</label>
             <input type="text" name="uid" id="uid" required>
 
-            <button type="submit" class="btn-primary">Save Player</button>
+            <button type="submit" class="btn-primary">Add Player</button>
         </form>
 
-        <!-- Players Table -->
         <h2>All Players</h2>
         <table>
             <thead>
@@ -82,7 +144,6 @@
                     <th>Sex</th>
                     <th>UID</th>
                     <th>Linked Users</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,13 +156,6 @@
                         <td><?= htmlspecialchars($row['sex']) ?></td>
                         <td><?= htmlspecialchars($row['uid']) ?></td>
                         <td><?= htmlspecialchars($row['linked_users'] ?: 'No users linked') ?></td>
-                        <td>
-                            <button type="button" onclick='populateForm(<?= json_encode($row, JSON_HEX_TAG | JSON_HEX_AMP) ?>)'>Edit</button>
-                            <form method="post" style="display:inline;">
-                                <input type="hidden" name="player_id" value="<?= $row['id'] ?>">
-                                <button type="submit" name="action" value="delete" onclick="return confirm('Are you sure you want to delete this player?')">Delete</button>
-                            </form>
-                        </td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>

@@ -69,7 +69,7 @@ $is_user = is_user();
                 <a href="register.php" class="btn-primary">Manage Users</a>
             </div>
             <div class="card">
-                <h2>View All Tournaments</h2>
+                <h2>Manage All Tournaments</h2>
                 <p>See all tournaments created by all users.</p>
                 <a href="insert_tournament.php" class="btn-primary">View Tournaments</a>
             </div>
@@ -79,7 +79,7 @@ $is_user = is_user();
                 <a href="insert_category.php" class="btn-primary">Manage Categories</a>
             </div>
             <div class="card">
-                <h2>All Matches</h2>
+                <h2>Manage All Matches</h2>
                 <p>View, edit, or delete matches created by all users.</p>
                 <a href="matches.php" class="btn-primary">Manage Matches</a>
             </div>
