@@ -1,5 +1,5 @@
 <?php
-// edit_match.php
+//edit_match.php
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -31,7 +31,16 @@ if ($created_by !== $user_id && !$is_admin) {
 }
 
 // Fetch match details
-$stmt = $conn->prepare("SELECT * FROM matches WHERE id = ?");
+$stmt = $conn->prepare("
+    SELECT m.*, t.name AS tournament_name, c.name AS category_name, 
+           p1.name AS player1_name, p2.name AS player2_name
+    FROM matches m
+    LEFT JOIN tournaments t ON m.tournament_id = t.id
+    LEFT JOIN categories c ON m.category_id = c.id
+    LEFT JOIN players p1 ON m.player1_id = p1.id
+    LEFT JOIN players p2 ON m.player2_id = p2.id
+    WHERE m.id = ?
+");
 $stmt->bind_param("i", $match_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -84,7 +93,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         $message = "<p class='success'>Match updated successfully!</p>";
         // Refresh match data after update
-        $stmt = $conn->prepare("SELECT * FROM matches WHERE id = ?");
+        $stmt = $conn->prepare("
+            SELECT m.*, t.name AS tournament_name, c.name AS category_name, 
+                   p1.name AS player1_name, p2.name AS player2_name
+            FROM matches m
+            LEFT JOIN tournaments t ON m.tournament_id = t.id
+            LEFT JOIN categories c ON m.category_id = c.id
+            LEFT JOIN players p1 ON m.player1_id = p1.id
+            LEFT JOIN players p2 ON m.player2_id = p2.id
+            WHERE m.id = ?
+        ");
         $stmt->bind_param("i", $match_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -94,6 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "<p class='error'>Error updating match: " . $stmt->error . "</p>";
     }
 }
+
+// Calculate winner
+$p1_total = $match['set1_player1_points'] + $match['set2_player1_points'] + $match['set3_player1_points'];
+$p2_total = $match['set1_player2_points'] + $match['set2_player2_points'] + $match['set3_player2_points'];
+$winner = $p1_total > $p2_total ? $match['player1_name'] : ($p1_total < $p2_total ? $match['player2_name'] : 'Draw');
 
 // Fetch data for dropdowns
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
@@ -113,11 +136,11 @@ $players = $conn->query("SELECT id, name FROM players");
         <span>Welcome, <?= htmlspecialchars($username) ?></span>
         <a href="logout.php" class="logout-link">Logout</a>
     </div>
-
     <div class="container">
         <h1>Edit Match</h1>
         <?= $message ?>
         <form method="post">
+            <!-- Tournament, Category, Player Dropdowns, Stage, and Set Scores -->
             <label for="tournament_id">Tournament:</label>
             <select name="tournament_id" id="tournament_id" required>
                 <?php while ($row = $tournaments->fetch_assoc()): ?>
@@ -197,19 +220,21 @@ $players = $conn->query("SELECT id, name FROM players");
                     <th>Set 1</th>
                     <th>Set 2</th>
                     <th>Set 3</th>
+                    <th>Winner</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><?= $match['id'] ?></td>
-                    <td><?= htmlspecialchars($match['tournament_id']) ?></td>
-                    <td><?= htmlspecialchars($match['category_id']) ?></td>
-                    <td><?= htmlspecialchars($match['player1_id']) ?></td>
-                    <td><?= htmlspecialchars($match['player2_id']) ?></td>
+                    <td><?= htmlspecialchars($match['id']) ?></td>
+                    <td><?= htmlspecialchars($match['tournament_name']) ?></td>
+                    <td><?= htmlspecialchars($match['category_name']) ?></td>
+                    <td><?= htmlspecialchars($match['player1_name']) ?></td>
+                    <td><?= htmlspecialchars($match['player2_name']) ?></td>
                     <td><?= htmlspecialchars($match['stage']) ?></td>
                     <td><?= htmlspecialchars($match['set1_player1_points']) ?> - <?= htmlspecialchars($match['set1_player2_points']) ?></td>
                     <td><?= htmlspecialchars($match['set2_player1_points']) ?> - <?= htmlspecialchars($match['set2_player2_points']) ?></td>
                     <td><?= htmlspecialchars($match['set3_player1_points']) ?> - <?= htmlspecialchars($match['set3_player2_points']) ?></td>
+                    <td><?= htmlspecialchars($winner) ?></td>
                 </tr>
             </tbody>
         </table>
