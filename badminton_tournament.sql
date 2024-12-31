@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 31, 2024 at 09:52 AM
+-- Generation Time: Dec 31, 2024 at 05:18 PM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -59,7 +59,23 @@ INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
 (1, 'U17BS', 1, '17', 'M'),
 (2, 'U15BS', 1, '15', 'M'),
 (3, 'U17GS', 1, '17', 'F'),
-(4, 'Veteran 55 Plus Males', 2, '55', 'M');
+(4, 'Veteran 55 Plus Males', 2, '55', 'M'),
+(6, 'U15GS', 4, '15', 'F'),
+(7, 'U15GS', 1, '15', 'F'),
+(8, 'U19BSuser', 1, '19', 'M'),
+(9, 'U17BS', 5, '15', 'M');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `category_access`
+--
+
+CREATE TABLE `category_access` (
+  `id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -160,7 +176,29 @@ CREATE TABLE `tournaments` (
 INSERT INTO `tournaments` (`id`, `name`, `created_by`, `year`) VALUES
 (1, 'ABPL3', 1, '2024'),
 (2, 'Super Series 2024', 2, '2024'),
-(3, 'xxx', 3, '2024');
+(3, 'xxx', 3, '2024'),
+(4, 'User2 Tournament', 5, '2015');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tournament_categories`
+--
+
+CREATE TABLE `tournament_categories` (
+  `id` int(11) NOT NULL,
+  `tournament_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `tournament_categories`
+--
+
+INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`, `user_id`) VALUES
+(1, 1, 2, 2),
+(2, 1, 6, 2);
 
 -- --------------------------------------------------------
 
@@ -186,7 +224,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `username`, `password`, `mobile_no`, `notes`, `role`, `created_at`, `email`) VALUES
 (1, 'user', '$2y$10$q0I/ctXI5pI0oUUcaTsqV.mTNeYf8evE0xKimNAvhSEooL7CIFjAW', '11111111', 'First user', 'user', '2024-12-29 03:50:28', 'user@user.com'),
 (2, 'admin', '$2y$10$Vzemd6vNZoJ7tsir9lxqKuBfkPhks/ZL3mB6YRRNKRLg3H8THFdba', '7432001215', 'Admin account', 'admin', '2024-12-29 04:11:42', 'admin@admin.com'),
-(4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com');
+(4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com'),
+(5, 'user2', '$2y$10$h2N1Jb3tCQ72X.KWuQaB8eUfBfJa61DULmbLDzMArIlUdtpj4im.m', '2222222222', NULL, 'user', '2024-12-31 15:28:19', 'user2@jdjdj.com');
 
 --
 -- Indexes for dumped tables
@@ -205,6 +244,14 @@ ALTER TABLE `audit_logs`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `category_access`
+--
+ALTER TABLE `category_access`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `category_id` (`category_id`,`user_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `matches`
@@ -238,6 +285,15 @@ ALTER TABLE `tournaments`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `tournament_categories`
+--
+ALTER TABLE `tournament_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `tournament_id` (`tournament_id`),
+  ADD KEY `category_id` (`category_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -258,7 +314,13 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `category_access`
+--
+ALTER TABLE `category_access`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `matches`
@@ -282,13 +344,19 @@ ALTER TABLE `player_access`
 -- AUTO_INCREMENT for table `tournaments`
 --
 ALTER TABLE `tournaments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tournament_categories`
+--
+ALTER TABLE `tournament_categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -300,6 +368,13 @@ ALTER TABLE `users`
 ALTER TABLE `audit_logs`
   ADD CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `audit_logs_ibfk_2` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`);
+
+--
+-- Constraints for table `category_access`
+--
+ALTER TABLE `category_access`
+  ADD CONSTRAINT `category_access_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  ADD CONSTRAINT `category_access_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `matches`
@@ -316,6 +391,14 @@ ALTER TABLE `matches`
 ALTER TABLE `player_access`
   ADD CONSTRAINT `player_access_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `player_access_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `tournament_categories`
+--
+ALTER TABLE `tournament_categories`
+  ADD CONSTRAINT `tournament_categories_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`),
+  ADD CONSTRAINT `tournament_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  ADD CONSTRAINT `tournament_categories_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
