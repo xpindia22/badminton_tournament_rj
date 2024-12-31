@@ -19,7 +19,7 @@ $query = "
            m.set1_player1_points, m.set1_player2_points,
            m.set2_player1_points, m.set2_player2_points,
            m.set3_player1_points, m.set3_player2_points,
-           m.match_time
+           m.match_date, m.match_time
     FROM matches m
     LEFT JOIN tournaments t ON m.tournament_id = t.id
     LEFT JOIN categories c ON m.category_id = c.id
@@ -60,7 +60,8 @@ if (!$result) {
                         <th>Player 1</th>
                         <th>Player 2</th>
                         <th>Stage</th>
-                        <th>Date-Time</th>
+                        <th>Date</th>
+                        <th>Time</th>
                         <th>Set 1</th>
                         <th>Set 2</th>
                         <th>Set 3</th>
@@ -76,6 +77,7 @@ if (!$result) {
                             <td><?= htmlspecialchars($row['player1_name'] ?? 'N/A') ?></td>
                             <td><?= htmlspecialchars($row['player2_name'] ?? 'N/A') ?></td>
                             <td><?= htmlspecialchars($row['stage'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars(date('d-m-Y', strtotime($row['match_date'] ?? ''))) ?></td>
                             <td><?= htmlspecialchars($row['match_time'] ?? 'N/A') ?></td>
                             <td><?= htmlspecialchars($row['set1_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set1_player2_points'] ?? '0') ?></td>
                             <td><?= htmlspecialchars($row['set2_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set2_player2_points'] ?? '0') ?></td>
