@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 30, 2024 at 05:07 AM
+-- Generation Time: Dec 31, 2024 at 09:52 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -85,20 +85,20 @@ CREATE TABLE `matches` (
   `set3_player1_points` int(11) DEFAULT 0,
   `set3_player2_points` int(11) DEFAULT 0,
   `created_by` int(11) NOT NULL,
-  `stage` varchar(50) NOT NULL
+  `stage` varchar(22) NOT NULL,
+  `match_date` date DEFAULT NULL,
+  `match_time` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `matches`
 --
 
-INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`) VALUES
-(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals'),
-(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals'),
-(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals'),
-(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 11, 11, 21, 21, 11, 1, 'Pre Quarter Finals'),
-(5, 2, 1, NULL, 8, 3, 0, 0, 0, 0, 21, 1, 2, 21, 2, 21, 2, 'Pre Quarter Finals'),
-(6, 2, 1, NULL, 3, 8, 0, 0, 0, 0, 21, 1, 1, 21, 21, 1, 2, 'Pre Quarter Finals');
+INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`) VALUES
+(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM'),
+(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM'),
+(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM'),
+(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM');
 
 -- --------------------------------------------------------
 
@@ -113,7 +113,7 @@ CREATE TABLE `players` (
   `age` int(11) NOT NULL,
   `sex` enum('M','F') NOT NULL,
   `uid` varchar(100) NOT NULL,
-  `created_by` int(11) NOT NULL
+  `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -125,8 +125,20 @@ INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`) V
 (2, 'Eric James', '2009-05-02', 15, 'M', '1', 1),
 (3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1),
 (4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1),
-(6, 'Lee Chong Wei', '2009-02-03', 15, 'M', '5', 1),
-(8, 'Kento Momota', '2008-01-02', 16, 'M', '6', 2);
+(6, 'Lee', '2009-02-03', 15, 'M', '5', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `player_access`
+--
+
+CREATE TABLE `player_access` (
+  `id` int(11) NOT NULL,
+  `player_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -212,6 +224,14 @@ ALTER TABLE `players`
   ADD UNIQUE KEY `uid` (`uid`);
 
 --
+-- Indexes for table `player_access`
+--
+ALTER TABLE `player_access`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `player_id` (`player_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `tournaments`
 --
 ALTER TABLE `tournaments`
@@ -244,13 +264,19 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `player_access`
+--
+ALTER TABLE `player_access`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tournaments`
@@ -283,6 +309,13 @@ ALTER TABLE `matches`
   ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`player1_id`) REFERENCES `players` (`id`),
   ADD CONSTRAINT `matches_ibfk_4` FOREIGN KEY (`player2_id`) REFERENCES `players` (`id`);
+
+--
+-- Constraints for table `player_access`
+--
+ALTER TABLE `player_access`
+  ADD CONSTRAINT `player_access_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `player_access_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
