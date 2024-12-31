@@ -19,13 +19,11 @@ if ($conn->connect_error) {
 $tournament_id = $_GET['tournament_id'] ?? '';
 $category_id = $_GET['category_id'] ?? '';
 $player_id = $_GET['player_id'] ?? '';
-$datetime = $_GET['datetime'] ?? '';
 
 // Fetch data for dropdowns
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 $categories = $conn->query("SELECT id, name FROM categories");
 $players = $conn->query("SELECT id, name FROM players");
-$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
 
 // Build the query with optional filters
 $query = "
@@ -61,10 +59,6 @@ if ($category_id) {
 
 if ($player_id) {
     $query .= " AND (m.player1_id = $player_id OR m.player2_id = $player_id)";
-}
-
-if ($datetime) {
-    $query .= " AND m.match_time = '$datetime'";
 }
 
 $query .= " ORDER BY m.id";
@@ -119,16 +113,6 @@ $result = $conn->query($query);
             <?php while ($row = $players->fetch_assoc()): ?>
                 <option value="<?= $row['id'] ?>" <?= $player_id == $row['id'] ? 'selected' : '' ?>>
                     <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="datetime">Date-Time:</label>
-        <select name="datetime" id="datetime">
-            <option value="">All Date-Times</option>
-            <?php while ($row = $datetimes->fetch_assoc()): ?>
-                <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ?>
                 </option>
             <?php endwhile; ?>
         </select>

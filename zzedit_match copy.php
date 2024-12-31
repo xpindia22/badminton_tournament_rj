@@ -178,7 +178,7 @@ $players = $conn->query("SELECT id, name FROM players");
             </select>
 
             <label for="datetime">Date-Time:</label>
-            <input type="text" name="datetime" id="datetime" value="Day-Month-Year HH:MM AM/PM Eg 12-12-2024 10:10 AM" value="<?= htmlspecialchars($match['match_time'] ?? '') ?>" required>
+            <input type="text" name="datetime" id="datetime" placeholder="YYYY-MM-DD HH:MM:SS" value="<?= htmlspecialchars($match['match_time'] ?? '') ?>" required>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
             <input type="number" name="set1_player1_points" id="set1_player1_points" value="<?= $match['set1_player1_points'] ?>" required>

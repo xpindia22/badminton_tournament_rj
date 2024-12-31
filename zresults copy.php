@@ -1,5 +1,5 @@
 <?php
-// results.php
+//results.php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -19,13 +19,11 @@ if ($conn->connect_error) {
 $tournament_id = $_GET['tournament_id'] ?? '';
 $category_id = $_GET['category_id'] ?? '';
 $player_id = $_GET['player_id'] ?? '';
-$datetime = $_GET['datetime'] ?? '';
 
 // Fetch data for dropdowns
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 $categories = $conn->query("SELECT id, name FROM categories");
 $players = $conn->query("SELECT id, name FROM players");
-$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
 
 // Build the query with optional filters
 $query = "
@@ -41,8 +39,7 @@ $query = "
         m.set2_player1_points,
         m.set2_player2_points,
         m.set3_player1_points,
-        m.set3_player2_points,
-        m.match_time AS date_time
+        m.set3_player2_points
     FROM matches m
     INNER JOIN tournaments t ON m.tournament_id = t.id
     INNER JOIN categories c ON m.category_id = c.id
@@ -61,10 +58,6 @@ if ($category_id) {
 
 if ($player_id) {
     $query .= " AND (m.player1_id = $player_id OR m.player2_id = $player_id)";
-}
-
-if ($datetime) {
-    $query .= " AND m.match_time = '$datetime'";
 }
 
 $query .= " ORDER BY m.id";
@@ -123,16 +116,6 @@ $result = $conn->query($query);
             <?php endwhile; ?>
         </select>
 
-        <label for="datetime">Date-Time:</label>
-        <select name="datetime" id="datetime">
-            <option value="">All Date-Times</option>
-            <?php while ($row = $datetimes->fetch_assoc()): ?>
-                <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
         <button type="submit">Filter</button>
     </form>
 
@@ -146,7 +129,6 @@ $result = $conn->query($query);
                 <th>Player 1</th>
                 <th>Player 2</th>
                 <th>Stage</th>
-                <th>Date-Time</th>
                 <th>Set 1</th>
                 <th>Set 2</th>
                 <th>Set 3</th>
@@ -164,7 +146,6 @@ $result = $conn->query($query);
                     <td><?= $row['player1_name'] ?></td>
                     <td><?= $row['player2_name'] ?></td>
                     <td><?= $row['stage'] ?></td>
-                    <td><?= $row['date_time'] ?></td>
                     <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
                     <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
                     <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>
