@@ -46,6 +46,9 @@ if (!$result) {
 <body>
     <div class="top-bar">
         <span>Welcome, <?= htmlspecialchars($username) ?></span>
+        <a href="dashboard.php" class="logout-link">Dashboard</a>
+        <a href="results.php" class="logout-link">Results</a>
+        <a href="insert_player.php" class="logout-link">Players</a>
         <a href="logout.php" class="logout-link">Logout</a>
     </div>
     <div class="container">
