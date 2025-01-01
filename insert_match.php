@@ -3,7 +3,10 @@
 require 'auth.php';
 redirect_if_not_logged_in();
 
-session_start();
+// Start session only if not already active
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 $message = '';
 $lockedTournament = $_SESSION['locked_tournament'] ?? null;
@@ -25,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $player2_id = $_POST['player2_id'];
         $stage = $_POST['stage'];
         $date = $_POST['date'];
-        $time = $_POST['time'];
+        $match_time = $_POST['time']; // Match time field
         $set1_p1 = $_POST['set1_player1_points'];
         $set1_p2 = $_POST['set1_player2_points'];
         $set2_p1 = $_POST['set2_player1_points'];
@@ -36,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("
             INSERT INTO matches (
                 tournament_id, category_id, player1_id, player2_id, stage, 
-                date, time, set1_player1_points, set1_player2_points, 
+                date, match_time, set1_player1_points, set1_player2_points, 
                 set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
             ) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -44,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param(
             "iiiisssiiiiii",
             $tournament_id, $category_id, $player1_id, $player2_id, $stage,
-            $date, $time, $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
+            $date, $match_time, $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
         );
 
         if ($stmt->execute()) {
@@ -176,22 +179,22 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             <input type="time" name="time" required>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
-            <input type="number" name="set1_player1_points" required>
+            <input type="number" name="set1_player1_points" value=0 required>
 
             <label for="set1_player2_points">Set 1 Player 2 Points:</label>
-            <input type="number" name="set1_player2_points" required>
+            <input type="number" name="set1_player2_points" value=0 required>
 
             <label for="set2_player1_points">Set 2 Player 1 Points:</label>
-            <input type="number" name="set2_player1_points" required>
+            <input type="number" name="set2_player1_points" value=0 required>
 
             <label for="set2_player2_points">Set 2 Player 2 Points:</label>
-            <input type="number" name="set2_player2_points" required>
+            <input type="number" name="set2_player2_points" value=0 required>
 
             <label for="set3_player1_points">Set 3 Player 1 Points:</label>
-            <input type="number" name="set3_player1_points">
+            <input type="number" name="set3_player1_points" value=0 required>
 
             <label for="set3_player2_points">Set 3 Player 2 Points:</label>
-            <input type="number" name="set3_player2_points">
+            <input type="number" name="set3_player2_points" value=0 required>
 
             <button type="submit" class="btn-primary">Add Match</button>
         </form>
