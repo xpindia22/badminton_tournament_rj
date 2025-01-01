@@ -134,7 +134,7 @@ $result = $conn->query($query);
             <option value="">All Dates</option>
             <?php while ($row = $dates->fetch_assoc()): ?>
                 <option value="<?= $row['match_date'] ?>" <?= $match_date == $row['match_date'] ? 'selected' : '' ?>>
-                    <?= date("d-m-Y", strtotime($row['match_date'])) ?>
+                    <?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?>
                 </option>
             <?php endwhile; ?>
         </select>
@@ -144,7 +144,7 @@ $result = $conn->query($query);
             <option value="">All Times</option>
             <?php while ($row = $datetimes->fetch_assoc()): ?>
                 <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ?>
+                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
                 </option>
             <?php endwhile; ?>
         </select>
@@ -181,8 +181,8 @@ $result = $conn->query($query);
                     <td><?= $row['player1_name'] ?></td>
                     <td><?= $row['player2_name'] ?></td>
                     <td><?= $row['stage'] ?></td>
-                    <td><?= date("d-m-Y", strtotime($row['match_date'])) ?></td>
-                    <td><?= $row['match_time'] ?></td>
+                    <td><?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?></td>
+                    <td><?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?></td>
                     <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
                     <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
                     <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>

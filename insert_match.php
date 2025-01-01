@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $player2_id = $_POST['player2_id'];
         $stage = $_POST['stage'];
         $date = $_POST['date'];
-        $match_time = $_POST['time']; // Match time field
+        $match_time = $_POST['time']; // Match time in 24-hour format
         $set1_p1 = $_POST['set1_player1_points'];
         $set1_p2 = $_POST['set1_player2_points'];
         $set2_p1 = $_POST['set2_player1_points'];
@@ -111,6 +111,21 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             const [minAge, maxAge] = ageRange.length === 2 ? ageRange : [0, ageRange[0]];
             return playerAge >= parseInt(minAge, 10) && playerAge <= parseInt(maxAge, 10);
         }
+
+        // Convert time to AM/PM format
+        function convertToAMPM(time) {
+            const [hour, minute] = time.split(':');
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const adjustedHour = hour % 12 || 12; // Convert hour to 12-hour format
+            return `${adjustedHour}:${minute} ${period}`;
+        }
+
+        // Update displayed time dynamically
+        function updateTimeDisplay() {
+            const timeInput = document.getElementById('match_time');
+            const timeDisplay = document.getElementById('time_display');
+            timeDisplay.textContent = convertToAMPM(timeInput.value);
+        }
     </script>
 </head>
 <body>
@@ -175,8 +190,9 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             <label for="date">Match Date:</label>
             <input type="date" name="date" required>
 
-            <label for="time">Match Time:</label>
-            <input type="time" name="time" required>
+            <label for="match_time">Match Time:</label>
+            <input type="time" name="time" id="match_time" onchange="updateTimeDisplay()" required>
+            <p>Selected Time: <span id="time_display"></span></p>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
             <input type="number" name="set1_player1_points" value=0 required>
