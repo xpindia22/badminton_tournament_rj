@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 01, 2025 at 01:35 AM
+-- Generation Time: Jan 01, 2025 at 05:09 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -103,20 +103,24 @@ CREATE TABLE `matches` (
   `created_by` int(11) DEFAULT NULL,
   `stage` varchar(22) NOT NULL,
   `match_date` date DEFAULT NULL,
-  `match_time` varchar(255) NOT NULL
+  `match_time` varchar(255) NOT NULL,
+  `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `matches`
 --
 
-INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`) VALUES
-(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM'),
-(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM'),
-(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM'),
-(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM'),
-(5, 3, 7, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53'),
-(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55');
+INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`, `date`) VALUES
+(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM', '0000-00-00'),
+(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM', '0000-00-00'),
+(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM', '0000-00-00'),
+(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM', '0000-00-00'),
+(5, 3, 7, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53', '0000-00-00'),
+(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00'),
+(7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01'),
+(8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01'),
+(9, 1, 3, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01');
 
 -- --------------------------------------------------------
 
@@ -131,19 +135,20 @@ CREATE TABLE `players` (
   `age` int(11) NOT NULL,
   `sex` enum('M','F') NOT NULL,
   `uid` varchar(100) NOT NULL,
-  `created_by` int(11) DEFAULT NULL
+  `created_by` int(11) DEFAULT NULL,
+  `category_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `players`
 --
 
-INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`) VALUES
-(1, 'Sreesha', '2008-01-01', 16, 'F', '3', 1),
-(2, 'Eric James', '2009-05-02', 15, 'M', '1', 1),
-(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1),
-(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1),
-(6, 'Lee', '2009-02-03', 15, 'M', '5', 1);
+INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`, `category_id`) VALUES
+(1, 'Sreesha', '2008-01-01', 16, 'F', '3', 1, 0),
+(2, 'Eric James', '2009-05-02', 15, 'M', '1', 1, 0),
+(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1, 0),
+(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1, 0),
+(6, 'Lee', '2009-02-03', 15, 'M', '5', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -180,8 +185,8 @@ INSERT INTO `tournaments` (`id`, `name`, `created_by`, `year`) VALUES
 (2, 'Super Series 2024', 2, 2024),
 (3, 'Winter Series', 3, 2024),
 (4, 'Senior Championship', 5, 2015),
-(5, 'abcd', 1, 2025),
-(6, 'awed', 1, 2025);
+(5, 'Winners Trophy', 1, 2025),
+(6, 'ACE Championship', 1, 2025);
 
 -- --------------------------------------------------------
 
@@ -204,7 +209,10 @@ INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUE
 (2, 1, 2),
 (3, 2, 4),
 (4, 2, 4),
-(5, 1, 3);
+(5, 1, 3),
+(16, 6, 4),
+(17, 3, 3),
+(18, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -331,7 +339,7 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `players`
@@ -355,7 +363,7 @@ ALTER TABLE `tournaments`
 -- AUTO_INCREMENT for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `users`
