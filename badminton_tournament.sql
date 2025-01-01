@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 01, 2025 at 05:09 AM
+-- Generation Time: Jan 01, 2025 at 06:04 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -47,8 +47,8 @@ CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `created_by` int(11) NOT NULL,
-  `age_group` varchar(255) NOT NULL,
-  `sex` enum('M','F') NOT NULL
+  `age_group` varchar(255) DEFAULT NULL,
+  `sex` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -56,14 +56,23 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
-(1, 'U17BS', 1, '17', 'M'),
-(2, 'U15BS', 1, '15', 'M'),
-(3, 'U17GS', 1, '17', 'F'),
-(4, 'Senior 55 +', 2, '55', 'M'),
-(6, 'U15GS', 4, '15', 'F'),
-(7, 'U15GS', 1, '15', 'F'),
-(8, 'U19BSuser', 1, '19', 'M'),
-(9, 'U17BS', 5, '15', 'M');
+(1, 'U17BS', 1, 'Under 17', 'M'),
+(2, 'U15BS', 1, 'Under 15', 'M'),
+(3, 'U15BD', 1, 'Under 15', 'M'),
+(4, 'U17BD', 2, 'Under 17', 'M'),
+(6, 'U15GS', 4, 'Under 15', 'F'),
+(7, 'U15GD', 1, 'Under 15', 'F'),
+(8, 'U13BS', 1, 'Under 13', 'M'),
+(10, 'Senior 55 Plus Men', 4, 'Over 55', 'M'),
+(11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M'),
+(12, 'Open Womens Single', 4, 'Between 5 - 100', 'F'),
+(13, 'Open Mixed Doubles', 4, 'Between 5 - 100', 'Mixed'),
+(14, 'Open Mens Doubles', 4, 'Open', 'M'),
+(15, 'Open Women Doubles', 4, 'Open', 'F'),
+(16, 'U17GS', 4, 'Under 17', 'F'),
+(17, 'U17GD', 4, 'Under 17', 'F'),
+(18, 'U17GD', 4, 'Under 17', 'F'),
+(19, 'U13GS', 4, 'Under 13', 'F');
 
 -- --------------------------------------------------------
 
@@ -327,7 +336,7 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `category_access`

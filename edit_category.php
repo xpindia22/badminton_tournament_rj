@@ -12,13 +12,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $result = $stmt->get_result();
     $category = $result->fetch_assoc();
     $stmt->close();
+
+    // Extract age range details for pre-filling the form
+    if (preg_match('/^(Under|Over|Between)\s(\d+)(?:\s?-\s?(\d+))?/', $category['age_group'], $matches)) {
+        $age_condition = $matches[1];
+        $age_limit1 = intval($matches[2]);
+        $age_limit2 = isset($matches[3]) ? intval($matches[3]) : null;
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
     $name = trim($_POST['name']);
-    $age_group = trim($_POST['age_group']);
+    $age_condition = $_POST['age_condition'];
+    $age_limit1 = intval($_POST['age_limit1']);
+    $age_limit2 = isset($_POST['age_limit2']) ? intval($_POST['age_limit2']) : null;
     $sex = $_POST['sex'];
+
+    // Build the age group string based on the inputs
+    if ($age_condition === 'Under') {
+        $age_group = "Under $age_limit1";
+    } elseif ($age_condition === 'Over') {
+        $age_group = "Over $age_limit1";
+    } elseif ($age_condition === 'Between') {
+        $age_group = "Between $age_limit1 - $age_limit2";
+    } else {
+        $age_group = '';
+    }
 
     $stmt = $conn->prepare("UPDATE categories SET name = ?, age_group = ?, sex = ? WHERE id = ?");
     $stmt->bind_param("sssi", $name, $age_group, $sex, $id);
@@ -49,18 +69,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" name="name" id="name" value="<?= htmlspecialchars($category['name']) ?>" required>
             </div>
             <div class="form-group">
-                <label for="age_group">Age Group:</label>
-                <input type="text" name="age_group" id="age_group" value="<?= htmlspecialchars($category['age_group']) ?>" required>
+                <label for="age_condition">Age Group Condition:</label>
+                <select name="age_condition" id="age_condition" required onchange="toggleAgeInputs()">
+                    <option value="Under" <?= $age_condition === 'Under' ? 'selected' : '' ?>>Under</option>
+                    <option value="Over" <?= $age_condition === 'Over' ? 'selected' : '' ?>>Over</option>
+                    <option value="Between" <?= $age_condition === 'Between' ? 'selected' : '' ?>>Between</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="age_limit1">Age Limit 1:</label>
+                <input type="number" name="age_limit1" id="age_limit1" value="<?= htmlspecialchars($age_limit1) ?>" required>
+            </div>
+            <div class="form-group" id="age_limit2_group" style="display: <?= $age_condition === 'Between' ? 'block' : 'none' ?>">
+                <label for="age_limit2">Age Limit 2:</label>
+                <input type="number" name="age_limit2" id="age_limit2" value="<?= htmlspecialchars($age_limit2) ?>">
             </div>
             <div class="form-group">
                 <label for="sex">Sex:</label>
-                <select name="sex" id="sex">
+                <select name="sex" id="sex" required>
                     <option value="M" <?= $category['sex'] === 'M' ? 'selected' : '' ?>>Male</option>
                     <option value="F" <?= $category['sex'] === 'F' ? 'selected' : '' ?>>Female</option>
+                    <option value="Mixed" <?= $category['sex'] === 'Mixed' ? 'selected' : '' ?>>Mixed Doubles</option>
                 </select>
             </div>
             <button type="submit" class="btn-primary">Update Category</button>
         </form>
     </div>
+    <script>
+        function toggleAgeInputs() {
+            const ageCondition = document.getElementById('age_condition').value;
+            const ageLimit2Group = document.getElementById('age_limit2_group');
+            if (ageCondition === 'Between') {
+                ageLimit2Group.style.display = 'block';
+            } else {
+                ageLimit2Group.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
