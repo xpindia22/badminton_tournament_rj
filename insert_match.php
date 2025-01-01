@@ -1,9 +1,7 @@
 <?php
-// insert_match.php
 require 'auth.php';
 redirect_if_not_logged_in();
 
-// Start session only if not already active
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -13,22 +11,19 @@ $lockedTournament = $_SESSION['locked_tournament'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['lock_tournament'])) {
-        // Lock the selected tournament
         $lockedTournament = intval($_POST['tournament_id']);
         $_SESSION['locked_tournament'] = $lockedTournament;
     } elseif (isset($_POST['unlock_tournament'])) {
-        // Unlock the tournament
         unset($_SESSION['locked_tournament']);
         $lockedTournament = null;
     } else {
-        // Handle match insertion
         $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
         $category_id = $_POST['category_id'];
         $player1_id = $_POST['player1_id'];
         $player2_id = $_POST['player2_id'];
         $stage = $_POST['stage'];
         $date = $_POST['date'];
-        $match_time = $_POST['time']; // Match time in 24-hour format
+        $match_time = $_POST['time'];
         $set1_p1 = $_POST['set1_player1_points'];
         $set1_p2 = $_POST['set1_player2_points'];
         $set2_p1 = $_POST['set2_player1_points'];
@@ -59,14 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
-
-// Fetch categories
 $categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
-
-// Fetch all players
 $players = $conn->query("SELECT id, name, age, sex FROM players");
+
+if (!$players || !$categories || !$tournaments) {
+    die("Error fetching data: " . $conn->error);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,10 +86,12 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
                 const sex = category.dataset.sex;
 
                 players.forEach(player => {
-                    if (
-                        (sex === 'Any' || player.sex === sex) &&
-                        isPlayerEligible(player.age, ageGroup)
-                    ) {
+                    const isSeniorCategory = ageGroup.includes("40 Plus");
+                    const isEligible = isSeniorCategory
+                        ? player.age >= 40 && (sex === 'Any' || player.sex === sex)
+                        : isPlayerEligible(player.age, ageGroup) && (sex === 'Any' || player.sex === sex);
+
+                    if (isEligible) {
                         const option = `<option value="${player.id}">${player.name}</option>`;
                         player1Dropdown.innerHTML += option;
                         player2Dropdown.innerHTML += option;
@@ -105,26 +101,19 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
         }
 
         function isPlayerEligible(playerAge, ageGroup) {
+            if (!ageGroup || ageGroup.trim() === "") {
+                return true;
+            }
+
             const ageRange = ageGroup.match(/\d+/g);
-            if (!ageRange) return true;
+            if (!ageRange) {
+                return true;
+            }
 
-            const [minAge, maxAge] = ageRange.length === 2 ? ageRange : [0, ageRange[0]];
-            return playerAge >= parseInt(minAge, 10) && playerAge <= parseInt(maxAge, 10);
-        }
+            const maxAge = parseInt(ageRange[0], 10);
+            const minAge = ageRange.length > 1 ? parseInt(ageRange[1], 10) : 0;
 
-        // Convert time to AM/PM format
-        function convertToAMPM(time) {
-            const [hour, minute] = time.split(':');
-            const period = hour >= 12 ? 'PM' : 'AM';
-            const adjustedHour = hour % 12 || 12; // Convert hour to 12-hour format
-            return `${adjustedHour}:${minute} ${period}`;
-        }
-
-        // Update displayed time dynamically
-        function updateTimeDisplay() {
-            const timeInput = document.getElementById('match_time');
-            const timeDisplay = document.getElementById('time_display');
-            timeDisplay.textContent = convertToAMPM(timeInput.value);
+            return playerAge >= minAge && playerAge < maxAge;
         }
     </script>
 </head>
@@ -153,7 +142,11 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             </form>
         <?php else: ?>
             <form method="post">
-                <p>Locked Tournament: <?= htmlspecialchars($tournaments->fetch_assoc()['name'] ?? '') ?></p>
+                <?php
+                $result = $conn->query("SELECT name FROM tournaments WHERE id = $lockedTournament");
+                $lockedTournamentName = $result->fetch_assoc()['name'] ?? 'Unknown';
+                ?>
+                <p>Locked Tournament: <?= htmlspecialchars($lockedTournamentName) ?></p>
                 <button type="submit" name="unlock_tournament" class="btn-secondary">Unlock Tournament</button>
             </form>
         <?php endif; ?>
@@ -191,26 +184,26 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             <input type="date" name="date" required>
 
             <label for="match_time">Match Time:</label>
-            <input type="time" name="time" id="match_time" onchange="updateTimeDisplay()" required>
+            <input type="time" name="time" id="match_time" required>
             <p>Selected Time: <span id="time_display"></span></p>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
-            <input type="number" name="set1_player1_points" value=0 required>
+            <input type="number" name="set1_player1_points" value="0" required>
 
             <label for="set1_player2_points">Set 1 Player 2 Points:</label>
-            <input type="number" name="set1_player2_points" value=0 required>
+            <input type="number" name="set1_player2_points" value="0" required>
 
             <label for="set2_player1_points">Set 2 Player 1 Points:</label>
-            <input type="number" name="set2_player1_points" value=0 required>
+            <input type="number" name="set2_player1_points" value="0" required>
 
             <label for="set2_player2_points">Set 2 Player 2 Points:</label>
-            <input type="number" name="set2_player2_points" value=0 required>
+            <input type="number" name="set2_player2_points" value="0" required>
 
             <label for="set3_player1_points">Set 3 Player 1 Points:</label>
-            <input type="number" name="set3_player1_points" value=0 required>
+            <input type="number" name="set3_player1_points" value="0" required>
 
             <label for="set3_player2_points">Set 3 Player 2 Points:</label>
-            <input type="number" name="set3_player2_points" value=0 required>
+            <input type="number" name="set3_player2_points" value="0" required>
 
             <button type="submit" class="btn-primary">Add Match</button>
         </form>
