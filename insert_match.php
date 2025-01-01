@@ -86,11 +86,7 @@ if (!$players || !$categories || !$tournaments) {
                 const sex = category.dataset.sex;
 
                 players.forEach(player => {
-                    const isSeniorCategory = ageGroup.includes("40 Plus");
-                    const isEligible = isSeniorCategory
-                        ? player.age >= 40 && (sex === 'Any' || player.sex === sex)
-                        : isPlayerEligible(player.age, ageGroup) && (sex === 'Any' || player.sex === sex);
-
+                    const isEligible = isPlayerEligible(player.age, ageGroup, sex, player.sex);
                     if (isEligible) {
                         const option = `<option value="${player.id}">${player.name}</option>`;
                         player1Dropdown.innerHTML += option;
@@ -100,20 +96,25 @@ if (!$players || !$categories || !$tournaments) {
             }
         }
 
-        function isPlayerEligible(playerAge, ageGroup) {
-            if (!ageGroup || ageGroup.trim() === "") {
+        function isPlayerEligible(playerAge, ageGroup, categorySex, playerSex) {
+            if (categorySex !== 'Any' && categorySex !== playerSex) {
+                return false;
+            }
+
+            if (!ageGroup || ageGroup.toLowerCase() === "open") {
+                // Open categories allow all players
                 return true;
             }
 
-            const ageRange = ageGroup.match(/\d+/g);
-            if (!ageRange) {
+            const ageCriteria = ageGroup.match(/\d+/g);
+            if (!ageCriteria) {
                 return true;
             }
 
-            const maxAge = parseInt(ageRange[0], 10);
-            const minAge = ageRange.length > 1 ? parseInt(ageRange[1], 10) : 0;
+            const minAge = parseInt(ageCriteria[0], 10);
+            const maxAge = ageCriteria.length > 1 ? parseInt(ageCriteria[1], 10) : Infinity;
 
-            return playerAge >= minAge && playerAge < maxAge;
+            return playerAge >= minAge && playerAge <= maxAge;
         }
     </script>
 </head>
@@ -185,7 +186,6 @@ if (!$players || !$categories || !$tournaments) {
 
             <label for="match_time">Match Time:</label>
             <input type="time" name="time" id="match_time" required>
-            <p>Selected Time: <span id="time_display"></span></p>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
             <input type="number" name="set1_player1_points" value="0" required>
