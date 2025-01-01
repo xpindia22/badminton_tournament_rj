@@ -26,29 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_tournament'])) {
     }
 }
 
-// Edit Tournament
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_tournament'])) {
-    $tournament_id = intval($_POST['tournament_id']);
-    $tournament_name = trim($conn->real_escape_string($_POST['tournament_name']));
-    if (empty($tournament_name)) {
-        die("Tournament name cannot be empty.");
-    }
-
-    $sql = "UPDATE tournaments SET name='$tournament_name' WHERE id=$tournament_id";
-    if (!$conn->query($sql)) {
-        die("Error editing tournament: " . $conn->error);
-    }
-}
-
-// Delete Tournament
-if (isset($_GET['delete_tournament'])) {
-    $tournament_id = intval($_GET['delete_tournament']);
-    $sql = "DELETE FROM tournaments WHERE id=$tournament_id";
-    if (!$conn->query($sql)) {
-        die("Error deleting tournament: " . $conn->error);
-    }
-}
-
 // Add Category to Tournament
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
     $tournament_id = intval($_POST['tournament_id']);
@@ -61,6 +38,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
     if (!$conn->query($sql)) {
         die("Error assigning category: " . $conn->error);
     }
+}
+
+// Update Tournament Row
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_tournament'])) {
+    $tournament_id = intval($_POST['tournament_id']);
+    $tournament_name = trim($conn->real_escape_string($_POST['tournament_name']));
+    $categories = trim($conn->real_escape_string($_POST['categories']));
+
+    if (empty($tournament_name)) {
+        die("Tournament name cannot be empty.");
+    }
+
+    // Update the tournament name
+    $sql = "UPDATE tournaments SET name='$tournament_name' WHERE id=$tournament_id";
+    if (!$conn->query($sql)) {
+        die("Error updating tournament: " . $conn->error);
+    }
+
+    // Update the categories
+    $sql = "DELETE FROM tournament_categories WHERE tournament_id=$tournament_id";
+    if (!$conn->query($sql)) {
+        die("Error clearing categories: " . $conn->error);
+    }
+
+    $categories_array = explode(',', $categories);
+    foreach ($categories_array as $category_name) {
+        $category_name = trim($category_name);
+        if (!empty($category_name)) {
+            // Insert the category
+            $category_id_result = $conn->query("SELECT id FROM categories WHERE name='$category_name'");
+            if ($category_id_result && $category_id_result->num_rows > 0) {
+                $category_id = $category_id_result->fetch_assoc()['id'];
+                $conn->query("INSERT INTO tournament_categories (tournament_id, category_id) VALUES ($tournament_id, $category_id)");
+            }
+        }
+    }
+}
+
+// Delete Tournament
+if (isset($_GET['delete_tournament'])) {
+    $tournament_id = intval($_GET['delete_tournament']);
+    $sql = "DELETE FROM tournaments WHERE id=$tournament_id";
+    if (!$conn->query($sql)) {
+        die("Error deleting tournament: " . $conn->error);
+    }
+    $sql = "DELETE FROM tournament_categories WHERE tournament_id=$tournament_id";
+    $conn->query($sql);
 }
 
 // Fetch all tournaments with their categories
@@ -156,7 +180,6 @@ if (!$categories_result) {
             background: #fff;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            overflow: hidden;
         }
 
         table thead {
@@ -165,13 +188,9 @@ if (!$categories_result) {
         }
 
         table th, table td {
-            padding: 8px 10px; /* Reduced row height */
+            padding: 6px 8px; /* Reduced row height */
             text-align: left;
             border: 1px solid #ddd;
-        }
-
-        table th.categories-column {
-            width: 200px; /* Set a fixed width for the "Categories" column */
         }
 
         table tbody tr:nth-child(odd) {
@@ -185,23 +204,19 @@ if (!$categories_result) {
         .actions {
             display: flex;
             gap: 10px;
-        }
-
-        .actions form, .actions a {
-            display: inline-block;
-            margin: 0;
+            align-items: center;
         }
 
         .actions button, .actions a {
-            padding: 6px 12px;
+            padding: 5px 10px;
             font-size: 12px;
             border: none;
             border-radius: 4px;
-            text-align: center;
             color: white;
             background-color: #007bff;
             cursor: pointer;
             text-decoration: none;
+            text-align: center;
         }
 
         .actions a.delete {
@@ -214,6 +229,13 @@ if (!$categories_result) {
 
         .actions a.delete:hover {
             background-color: #c82333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
         }
     </style>
 </head>
@@ -256,24 +278,27 @@ if (!$categories_result) {
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th class="categories-column">Categories</th>
+                <th>Categories</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
-                    <td><?= $row['tournament_id'] ?></td>
-                    <td><?= htmlspecialchars($row['tournament_name']) ?></td>
-                    <td><?= htmlspecialchars($row['categories'] ?? 'None') ?></td>
-                    <td class="actions">
-                        <form method="POST">
+                    <form method="POST">
+                        <td><?= $row['tournament_id'] ?></td>
+                        <td>
+                            <input type="text" name="tournament_name" value="<?= htmlspecialchars($row['tournament_name']) ?>">
+                        </td>
+                        <td>
+                            <input type="text" name="categories" value="<?= htmlspecialchars($row['categories'] ?? '') ?>">
+                        </td>
+                        <td class="actions">
                             <input type="hidden" name="tournament_id" value="<?= $row['tournament_id'] ?>">
-                            <input type="text" name="tournament_name" value="<?= htmlspecialchars($row['tournament_name']) ?>" required>
-                            <button type="submit" name="edit_tournament">Edit</button>
-                        </form>
-                        <a href="?delete_tournament=<?= $row['tournament_id'] ?>" class="delete" onclick="return confirm('Are you sure?')">Delete</a>
-                    </td>
+                            <button type="submit" name="update_tournament">Save</button>
+                            <a href="?delete_tournament=<?= $row['tournament_id'] ?>" class="delete" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </form>
                 </tr>
             <?php endwhile; ?>
         </tbody>
