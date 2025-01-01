@@ -1,65 +1,53 @@
 <?php
+// insert_match.php
+session_start();
 require 'auth.php';
+require_once 'conn.php'; // Database connection file
 redirect_if_not_logged_in();
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $message = '';
-$lockedTournament = $_SESSION['locked_tournament'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['lock_tournament'])) {
-        $lockedTournament = intval($_POST['tournament_id']);
-        $_SESSION['locked_tournament'] = $lockedTournament;
-    } elseif (isset($_POST['unlock_tournament'])) {
-        unset($_SESSION['locked_tournament']);
-        $lockedTournament = null;
-    } else {
-        $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
-        $category_id = $_POST['category_id'];
-        $player1_id = $_POST['player1_id'];
-        $player2_id = $_POST['player2_id'];
-        $stage = $_POST['stage'];
-        $date = $_POST['date'];
-        $match_time = $_POST['time'];
-        $set1_p1 = $_POST['set1_player1_points'];
-        $set1_p2 = $_POST['set1_player2_points'];
-        $set2_p1 = $_POST['set2_player1_points'];
-        $set2_p2 = $_POST['set2_player2_points'];
-        $set3_p1 = $_POST['set3_player1_points'] ?? 0;
-        $set3_p2 = $_POST['set3_player2_points'] ?? 0;
+    $player1_id = $_POST['player1_id'];
+    $player2_id = $_POST['player2_id'];
+    $category_id = $_POST['category_id'];
+    $match_date = $_POST['match_date'];
 
-        $stmt = $conn->prepare("
-            INSERT INTO matches (
-                tournament_id, category_id, player1_id, player2_id, stage, 
-                date, match_time, set1_player1_points, set1_player2_points, 
-                set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
-            ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->bind_param(
-            "iiiisssiiiiii",
-            $tournament_id, $category_id, $player1_id, $player2_id, $stage,
-            $date, $match_time, $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
-        );
+    // Ensure players are not the same
+    if ($player1_id === $player2_id) {
+        $message = "A player cannot play against themselves.";
+    } else {
+        // Insert match into the database
+        $stmt = $conn->prepare("INSERT INTO matches (player1_id, player2_id, category_id, match_date) VALUES (?, ?, ?, ?)");
+        if (!$stmt) {
+            die("Prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("iiis", $player1_id, $player2_id, $category_id, $match_date);
 
         if ($stmt->execute()) {
-            $message = "Match added successfully!";
+            $message = "Match successfully added.";
         } else {
             $message = "Error adding match: " . $stmt->error;
         }
+
         $stmt->close();
     }
 }
 
-$tournaments = $conn->query("SELECT id, name FROM tournaments");
-$categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
-$players = $conn->query("SELECT id, name, age, sex FROM players");
+// Fetch players
+$players = $conn->query("SELECT id, name FROM players ORDER BY name ASC");
+if (!$players) {
+    die("Error fetching players: " . $conn->error);
+}
 
-if (!$players || !$categories || !$tournaments) {
-    die("Error fetching data: " . $conn->error);
+// Fetch categories
+$categories = $conn->query("SELECT id, name FROM categories ORDER BY name ASC");
+if (!$categories) {
+    die("Error fetching categories: " . $conn->error);
 }
 ?>
 <!DOCTYPE html>
@@ -69,141 +57,45 @@ if (!$players || !$categories || !$tournaments) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Match</title>
     <link rel="stylesheet" href="styles.css">
-    <script>
-        const players = <?= json_encode($players->fetch_all(MYSQLI_ASSOC)) ?>;
-
-        function updatePlayerDropdown() {
-            const categoryId = document.getElementById('category_id').value;
-            const player1Dropdown = document.getElementById('player1_id');
-            const player2Dropdown = document.getElementById('player2_id');
-
-            player1Dropdown.innerHTML = '<option value="">Select Player</option>';
-            player2Dropdown.innerHTML = '<option value="">Select Player</option>';
-
-            if (categoryId) {
-                const category = document.querySelector(`#category_id option[value="${categoryId}"]`);
-                const ageGroup = category.dataset.ageGroup;
-                const sex = category.dataset.sex;
-
-                players.forEach(player => {
-                    const isEligible = isPlayerEligible(player.age, ageGroup, sex, player.sex);
-                    if (isEligible) {
-                        const option = `<option value="${player.id}">${player.name}</option>`;
-                        player1Dropdown.innerHTML += option;
-                        player2Dropdown.innerHTML += option;
-                    }
-                });
-            }
-        }
-
-        function isPlayerEligible(playerAge, ageGroup, categorySex, playerSex) {
-            if (categorySex !== 'Any' && categorySex !== playerSex) {
-                return false;
-            }
-
-            if (!ageGroup || ageGroup.toLowerCase() === "open") {
-                // Open categories allow all players
-                return true;
-            }
-
-            const ageCriteria = ageGroup.match(/\d+/g);
-            if (!ageCriteria) {
-                return true;
-            }
-
-            const minAge = parseInt(ageCriteria[0], 10);
-            const maxAge = ageCriteria.length > 1 ? parseInt(ageCriteria[1], 10) : Infinity;
-
-            return playerAge >= minAge && playerAge <= maxAge;
-        }
-    </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
-
     <div class="container">
         <h1>Insert Match</h1>
-        <?php if ($message): ?>
-            <p><?= htmlspecialchars($message) ?></p>
-        <?php endif; ?>
 
-        <?php if (!$lockedTournament): ?>
-            <form method="post">
-                <label for="tournament_id">Select Tournament:</label>
-                <select name="tournament_id" id="tournament_id" required>
-                    <option value="">Select Tournament</option>
-                    <?php while ($row = $tournaments->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                    <?php endwhile; ?>
-                </select>
-                <button type="submit" name="lock_tournament" class="btn-primary">Lock Tournament</button>
-            </form>
-        <?php else: ?>
-            <form method="post">
-                <?php
-                $result = $conn->query("SELECT name FROM tournaments WHERE id = $lockedTournament");
-                $lockedTournamentName = $result->fetch_assoc()['name'] ?? 'Unknown';
-                ?>
-                <p>Locked Tournament: <?= htmlspecialchars($lockedTournamentName) ?></p>
-                <button type="submit" name="unlock_tournament" class="btn-secondary">Unlock Tournament</button>
-            </form>
+        <?php if ($message): ?>
+            <p class="message"><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
 
         <form method="post" class="form-styled">
-            <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" onchange="updatePlayerDropdown()" required>
-                <option value="">Select Category</option>
-                <?php while ($row = $categories->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>" data-age-group="<?= $row['age_group'] ?>" data-sex="<?= $row['sex'] ?>">
-                        <?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['age_group']) ?>, <?= htmlspecialchars($row['sex']) ?>)
-                    </option>
-                <?php endwhile; ?>
-            </select>
-
             <label for="player1_id">Player 1:</label>
             <select name="player1_id" id="player1_id" required>
-                <option value="">Select Player</option>
+                <option value="">Select Player 1</option>
+                <?php while ($player = $players->fetch_assoc()): ?>
+                    <option value="<?= htmlspecialchars($player['id']) ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php endwhile; ?>
             </select>
 
             <label for="player2_id">Player 2:</label>
             <select name="player2_id" id="player2_id" required>
-                <option value="">Select Player</option>
+                <option value="">Select Player 2</option>
+                <?php
+                // Reset player result pointer for second dropdown
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): ?>
+                    <option value="<?= htmlspecialchars($player['id']) ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php endwhile; ?>
             </select>
 
-            <label for="stage">Match Stage:</label>
-            <select name="stage" id="stage" required>
-                <option value="Pre Quarter Finals">Pre Quarter Finals</option>
-                <option value="Quarter Finals">Quarter Finals</option>
-                <option value="Semi Finals">Semi Finals</option>
-                <option value="Finals">Finals</option>
+            <label for="category_id">Category:</label>
+            <select name="category_id" id="category_id" required>
+                <option value="">Select a Category</option>
+                <?php while ($category = $categories->fetch_assoc()): ?>
+                    <option value="<?= htmlspecialchars($category['id']) ?>"><?= htmlspecialchars($category['name']) ?></option>
+                <?php endwhile; ?>
             </select>
 
-            <label for="date">Match Date:</label>
-            <input type="date" name="date" required>
-
-            <label for="match_time">Match Time:</label>
-            <input type="time" name="time" id="match_time" required>
-
-            <label for="set1_player1_points">Set 1 Player 1 Points:</label>
-            <input type="number" name="set1_player1_points" value="0" required>
-
-            <label for="set1_player2_points">Set 1 Player 2 Points:</label>
-            <input type="number" name="set1_player2_points" value="0" required>
-
-            <label for="set2_player1_points">Set 2 Player 1 Points:</label>
-            <input type="number" name="set2_player1_points" value="0" required>
-
-            <label for="set2_player2_points">Set 2 Player 2 Points:</label>
-            <input type="number" name="set2_player2_points" value="0" required>
-
-            <label for="set3_player1_points">Set 3 Player 1 Points:</label>
-            <input type="number" name="set3_player1_points" value="0" required>
-
-            <label for="set3_player2_points">Set 3 Player 2 Points:</label>
-            <input type="number" name="set3_player2_points" value="0" required>
+            <label for="match_date">Match Date:</label>
+            <input type="date" name="match_date" id="match_date" required>
 
             <button type="submit" class="btn-primary">Add Match</button>
         </form>
