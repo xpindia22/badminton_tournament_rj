@@ -12,17 +12,17 @@ if ($conn->connect_error) {
 
 // Add Tournament
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_tournament'])) {
-    $tournament_name = trim($_POST['tournament_name']); // Trim whitespace
-    $created_by = 1; // Replace with actual user ID, e.g., $_SESSION['user_id']
+    $tournament_name = trim($_POST['tournament_name']);
+    $created_by = 1;
 
     if (empty($tournament_name)) {
         die("Tournament name cannot be empty.");
     }
 
-    $tournament_name = $conn->real_escape_string($tournament_name); // Escape input
+    $tournament_name = $conn->real_escape_string($tournament_name);
     $sql = "INSERT INTO tournaments (name, created_by) VALUES ('$tournament_name', $created_by)";
     if (!$conn->query($sql)) {
-        die("Error adding tournament: " . $conn->error); // Output error
+        die("Error adding tournament: " . $conn->error);
     }
 }
 
@@ -92,104 +92,171 @@ if (!$categories_result) {
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
+            padding: 20px;
         }
 
-        h1, h2 {
+        h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
         }
 
         form {
-            margin: 20px auto;
-            padding: 10px;
-            width: 50%;
+            flex: 1;
+            min-width: 300px;
             background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        form h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #555;
         }
 
         form input, form select, form button {
-            display: block;
-            width: calc(100% - 20px);
-            margin: 10px auto;
+            width: 100%;
+            margin-bottom: 10px;
             padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
         form button {
-            background-color: #28a745;
-            color: #fff;
+            background-color: #007bff;
+            color: white;
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         form button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
 
         table {
-            width: 90%;
             margin: 20px auto;
+            width: 100%;
+            max-width: 1200px;
             border-collapse: collapse;
             background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         table thead {
-            background: #28a745;
+            background-color: #007bff;
             color: white;
         }
 
         table th, table td {
-            padding: 12px;
+            padding: 8px 10px; /* Reduced row height */
             text-align: left;
             border: 1px solid #ddd;
         }
 
-        table tbody tr:nth-child(odd) {
-            background: #f9f9f9;
+        table th.categories-column {
+            width: 200px; /* Set a fixed width for the "Categories" column */
         }
 
-        table tbody tr:nth-child(even) {
-            background: #ffffff;
+        table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
         }
 
         table tbody tr:hover {
-            background: #f1f1f1;
+            background-color: #f1f1f1;
         }
 
-        a {
-            color: #007bff;
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions form, .actions a {
+            display: inline-block;
+            margin: 0;
+        }
+
+        .actions button, .actions a {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            color: white;
+            background-color: #007bff;
+            cursor: pointer;
             text-decoration: none;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .actions a.delete {
+            background-color: #dc3545;
+        }
+
+        .actions button:hover, .actions a:hover {
+            opacity: 0.9;
+        }
+
+        .actions a.delete:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
 <body>
     <h1>Manage Tournaments</h1>
 
-    <!-- Add Tournament Form -->
-    <form method="POST">
-        <input type="text" name="tournament_name" placeholder="Tournament Name" required>
-        <button type="submit" name="add_tournament">Add Tournament</button>
-    </form>
+    <div class="form-container">
+        <!-- Add Tournament Form -->
+        <form method="POST">
+            <h2>Add Tournament</h2>
+            <input type="text" name="tournament_name" placeholder="Tournament Name" required>
+            <button type="submit" name="add_tournament">Add Tournament</button>
+        </form>
+
+        <!-- Assign Categories to Tournaments Form -->
+        <form method="POST">
+            <h2>Assign Categories</h2>
+            <select name="tournament_id" required>
+                <option value="">Select Tournament</option>
+                <?php
+                $tournaments = $conn->query("SELECT * FROM tournaments");
+                while ($tournament = $tournaments->fetch_assoc()):
+                ?>
+                    <option value="<?= $tournament['id'] ?>"><?= htmlspecialchars($tournament['name']) ?></option>
+                <?php endwhile; ?>
+            </select>
+            <select name="category_id" required>
+                <option value="">Select Category</option>
+                <?php while ($category = $categories_result->fetch_assoc()): ?>
+                    <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['name']) ?></option>
+                <?php endwhile; ?>
+            </select>
+            <button type="submit" name="add_category">Assign Category</button>
+        </form>
+    </div>
 
     <!-- Tournament Table -->
-    <h2>Tournaments</h2>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Categories</th>
+                <th class="categories-column">Categories</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -199,40 +266,17 @@ if (!$categories_result) {
                     <td><?= $row['tournament_id'] ?></td>
                     <td><?= htmlspecialchars($row['tournament_name']) ?></td>
                     <td><?= htmlspecialchars($row['categories'] ?? 'None') ?></td>
-                    <td>
-                        <!-- Edit Form -->
-                        <form method="POST" style="display:inline;">
+                    <td class="actions">
+                        <form method="POST">
                             <input type="hidden" name="tournament_id" value="<?= $row['tournament_id'] ?>">
                             <input type="text" name="tournament_name" value="<?= htmlspecialchars($row['tournament_name']) ?>" required>
                             <button type="submit" name="edit_tournament">Edit</button>
                         </form>
-                        <!-- Delete Link -->
-                        <a href="?delete_tournament=<?= $row['tournament_id'] ?>" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a href="?delete_tournament=<?= $row['tournament_id'] ?>" class="delete" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
-
-    <!-- Add Category to Tournament Form -->
-    <h2>Assign Categories to Tournaments</h2>
-    <form method="POST">
-        <select name="tournament_id" required>
-            <option value="">Select Tournament</option>
-            <?php
-            $tournaments = $conn->query("SELECT * FROM tournaments");
-            while ($tournament = $tournaments->fetch_assoc()):
-            ?>
-                <option value="<?= $tournament['id'] ?>"><?= htmlspecialchars($tournament['name']) ?></option>
-            <?php endwhile; ?>
-        </select>
-        <select name="category_id" required>
-            <option value="">Select Category</option>
-            <?php while ($category = $categories_result->fetch_assoc()): ?>
-                <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['name']) ?></option>
-            <?php endwhile; ?>
-        </select>
-        <button type="submit" name="add_category">Assign Category</button>
-    </form>
 </body>
 </html>
