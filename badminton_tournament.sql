@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 01, 2025 at 06:04 AM
+-- Generation Time: Jan 01, 2025 at 12:28 PM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -63,7 +63,6 @@ INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
 (6, 'U15GS', 4, 'Under 15', 'F'),
 (7, 'U15GD', 1, 'Under 15', 'F'),
 (8, 'U13BS', 1, 'Under 13', 'M'),
-(10, 'Senior 55 Plus Men', 4, 'Over 55', 'M'),
 (11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M'),
 (12, 'Open Womens Single', 4, 'Between 5 - 100', 'F'),
 (13, 'Open Mixed Doubles', 4, 'Between 5 - 100', 'Mixed'),
@@ -72,7 +71,12 @@ INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
 (16, 'U17GS', 4, 'Under 17', 'F'),
 (17, 'U17GD', 4, 'Under 17', 'F'),
 (18, 'U17GD', 4, 'Under 17', 'F'),
-(19, 'U13GS', 4, 'Under 13', 'F');
+(19, 'U13GS', 4, 'Under 13', 'F'),
+(20, 'Senior 40 Plus Mens Single', 4, 'Over 40', 'M'),
+(21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M'),
+(22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F'),
+(23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F'),
+(24, 'Senior 40 Plus Mixed Doubles', 4, 'Over 40', 'Mixed');
 
 -- --------------------------------------------------------
 
@@ -129,7 +133,8 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00'),
 (7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01'),
 (8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01'),
-(9, 1, 3, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01');
+(9, 1, 3, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01'),
+(10, 3, 20, NULL, 11, 12, 0, 0, 0, 0, 21, 11, 12, 21, 21, 16, NULL, 'Pre Quarter Finals', '2025-01-02', '18:13', '2025-01-02');
 
 -- --------------------------------------------------------
 
@@ -145,7 +150,7 @@ CREATE TABLE `players` (
   `sex` enum('M','F') NOT NULL,
   `uid` varchar(100) NOT NULL,
   `created_by` int(11) DEFAULT NULL,
-  `category_id` int(11) NOT NULL
+  `category_id` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -157,7 +162,12 @@ INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`, `
 (2, 'Eric James', '2009-05-02', 15, 'M', '1', 1, 0),
 (3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1, 0),
 (4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1, 0),
-(6, 'Lee', '2009-02-03', 15, 'M', '5', 1, 0);
+(6, 'Lee', '2009-02-03', 15, 'M', '5', 1, 0),
+(9, 'Lakshaya', '2010-01-01', 15, 'F', '10', 4, 1),
+(10, 'Gokulan', '1990-01-01', 35, 'M', '9', 4, 1),
+(11, 'Zanpear', '1978-05-01', 46, 'M', '6', 4, 1),
+(12, 'Pandyraj2', '1968-01-01', 57, 'M', '7', 4, 20),
+(13, 'sdf', '1968-01-30', 56, 'M', '8', 4, 1);
 
 -- --------------------------------------------------------
 
@@ -171,6 +181,17 @@ CREATE TABLE `player_access` (
   `user_id` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `player_access`
+--
+
+INSERT INTO `player_access` (`id`, `player_id`, `user_id`, `created_at`) VALUES
+(2, 9, 4, '2025-01-01 10:50:08'),
+(3, 10, 4, '2025-01-01 10:50:55'),
+(4, 11, 4, '2025-01-01 10:51:56'),
+(5, 12, 4, '2025-01-01 11:35:13'),
+(6, 13, 4, '2025-01-01 12:06:34');
 
 -- --------------------------------------------------------
 
@@ -220,8 +241,9 @@ INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUE
 (4, 2, 4),
 (5, 1, 3),
 (16, 6, 4),
-(17, 3, 3),
-(18, 3, 2);
+(32, 3, 1),
+(33, 3, 11),
+(34, 3, 20);
 
 -- --------------------------------------------------------
 
@@ -336,7 +358,7 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `category_access`
@@ -348,19 +370,19 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `player_access`
 --
 ALTER TABLE `player_access`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tournaments`
@@ -372,7 +394,7 @@ ALTER TABLE `tournaments`
 -- AUTO_INCREMENT for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `users`
