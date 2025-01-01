@@ -2,7 +2,12 @@
 // insert_player.php
 session_start();
 require 'auth.php';
+require_once 'conn.php'; // Use conn.php for database connection
 redirect_if_not_logged_in();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 if (!is_admin() && !is_user()) {
     die("Access denied.");
@@ -21,10 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dob = $_POST['dob'];
     $age = $_POST['age'];
     $sex = $_POST['sex'];
-    $uid = $_POST['uid'];
+    $uid = !empty($_POST['uid']) ? $_POST['uid'] : uniqid('UID_'); // Auto-assign UID if empty
 
     // Check if player exists
     $stmt = $conn->prepare("SELECT id FROM players WHERE uid = ?");
+    if (!$stmt) {
+        die("Prepare failed (Check player existence): " . $conn->error);
+    }
     $stmt->bind_param("s", $uid);
     $stmt->execute();
     $stmt->bind_result($player_id);
@@ -34,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($player_exists) {
         // Link player to current user if not already linked
         $stmt = $conn->prepare("SELECT id FROM player_access WHERE player_id = ? AND user_id = ?");
+        if (!$stmt) {
+            die("Prepare failed (Link player): " . $conn->error);
+        }
         $stmt->bind_param("ii", $player_id, $user_id);
         $stmt->execute();
         $access_exists = $stmt->fetch();
@@ -41,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$access_exists) {
             $stmt = $conn->prepare("INSERT INTO player_access (player_id, user_id) VALUES (?, ?)");
+            if (!$stmt) {
+                die("Prepare failed (Insert player access): " . $conn->error);
+            }
             $stmt->bind_param("ii", $player_id, $user_id);
             $stmt->execute();
             $stmt->close();
@@ -51,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Add new player
         $stmt = $conn->prepare("INSERT INTO players (name, dob, age, sex, uid, created_by) VALUES (?, ?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            die("Prepare failed (Add player): " . $conn->error);
+        }
         $stmt->bind_param("ssissi", $name, $dob, $age, $sex, $uid, $user_id);
         if ($stmt->execute()) {
             $player_id = $stmt->insert_id;
@@ -58,6 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Link new player to the current user
             $stmt = $conn->prepare("INSERT INTO player_access (player_id, user_id) VALUES (?, ?)");
+            if (!$stmt) {
+                die("Prepare failed (Link new player): " . $conn->error);
+            }
             $stmt->bind_param("ii", $player_id, $user_id);
             $stmt->execute();
             $stmt->close();
@@ -76,7 +96,9 @@ $players = $conn->query("
     LEFT JOIN users u ON pa.user_id = u.id
     GROUP BY p.id
 ");
-
+if (!$players) {
+    die("Error fetching players: " . $conn->error);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -130,7 +152,7 @@ $players = $conn->query("
             </select>
 
             <label for="uid">Unique ID:</label>
-            <input type="text" name="uid" id="uid" required>
+            <input type="text" name="uid" id="uid" placeholder="Leave empty to auto-generate">
 
             <button type="submit" class="btn-primary">Add Player</button>
         </form>
