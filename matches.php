@@ -10,7 +10,7 @@ error_reporting(E_ALL);
 
 if (is_logged_in()) {
     $username = $_SESSION['username'];
-    $user_id = $_SESSION['user_id']; // User ID stored in session
+    $user_id = $_SESSION['user_id'];
 }
 
 // Handle form submission for adding a new match
@@ -60,11 +60,9 @@ if (!$result) {
     die("<p class='error'>Error fetching matches: " . $conn->error . "</p>");
 }
 
-// Fetch required data for the form
+// Fetch tournaments and categories for the form
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 $categories = $conn->query("SELECT id, name FROM categories");
-$players_result = $conn->query("SELECT id, name FROM players");
-$players = $players_result->fetch_all(MYSQLI_ASSOC); // Fetch all players as an array
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,6 +72,7 @@ $players = $players_result->fetch_all(MYSQLI_ASSOC); // Fetch all players as an 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matches</title>
     <link rel="stylesheet" href="style-table.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -105,6 +104,7 @@ $players = $players_result->fetch_all(MYSQLI_ASSOC); // Fetch all players as an 
 
             <label for="category_id">Category:</label>
             <select name="category_id" id="category_id" required>
+                <option value="">Select a Category</option>
                 <?php while ($row = $categories->fetch_assoc()): ?>
                     <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
                 <?php endwhile; ?>
@@ -112,16 +112,12 @@ $players = $players_result->fetch_all(MYSQLI_ASSOC); // Fetch all players as an 
 
             <label for="player1_id">Player 1:</label>
             <select name="player1_id" id="player1_id" required>
-                <?php foreach ($players as $player): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
-                <?php endforeach; ?>
+                <option value="">Select a Player</option>
             </select>
 
             <label for="player2_id">Player 2:</label>
             <select name="player2_id" id="player2_id" required>
-                <?php foreach ($players as $player): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
-                <?php endforeach; ?>
+                <option value="">Select a Player</option>
             </select>
 
             <label for="stage">Stage:</label>
@@ -181,6 +177,38 @@ $players = $players_result->fetch_all(MYSQLI_ASSOC); // Fetch all players as an 
             </tbody>
         </table>
     </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#category_id').on('change', function () {
+                const categoryId = $(this).val();
+
+                $('#player1_id, #player2_id').empty().append('<option value="">Select a Player</option>');
+
+                if (categoryId) {
+                    $.ajax({
+                        url: 'fetch_players.php',
+                        type: 'GET',
+                        data: { category_id: categoryId },
+                        success: function (response) {
+                            try {
+                                const players = JSON.parse(response);
+                                players.forEach(player => {
+                                    const option = `<option value="${player.id}">${player.name}</option>`;
+                                    $('#player1_id, #player2_id').append(option);
+                                });
+                            } catch (error) {
+                                console.error('Error parsing JSON:', error);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX Error:', xhr.responseText, status, error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
