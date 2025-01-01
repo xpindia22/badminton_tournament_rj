@@ -10,6 +10,33 @@ error_reporting(E_ALL);
 
 if (is_logged_in()) {
     $username = $_SESSION['username'];
+    $user_id = $_SESSION['user_id']; // User ID stored in session
+}
+
+// Handle form submission for adding a new match
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $tournament_id = $_POST['tournament_id'];
+    $category_id = $_POST['category_id'];
+    $player1_id = $_POST['player1_id'];
+    $player2_id = $_POST['player2_id'];
+    $stage = $_POST['stage'];
+    $match_date = $_POST['match_date'];
+    $match_time = $_POST['match_time'];
+    $created_by = $user_id;
+
+    $insert_query = "
+        INSERT INTO matches (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ";
+
+    $stmt = $conn->prepare($insert_query);
+    $stmt->bind_param('iiiisssi', $tournament_id, $category_id, $player1_id, $player2_id, $stage, $match_date, $match_time, $created_by);
+
+    if ($stmt->execute()) {
+        $success_message = "Match added successfully.";
+    } else {
+        $error_message = "Error adding match: " . $stmt->error;
+    }
 }
 
 // Fetch matches
@@ -32,6 +59,12 @@ $result = $conn->query($query);
 if (!$result) {
     die("<p class='error'>Error fetching matches: " . $conn->error . "</p>");
 }
+
+// Fetch required data for the form
+$tournaments = $conn->query("SELECT id, name FROM tournaments");
+$categories = $conn->query("SELECT id, name FROM categories");
+$players_result = $conn->query("SELECT id, name FROM players");
+$players = $players_result->fetch_all(MYSQLI_ASSOC); // Fetch all players as an array
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,49 +86,100 @@ if (!$result) {
     </div>
     <div class="container">
         <h1>Matches</h1>
-        <?php if ($result->num_rows > 0): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tournament</th>
-                        <th>Category</th>
-                        <th>Player 1</th>
-                        <th>Player 2</th>
-                        <th>Stage</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Set 1</th>
-                        <th>Set 2</th>
-                        <th>Set 3</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['id']) ?></td>
-                            <td><?= htmlspecialchars($row['tournament_name'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars($row['category_name'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars($row['player1_name'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars($row['player2_name'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars($row['stage'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars(date('d-m-Y', strtotime($row['match_date'] ?? ''))) ?></td>
-                            <td><?= htmlspecialchars($row['match_time'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars($row['set1_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set1_player2_points'] ?? '0') ?></td>
-                            <td><?= htmlspecialchars($row['set2_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set2_player2_points'] ?? '0') ?></td>
-                            <td><?= htmlspecialchars($row['set3_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set3_player2_points'] ?? '0') ?></td>
-                            <td>
-                                <a href="edit_match.php?id=<?= htmlspecialchars($row['id']) ?>" class="btn-edit">Edit</a>
-                                <a href="delete_match.php?id=<?= htmlspecialchars($row['id']) ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>No matches found.</p>
+
+        <?php if (isset($success_message)): ?>
+            <p class="success"><?= htmlspecialchars($success_message) ?></p>
+        <?php elseif (isset($error_message)): ?>
+            <p class="error"><?= htmlspecialchars($error_message) ?></p>
         <?php endif; ?>
+
+        <!-- Add Match Form -->
+        <form action="matches.php" method="post" class="form-add">
+            <h2>Add New Match</h2>
+            <label for="tournament_id">Tournament:</label>
+            <select name="tournament_id" id="tournament_id" required>
+                <?php while ($row = $tournaments->fetch_assoc()): ?>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
+                <?php endwhile; ?>
+            </select>
+
+            <label for="category_id">Category:</label>
+            <select name="category_id" id="category_id" required>
+                <?php while ($row = $categories->fetch_assoc()): ?>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
+                <?php endwhile; ?>
+            </select>
+
+            <label for="player1_id">Player 1:</label>
+            <select name="player1_id" id="player1_id" required>
+                <?php foreach ($players as $player): ?>
+                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <label for="player2_id">Player 2:</label>
+            <select name="player2_id" id="player2_id" required>
+                <?php foreach ($players as $player): ?>
+                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <label for="stage">Stage:</label>
+            <select name="stage" id="stage" required>
+                <option value="Quarterfinals">Quarterfinals</option>
+                <option value="Semifinals">Semifinals</option>
+                <option value="Final">Final</option>
+            </select>
+
+            <label for="match_date">Date:</label>
+            <input type="date" name="match_date" id="match_date" required>
+
+            <label for="match_time">Time:</label>
+            <input type="time" name="match_time" id="match_time" required>
+
+            <button type="submit" class="btn-submit">Add Match</button>
+        </form>
+
+        <!-- Match List -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tournament</th>
+                    <th>Category</th>
+                    <th>Player 1</th>
+                    <th>Player 2</th>
+                    <th>Stage</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Set 1</th>
+                    <th>Set 2</th>
+                    <th>Set 3</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['tournament_name'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($row['category_name'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($row['player1_name'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($row['player2_name'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($row['stage'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars(date('d-m-Y', strtotime($row['match_date'] ?? ''))) ?></td>
+                        <td><?= htmlspecialchars($row['match_time'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($row['set1_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set1_player2_points'] ?? '0') ?></td>
+                        <td><?= htmlspecialchars($row['set2_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set2_player2_points'] ?? '0') ?></td>
+                        <td><?= htmlspecialchars($row['set3_player1_points'] ?? '0') ?> - <?= htmlspecialchars($row['set3_player2_points'] ?? '0') ?></td>
+                        <td>
+                            <a href="edit_match.php?id=<?= htmlspecialchars($row['id']) ?>" class="btn-edit">Edit</a>
+                            <a href="delete_match.php?id=<?= htmlspecialchars($row['id']) ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
 </body>
 
