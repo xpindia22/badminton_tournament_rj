@@ -1,4 +1,5 @@
 <?php
+include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -227,10 +228,7 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
     </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
     <div class="container">
         <h1>Insert Match</h1>
         <?php if ($message): ?>

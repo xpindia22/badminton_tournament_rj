@@ -87,49 +87,7 @@ $categories = $conn->query("SELECT id, name FROM categories");
             <p class="error"><?= htmlspecialchars($error_message) ?></p>
         <?php endif; ?>
 
-        <!-- Add Match Form -->
-        <form action="matches.php" method="post" class="form-add">
-            <h2>Add New Match</h2>
-            <label for="tournament_id">Tournament:</label>
-            <select name="tournament_id" id="tournament_id" required>
-                <?php while ($row = $tournaments->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                <?php endwhile; ?>
-            </select>
-
-            <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" required>
-                <option value="">Select a Category</option>
-                <?php while ($row = $categories->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                <?php endwhile; ?>
-            </select>
-
-            <label for="player1_id">Player 1:</label>
-            <select name="player1_id" id="player1_id" required>
-                <option value="">Select a Player</option>
-            </select>
-
-            <label for="player2_id">Player 2:</label>
-            <select name="player2_id" id="player2_id" required>
-                <option value="">Select a Player</option>
-            </select>
-
-            <label for="stage">Stage:</label>
-            <select name="stage" id="stage" required>
-                <option value="Quarterfinals">Quarterfinals</option>
-                <option value="Semifinals">Semifinals</option>
-                <option value="Final">Final</option>
-            </select>
-
-            <label for="match_date">Date:</label>
-            <input type="date" name="match_date" id="match_date" required>
-
-            <label for="match_time">Time:</label>
-            <input type="time" name="match_time" id="match_time" required>
-
-            <button type="submit" class="btn-submit">Add Match</button>
-        </form>
+ 
 
         <!-- Match List -->
         <table>
