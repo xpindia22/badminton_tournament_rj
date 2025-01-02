@@ -9,9 +9,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Fetch user details
 if (is_logged_in()) {
     $username = $_SESSION['username'];
     $user_id = $_SESSION['user_id'];
+    $is_admin = $_SESSION['is_admin'] ?? false;
+
+    // Explicit admin rights for specific users
+    $admin_usernames = ['admin', 'xxx'];
+    if (in_array($username, $admin_usernames)) {
+        $is_admin = true;
+    }
 }
 
 // Handle form submission for adding a new match
@@ -55,7 +63,19 @@ $query = "
     LEFT JOIN players p2 ON m.player2_id = p2.id
 ";
 
-$result = $conn->query($query);
+// Adjust query for non-admin users
+if (!$is_admin) {
+    $query .= " WHERE m.created_by = ?";
+}
+
+$stmt = $conn->prepare($query);
+
+if (!$is_admin) {
+    $stmt->bind_param('i', $user_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 
 if (!$result) {
     die("<p class='error'>Error fetching matches: " . $conn->error . "</p>");
@@ -77,7 +97,6 @@ $categories = $conn->query("SELECT id, name FROM categories");
 </head>
 
 <body>
- 
     <div class="container">
         <h1>Matches</h1>
 
@@ -86,8 +105,6 @@ $categories = $conn->query("SELECT id, name FROM categories");
         <?php elseif (isset($error_message)): ?>
             <p class="error"><?= htmlspecialchars($error_message) ?></p>
         <?php endif; ?>
-
- 
 
         <!-- Match List -->
         <table>
