@@ -1,5 +1,4 @@
 <?php
-include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -181,9 +180,13 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
                 const category = document.querySelector(`#category_id option[value="${categoryId}"]`);
                 const ageGroup = category.dataset.ageGroup;
                 const sex = category.dataset.sex;
+                const categoryName = category.textContent.trim();
 
                 players.forEach(player => {
-                    if (isPlayerEligible(player, ageGroup, sex)) {
+                    if (
+                        (sex === 'Any' || player.sex === sex) && // Match player's sex
+                        isPlayerEligible(player.age, ageGroup, categoryName) // Validate age criteria
+                    ) {
                         const option = `<option value="${player.id}">${player.name}</option>`;
                         player1Dropdown.innerHTML += option;
                         player2Dropdown.innerHTML += option;
@@ -192,31 +195,19 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             }
         }
 
-        function isPlayerEligible(player, ageGroup, sex) {
-            const ageMatch = ageGroup.match(/\d+/g);
-            if (!ageMatch) return true; // No age restriction, all players are eligible
-
-            if (ageGroup.includes("Under")) {
-                // Handle "Under" categories (e.g., Under 15, Under 19)
-                const maxAge = parseInt(ageMatch[0], 10);
-                if (player.age > maxAge) return false; // Exclude players older than maxAge
-            } else if (ageGroup.includes("Plus")) {
-                // Handle "Plus" categories (e.g., 40 Plus, 50 Plus)
-                const minAge = parseInt(ageMatch[0], 10);
-                if (player.age < 40 || player.age < minAge) return false; // Exclude players under 40 or under minAge
-            }
-
-            // Validate gender
-            if (sex === 'M' && player.sex !== 'M') return false; // Exclude non-male players for male-only categories
-            if (sex === 'F' && player.sex !== 'F') return false; // Exclude non-female players for female-only categories
-            if (sex === 'Mixed' && (player.sex !== 'M' && player.sex !== 'F')) return false; // Exclude players not fitting mixed criteria
-
-            return true; // If all conditions pass, the player is eligible
+        function isPlayerEligible(playerAge, ageGroup, categoryName) {
+            const ageRange = ageGroup.match(/\d+/g);
+            if (!ageRange) return true;
+            const [minAge, maxAge] = ageRange.length === 2 ? ageRange : [0, ageRange[0]];
+            return playerAge >= parseInt(minAge, 10) && playerAge <= parseInt(maxAge, 10);
         }
     </script>
 </head>
 <body>
- 
+    <div class="top-bar">
+        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+        <a href="logout.php" class="logout-link">Logout</a>
+    </div>
     <div class="container">
         <h1>Insert Match</h1>
         <?php if ($message): ?>
