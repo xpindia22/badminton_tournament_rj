@@ -1,5 +1,6 @@
 <?php
 //edit_category.php
+include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 if (!is_admin()) die("Access denied.");

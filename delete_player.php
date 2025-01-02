@@ -1,5 +1,6 @@
 <?php
 //delete_player.php
+include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -55,10 +56,7 @@ $result = $stmt->get_result();
     <script src="session.js"></script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($username) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
 
     <div class="container">
         <h1>Delete Player</h1>
