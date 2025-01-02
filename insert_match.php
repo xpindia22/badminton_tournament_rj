@@ -1,5 +1,4 @@
 <?php
-include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -83,7 +82,7 @@ if ($lockedTournament) {
 }
 
 // Fetch players
-$players = $conn->query("SELECT id, name, age, sex FROM players");
+$players = $conn->query("SELECT id, name, dob, sex FROM players");
 ?>
 
 <!DOCTYPE html>
@@ -169,6 +168,20 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
     <script>
         const players = <?= json_encode($players->fetch_all(MYSQLI_ASSOC)) ?>;
 
+        function calculateAge(dob) {
+            if (!dob) return "N/A"; // Handle missing or invalid DOB
+            const birthDate = new Date(dob);
+            if (isNaN(birthDate)) return "N/A"; // Handle invalid date format
+
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
         function updatePlayerDropdown() {
             const categoryId = document.getElementById('category_id').value;
             const player1Dropdown = document.getElementById('player1_id');
@@ -183,8 +196,9 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
                 const sex = category.dataset.sex;
 
                 players.forEach(player => {
-                    if (isPlayerEligible(player, ageGroup, sex)) {
-                        const option = `<option value="${player.id}">${player.name}</option>`;
+                    const age = calculateAge(player.dob); // Use corrected `dob` field
+                    if (isPlayerEligible(player, age, ageGroup, sex)) {
+                        const option = `<option value="${player.id}">${player.name} (${age}, ${player.sex})</option>`;
                         player1Dropdown.innerHTML += option;
                         player2Dropdown.innerHTML += option;
                     }
@@ -192,21 +206,18 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
             }
         }
 
-        function isPlayerEligible(player, ageGroup, sex) {
+        function isPlayerEligible(player, age, ageGroup, sex) {
             const ageMatch = ageGroup.match(/\d+/g);
             if (!ageMatch) return true; // No age restriction, all players are eligible
 
             if (ageGroup.includes("Under")) {
-                // Handle "Under" categories (e.g., Under 15, Under 19)
                 const maxAge = parseInt(ageMatch[0], 10);
-                if (player.age > maxAge) return false; // Exclude players older than maxAge
+                if (age > maxAge) return false; // Exclude players older than maxAge
             } else if (ageGroup.includes("Plus")) {
-                // Handle "Plus" categories (e.g., 40 Plus, 50 Plus)
                 const minAge = parseInt(ageMatch[0], 10);
-                if (player.age < 40 || player.age < minAge) return false; // Exclude players under 40 or under minAge
+                if (age < 40 || age < minAge) return false; // Exclude players under 40 or under minAge
             }
 
-            // Validate gender
             if (sex === 'M' && player.sex !== 'M') return false; // Exclude non-male players for male-only categories
             if (sex === 'F' && player.sex !== 'F') return false; // Exclude non-female players for female-only categories
             if (sex === 'Mixed' && (player.sex !== 'M' && player.sex !== 'F')) return false; // Exclude players not fitting mixed criteria
@@ -216,7 +227,10 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
     </script>
 </head>
 <body>
- 
+    <div class="top-bar">
+        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+        <a href="logout.php" class="logout-link">Logout</a>
+    </div>
     <div class="container">
         <h1>Insert Match</h1>
         <?php if ($message): ?>
