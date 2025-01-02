@@ -62,26 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
-
-// Fetch categories for the locked tournament
-if ($lockedTournament) {
-    $stmt = $conn->prepare("
-        SELECT c.id, c.name, c.age_group, c.sex 
-        FROM categories c
-        INNER JOIN tournament_categories tc ON c.id = tc.category_id
-        WHERE tc.tournament_id = ?
-    ");
-    $stmt->bind_param("i", $lockedTournament);
-    $stmt->execute();
-    $categories = $stmt->get_result();
-    $stmt->close();
-} else {
-    $categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
-}
-
-// Fetch players
+$categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
 $players = $conn->query("SELECT id, name, age, sex FROM players");
 ?>
 
@@ -196,8 +178,20 @@ $players = $conn->query("SELECT id, name, age, sex FROM players");
         }
 
         function isPlayerEligible(playerAge, ageGroup, categoryName) {
-            const ageRange = ageGroup.match(/\d+/g);
-            if (!ageRange) return true;
+            // For Senior categories, enforce dynamic minimum age and allow older players in younger categories
+            if (categoryName.startsWith('Senior')) {
+                const minAgeMatch = ageGroup.match(/\d+/); // Extract minimum age (e.g., "50+" for "Senior 50+")
+                if (minAgeMatch) {
+                    const minAge = parseInt(minAgeMatch[0], 10);
+                    return playerAge >= minAge; // Player is eligible if their age >= minAge
+                }
+                return false; // Disallow if no valid minimum age is found
+            }
+
+            // For other categories, use standard age range validation
+            const ageRange = ageGroup.match(/\d+/g); // Extract age range (e.g., "15-19")
+            if (!ageRange) return true; // No restriction if no valid range is defined
+
             const [minAge, maxAge] = ageRange.length === 2 ? ageRange : [0, ageRange[0]];
             return playerAge >= parseInt(minAge, 10) && playerAge <= parseInt(maxAge, 10);
         }
