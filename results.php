@@ -86,7 +86,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Results</title>
+    <title>All Tournament Results</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -97,7 +97,7 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Tournament Results</h1>
+    <h1>All Tournament Results</h1>
 
     <!-- Filter Form -->
     <form method="get">
