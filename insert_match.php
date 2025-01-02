@@ -1,3 +1,6 @@
+<?php include 'header.php'; ?>
+<!-- Rest of your page content -->
+
 <?php
 // Enable error reporting for debugging
 ini_set('display_errors', 1);

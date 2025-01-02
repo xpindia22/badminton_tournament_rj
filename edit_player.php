@@ -1,3 +1,6 @@
+<?php include 'header.php'; ?>
+<!-- Rest of your page content -->
+
 <?php
 // edit_player.php
 require 'auth.php';
@@ -31,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmt->bind_param("ssissi", $name, $dob, $age, $sex, $uid, $player_id);
     if ($stmt->execute()) {
-        $message = "Player updated successfully!";
+        header("Location: insert_player.php");
+        exit;
     } else {
         $message = "Error updating player: " . $stmt->error;
     }

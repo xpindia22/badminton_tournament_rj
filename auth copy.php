@@ -1,12 +1,11 @@
 <?php
-// auth.php
-
-// Start session only if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+//auth.php
+session_start();
 require_once "conn.php";
+// $servername = "localhost";
+// $username = "root";
+// $password = "xxx";
+// $dbname = "badminton_tournament";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -14,7 +13,6 @@ if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-// Functions for authentication and authorization
 function is_logged_in() {
     return isset($_SESSION['user_id']);
 }

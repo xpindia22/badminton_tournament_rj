@@ -1,3 +1,5 @@
+<?php include 'header.php'; ?>
+
 <?php
 // insert_player.php
 session_start();
@@ -125,10 +127,7 @@ if (!$players) {
     </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
 
     <div class="container">
         <h1>Insert Player</h1>

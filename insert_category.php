@@ -1,5 +1,7 @@
 <?php
 // insert_category.php
+include 'header.php';
+
 require 'auth.php';
 redirect_if_not_logged_in();
 
@@ -92,10 +94,7 @@ $result = $conn->query($query);
     </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
 
     <div class="container">
         <h1>Insert Category</h1>

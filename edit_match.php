@@ -1,3 +1,5 @@
+<?php include 'header.php'; ?>
+
 <?php
 // edit_match.php
 require_once 'conn.php';

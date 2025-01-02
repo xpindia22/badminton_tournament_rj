@@ -1,3 +1,5 @@
+<?php include 'header.php'; ?>
+
 <?php
 // dashboard.php
 require 'auth.php';
@@ -52,10 +54,7 @@ $is_user = is_user();
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= $username ?>!</span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
 
     <div class="container">
         <h1>Dashboard</h1>
