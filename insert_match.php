@@ -1,137 +1,226 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 
-if (!is_admin() && !is_user()) {
-    die("Access denied.");
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
 }
+
+$message = '';
+$lockedTournament = $_SESSION['locked_tournament'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tournament_id = $_POST['tournament_id'];
-    $category_id = $_POST['category_id'];
-    $player1_id = $_POST['player1_id'];
-    $player2_id = $_POST['player2_id'];
-    $stage = $_POST['stage'];
-    $set1_p1 = $_POST['set1_player1_points'];
-    $set1_p2 = $_POST['set1_player2_points'];
-    $set2_p1 = $_POST['set2_player1_points'];
-    $set2_p2 = $_POST['set2_player2_points'];
-    $set3_p1 = $_POST['set3_player1_points'] ?? 0;
-    $set3_p2 = $_POST['set3_player2_points'] ?? 0;
-    $created_by = $_SESSION['user_id'];
+    if (isset($_POST['lock_tournament'])) {
+        $lockedTournament = intval($_POST['tournament_id']);
+        $_SESSION['locked_tournament'] = $lockedTournament;
 
-    $stmt = $conn->prepare("
-        INSERT INTO matches (
-            tournament_id, category_id, player1_id, player2_id, stage, 
-            set1_player1_points, set1_player2_points, set2_player1_points, 
-            set2_player2_points, set3_player1_points, set3_player2_points, created_by
-        ) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->bind_param(
-        "iiiiiiiiiiii", 
-        $tournament_id, $category_id, $player1_id, $player2_id, $stage,
-        $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2, $created_by
-    );
-    if ($stmt->execute()) {
-        echo "<p class='success'>Match added successfully!</p>";
+        $stmt = $conn->prepare("SELECT name FROM tournaments WHERE id = ?");
+        $stmt->bind_param("i", $lockedTournament);
+        $stmt->execute();
+        $stmt->bind_result($lockedTournamentName);
+        $stmt->fetch();
+        $_SESSION['locked_tournament_name'] = $lockedTournamentName;
+        $stmt->close();
+    } elseif (isset($_POST['unlock_tournament'])) {
+        unset($_SESSION['locked_tournament'], $_SESSION['locked_tournament_name']);
+        $lockedTournament = null;
     } else {
-        echo "<p class='error'>Error: {$stmt->error}</p>";
+        $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
+        $category_id = $_POST['category_id'];
+        $player1_id = $_POST['player1_id'];
+        $player1_partner_id = $_POST['player1_partner_id'] ?? null;
+        $player2_id = $_POST['player2_id'];
+        $player2_partner_id = $_POST['player2_partner_id'] ?? null;
+        $stage = $_POST['stage'];
+        $date = $_POST['date'];
+        $match_time = $_POST['time'];
+        $set1_p1 = $_POST['set1_player1_points'];
+        $set1_p2 = $_POST['set1_player2_points'];
+        $set2_p1 = $_POST['set2_player1_points'];
+        $set2_p2 = $_POST['set2_player2_points'];
+        $set3_p1 = $_POST['set3_player1_points'] ?? 0;
+        $set3_p2 = $_POST['set3_player2_points'] ?? 0;
+
+        $stmt = $conn->prepare("
+            INSERT INTO matches (
+                tournament_id, category_id, player1_id, player1_partner_id, 
+                player2_id, player2_partner_id, stage, date, match_time, 
+                set1_player1_points, set1_player2_points, set2_player1_points, 
+                set2_player2_points, set3_player1_points, set3_player2_points
+            ) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param(
+            "iiiiisssiiiiiii",
+            $tournament_id, $category_id, $player1_id, $player1_partner_id,
+            $player2_id, $player2_partner_id, $stage, $date, $match_time,
+            $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
+        );
+
+        if ($stmt->execute()) {
+            $message = "Match added successfully!";
+        } else {
+            $message = "Error adding match: " . $stmt->error;
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
-// Fetch tournaments, categories, and players
+// Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
-$categories = $conn->query("SELECT id, name FROM categories");
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insert Match</title>
-    <link rel="stylesheet" href="styles.css">
-    <script>
-        // Fetch players dynamically based on the selected category
-        async function fetchPlayers() {
-            const categoryId = document.getElementById('category_id').value;
-            const player1Select = document.getElementById('player1_id');
-            const player2Select = document.getElementById('player2_id');
 
-            // Clear previous options
-            player1Select.innerHTML = '<option value="">Select Player</option>';
-            player2Select.innerHTML = '<option value="">Select Player</option>';
+// Fetch categories for the locked tournament
+if ($lockedTournament) {
+    $stmt = $conn->prepare("
+        SELECT c.id, c.name, c.age_group, c.sex, c.type 
+        FROM categories c
+        INNER JOIN tournament_categories tc ON c.id = tc.category_id
+        WHERE tc.tournament_id = ?
+    ");
+    $stmt->bind_param("i", $lockedTournament);
+    $stmt->execute();
+    $categories = $stmt->get_result();
+    $stmt->close();
+} else {
+    $categories = $conn->query("SELECT id, name, age_group, sex, type FROM categories");
+}
+
+// Fetch players
+$players = $conn->query("SELECT id, name, dob, sex FROM players");
+$playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insert Match</title>
+    <style>
+        .player-group {
+            display: none;
+        }
+    </style>
+    <script>
+        const players = <?= json_encode($playersData) ?>;
+
+        function calculateAge(dob) {
+            if (!dob) return "N/A";
+            const birthDate = new Date(dob);
+            if (isNaN(birthDate)) return "N/A";
+
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function isPlayerEligible(player, age, ageGroup, sex) {
+            const ageMatch = ageGroup.match(/\d+/g);
+            if (!ageMatch) return true;
+
+            if (ageGroup.includes("Under")) {
+                const maxAge = parseInt(ageMatch[0], 10);
+                if (age > maxAge) return false;
+            } else if (ageGroup.includes("Plus")) {
+                const minAge = parseInt(ageMatch[0], 10);
+                if (age < minAge) return false;
+            }
+
+            if (sex === 'M' && player.sex !== 'M') return false;
+            if (sex === 'F' && player.sex !== 'F') return false;
+            if (sex === 'Mixed' && (player.sex !== 'M' && player.sex !== 'F')) return false;
+
+            return true;
+        }
+
+        function updatePlayerDropdown() {
+            const categoryId = document.getElementById('category_id').value;
+            const playerDropdowns = document.querySelectorAll('.player-dropdown');
+            const playerGroup = document.querySelectorAll('.player-group');
+
+            playerDropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Player</option>';
+            });
 
             if (categoryId) {
-                try {
-                    const response = await fetch(`fetch_players.php?category_id=${categoryId}`);
-                    const data = await response.json();
+                const category = document.querySelector(`#category_id option[value="${categoryId}"]`);
+                const ageGroup = category.dataset.ageGroup;
+                const sex = category.dataset.sex;
+                const isDoubles = category.dataset.type === "doubles";
 
-                    if (data.error) {
-                        alert(data.error);
-                        return;
+                playerGroup.forEach(group => {
+                    group.style.display = isDoubles ? 'block' : 'none';
+                });
+
+                players.forEach(player => {
+                    const age = calculateAge(player.dob);
+                    if (isPlayerEligible(player, age, ageGroup, sex)) {
+                        const option = `<option value="${player.id}">${player.name} (${age}, ${player.sex})</option>`;
+                        playerDropdowns.forEach(dropdown => dropdown.innerHTML += option);
                     }
-
-                    if (data.length === 0) {
-                        alert('No players found for the selected category.');
-                        return;
-                    }
-
-                    data.forEach(player => {
-                        const option = `<option value="${player.id}">${player.name}</option>`;
-                        player1Select.innerHTML += option;
-                        player2Select.innerHTML += option;
-                    });
-                } catch (error) {
-                    console.error('Error fetching players:', error);
-                }
+                });
             }
         }
     </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
-
     <div class="container">
         <h1>Insert Match</h1>
-        <form method="post" class="form-styled">
-            <label for="tournament_id">Tournament:</label>
-            <select name="tournament_id" id="tournament_id" required>
-                <option value="">Select Tournament</option>
-                <?php while ($row = $tournaments->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                <?php endwhile; ?>
-            </select>
+        <?php if ($message): ?>
+            <p class="message"><?= htmlspecialchars($message) ?></p>
+        <?php endif; ?>
 
+        <form method="post">
             <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" required onchange="fetchPlayers()">
+            <select name="category_id" id="category_id" onchange="updatePlayerDropdown()" required>
                 <option value="">Select Category</option>
                 <?php while ($row = $categories->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
+                    <option value="<?= $row['id'] ?>" 
+                            data-age-group="<?= $row['age_group'] ?>" 
+                            data-sex="<?= $row['sex'] ?>" 
+                            data-type="<?= htmlspecialchars($row['type']) ?>"> 
+                        <?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['age_group']) ?>, <?= htmlspecialchars($row['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
-            <label for="player1_id">Player 1:</label>
-            <select name="player1_id" id="player1_id" required>
-                <option value="">Select Player</option>
-            </select>
+            <div class="player-group">
+                <label for="player1_id">Player 1:</label>
+                <select name="player1_id" id="player1_id" class="player-dropdown" required></select>
 
-            <label for="player2_id">Player 2:</label>
-            <select name="player2_id" id="player2_id" required>
-                <option value="">Select Player</option>
-            </select>
+                <label for="player1_partner_id">Player 1 Partner:</label>
+                <select name="player1_partner_id" id="player1_partner_id" class="player-dropdown" required></select>
+            </div>
+
+            <div class="player-group">
+                <label for="player2_id">Player 2:</label>
+                <select name="player2_id" id="player2_id" class="player-dropdown" required></select>
+
+                <label for="player2_partner_id">Player 2 Partner:</label>
+                <select name="player2_partner_id" id="player2_partner_id" class="player-dropdown" required></select>
+            </div>
 
             <label for="stage">Match Stage:</label>
-            <select name="stage" id="stage" required>
+            <select name="stage" required>
                 <option value="Pre Quarter Finals">Pre Quarter Finals</option>
                 <option value="Quarter Finals">Quarter Finals</option>
                 <option value="Semi Finals">Semi Finals</option>
                 <option value="Finals">Finals</option>
             </select>
+
+            <label for="date">Match Date:</label>
+            <input type="date" name="date" required>
+
+            <label for="time">Match Time:</label>
+            <input type="time" name="time" required>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
             <input type="number" name="set1_player1_points" required>
@@ -151,60 +240,8 @@ $categories = $conn->query("SELECT id, name FROM categories");
             <label for="set3_player2_points">Set 3 Player 2 Points:</label>
             <input type="number" name="set3_player2_points">
 
-            <button type="submit" class="btn-primary">Add Match</button>
+            <button type="submit">Add Match</button>
         </form>
-
-        <h2>Existing Matches</h2>
-        <?php
-        $query = is_admin() 
-            ? "SELECT m.*, p1.name AS player1_name, p2.name AS player2_name FROM matches m
-               LEFT JOIN players p1 ON m.player1_id = p1.id
-               LEFT JOIN players p2 ON m.player2_id = p2.id"
-            : "SELECT m.*, p1.name AS player1_name, p2.name AS player2_name FROM matches m
-               LEFT JOIN players p1 ON m.player1_id = p1.id
-               LEFT JOIN players p2 ON m.player2_id = p2.id
-               WHERE m.created_by = {$_SESSION['user_id']}";
-        $matches = $conn->query($query);
-
-        if ($matches->num_rows > 0): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Player 1</th>
-                        <th>Player 2</th>
-                        <th>Set 1</th>
-                        <th>Set 2</th>
-                        <th>Set 3</th>
-                        <th>Winner</th>
-                        <th>Stage</th>
-                        <th>Edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $matches->fetch_assoc()): ?>
-                        <?php
-                        $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
-                        $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
-                        $winner = $p1_total > $p2_total ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
-                        ?>
-                        <tr>
-                            <td><?= $row['id'] ?></td>
-                            <td><?= htmlspecialchars($row['player1_name']) ?></td>
-                            <td><?= htmlspecialchars($row['player2_name']) ?></td>
-                            <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
-                            <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
-                            <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>
-                            <td><?= htmlspecialchars($winner) ?></td>
-                            <td><?= htmlspecialchars($row['stage']) ?></td>
-                            <td><a href="edit_match.php?id=<?= $row['id'] ?>">Edit</a></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>No matches recorded yet.</p>
-        <?php endif; ?>
     </div>
 </body>
 </html>
