@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 02, 2025 at 06:47 AM
+-- Generation Time: Jan 03, 2025 at 07:21 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -65,7 +65,7 @@ INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
 (8, 'U13BS', 1, 'Under 13', 'M'),
 (11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M'),
 (12, 'Open Womens Single', 4, 'Between 5 - 100', 'F'),
-(13, 'Open Mixed Doubles', 4, 'Between 5 - 100', 'Mixed'),
+(13, 'Open XD', 4, 'Under 100', 'Mixed'),
 (14, 'Open Mens Doubles', 4, 'Open', 'M'),
 (15, 'Open Women Doubles', 4, 'Open', 'F'),
 (16, 'U17GS', 4, 'Under 17', 'F'),
@@ -76,12 +76,14 @@ INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
 (21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M'),
 (22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F'),
 (23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F'),
-(24, 'Senior 40 Plus Mixed Doubles', 4, 'Over 40', 'Mixed'),
-(25, 'U19BS', 4, 'Under 0', 'M'),
+(25, 'U19BS', 4, 'Under 19', 'M'),
 (26, 'U19BD', 4, 'Under 19', 'M'),
 (27, 'U19GS', 4, 'Under 19', 'F'),
 (28, 'U19GD', 4, 'Under 19', 'F'),
-(29, 'U19XD', 4, 'Under 19', 'Mixed');
+(29, 'U19XD', 4, 'Under 19', 'Mixed'),
+(30, 'U17XD', 4, 'Under 17', 'Mixed'),
+(31, 'U15XD', 4, 'Under 15', 'Mixed'),
+(32, 'Senior 40 Plus XD', 4, 'Over 40', 'Mixed');
 
 -- --------------------------------------------------------
 
@@ -122,27 +124,39 @@ CREATE TABLE `matches` (
   `stage` varchar(22) NOT NULL,
   `match_date` date DEFAULT NULL,
   `match_time` varchar(255) NOT NULL,
-  `date` date NOT NULL
+  `date` date NOT NULL,
+  `team1_player1_id` int(11) NOT NULL DEFAULT 0,
+  `team1_player2_id` int(11) NOT NULL DEFAULT 0,
+  `team2_player1_id` int(11) DEFAULT 0,
+  `team2_player2_id` int(11) DEFAULT 0,
+  `set1_team1_points` int(11) NOT NULL DEFAULT 0,
+  `set1_team2_points` int(11) DEFAULT 0,
+  `set2_team1_points` int(11) DEFAULT 0,
+  `set2_team2_points` int(11) DEFAULT 0,
+  `set3_team1_points` int(11) DEFAULT 0,
+  `set3_team2_points` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `matches`
 --
 
-INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`, `date`) VALUES
-(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM', '0000-00-00'),
-(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM', '0000-00-00'),
-(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM', '0000-00-00'),
-(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM', '0000-00-00'),
-(5, 3, 7, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53', '0000-00-00'),
-(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00'),
-(7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01'),
-(8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01'),
-(9, 1, 3, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01'),
-(10, 3, 20, NULL, 11, 12, 0, 0, 0, 0, 21, 11, 12, 21, 21, 16, NULL, 'Pre Quarter Finals', '2025-01-02', '18:13', '2025-01-02'),
-(11, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02'),
-(12, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02'),
-(13, 3, 11, NULL, 3, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:35', '2025-01-02');
+INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`, `date`, `team1_player1_id`, `team1_player2_id`, `team2_player1_id`, `team2_player2_id`, `set1_team1_points`, `set1_team2_points`, `set2_team1_points`, `set2_team2_points`, `set3_team1_points`, `set3_team2_points`) VALUES
+(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(5, 3, 7, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(9, 1, 3, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(10, 3, 20, NULL, 11, 12, 0, 0, 0, 0, 21, 11, 12, 21, 21, 16, NULL, 'Pre Quarter Finals', '2025-01-02', '18:13', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(11, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(12, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(13, 3, 11, NULL, 10, 6, 0, 0, 0, 0, 28, 26, 24, 26, 28, 2, NULL, 'Pre Quarter Finals', '2025-01-03', '11:35', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(14, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 1, NULL, 'Pre Quarter Finals', NULL, '12:29', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(15, 1, 11, NULL, 2, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '12:31', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -243,17 +257,19 @@ CREATE TABLE `tournament_categories` (
 --
 
 INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUES
-(1, 1, 1),
-(2, 1, 2),
 (3, 2, 4),
-(5, 1, 3),
 (16, 6, 4),
 (32, 3, 1),
 (33, 3, 11),
 (34, 3, 20),
 (35, 2, 1),
 (36, 4, 2),
-(37, 4, 3);
+(37, 4, 3),
+(44, 1, 1),
+(45, 1, 2),
+(46, 1, 3),
+(47, 1, 14),
+(48, 1, 11);
 
 -- --------------------------------------------------------
 
@@ -368,7 +384,7 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `category_access`
@@ -380,7 +396,7 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `players`
@@ -404,7 +420,7 @@ ALTER TABLE `tournaments`
 -- AUTO_INCREMENT for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `users`
