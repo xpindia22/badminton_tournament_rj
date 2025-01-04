@@ -3,6 +3,7 @@
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
+redirect_if_not_logged_in();
 
 $message = '';
 $username = '';
@@ -10,12 +11,8 @@ $email = '';
 $mobile_no = '';
 $role = 'visitor';
 
-// Check if the user is logged in and has admin rights for admin actions
-$is_admin = is_admin();
-
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($is_admin && isset($_POST['user_id']) && isset($_POST['action'])) {
+    if (isset($_POST['user_id']) && isset($_POST['action'])) {
         $user_id = intval($_POST['user_id']);
         if ($_POST['action'] === 'edit') {
             // Save edited user data (Admin only)
@@ -65,10 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mobile_no = $_POST['mobile_no'] ?? '';
         $role = $_POST['role'] ?? 'visitor';
 
-        if ($role !== 'visitor' && $role !== 'user') {
-            $role = 'visitor'; // Ensure visitors can only assign "visitor" or "user" roles
-        }
-
         if (empty($username) || empty($password) || empty($email)) {
             $message = "All fields are required.";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -94,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch all users for admin
 $users = [];
-if ($is_admin) {
+if (is_admin()) {
     $result = $conn->query("SELECT * FROM users");
     $users = $result->fetch_all(MYSQLI_ASSOC);
 }
@@ -106,6 +99,44 @@ if ($is_admin) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .edit-form {
+            display: inline-block;
+        }
+        .btn-edit, .btn-delete {
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-edit {
+            background-color: #007bff;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+        }
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -140,7 +171,7 @@ if ($is_admin) {
             <button type="submit" class="btn-primary">Register</button>
         </form>
 
-        <?php if ($is_admin): ?>
+        <?php if (is_admin()): ?>
             <h2>All Users</h2>
             <table>
                 <thead>
