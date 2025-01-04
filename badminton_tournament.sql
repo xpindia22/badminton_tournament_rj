@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 04, 2025 at 12:46 AM
+-- Generation Time: Jan 04, 2025 at 04:52 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -49,42 +49,43 @@ CREATE TABLE `categories` (
   `created_by` int(11) NOT NULL,
   `age_group` varchar(255) DEFAULT NULL,
   `sex` varchar(10) DEFAULT NULL,
-  `type` enum('singles','doubles','mixed doubles') DEFAULT 'singles'
+  `type` enum('singles','doubles','mixed doubles') DEFAULT 'singles',
+  `tournament_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`, `type`) VALUES
-(1, 'U17BS', 1, 'Under 17', 'M', 'singles'),
-(2, 'U15BS', 1, 'Under 15', 'M', 'singles'),
-(3, 'U15BD', 1, 'Under 15', 'M', 'doubles'),
-(4, 'U17BD', 2, 'Under 17', 'M', 'doubles'),
-(6, 'U15GS', 4, 'Under 15', 'F', 'singles'),
-(7, 'U15GD', 1, 'Under 15', 'F', 'doubles'),
-(8, 'U13BS', 1, 'Under 13', 'M', 'singles'),
-(11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M', 'singles'),
-(12, 'Open Womens Single', 4, 'Between 5 - 100', 'F', 'singles'),
-(13, 'Open XD', 4, 'Under 100', 'Mixed', 'mixed doubles'),
-(14, 'Open Mens Doubles', 4, 'Open', 'M', 'doubles'),
-(15, 'Open Women Doubles', 4, 'Open', 'F', 'doubles'),
-(16, 'U17GS', 4, 'Under 17', 'F', 'singles'),
-(17, 'U17GD', 4, 'Under 17', 'F', 'doubles'),
-(18, 'U17GD', 4, 'Under 17', 'F', 'doubles'),
-(19, 'U13GS', 4, 'Under 13', 'F', 'singles'),
-(20, 'Senior 40 Plus Mens Single', 4, 'Over 40', 'M', 'singles'),
-(21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M', 'doubles'),
-(22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F', 'singles'),
-(23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F', 'doubles'),
-(25, 'U19BS', 4, 'Under 19', 'M', 'singles'),
-(26, 'U19BD', 4, 'Under 19', 'M', 'doubles'),
-(27, 'U19GS', 4, 'Under 19', 'F', 'singles'),
-(28, 'U19GD', 4, 'Under 19', 'F', 'doubles'),
-(29, 'U19XD', 4, 'Under 19', 'Mixed', 'mixed doubles'),
-(30, 'U17XD', 4, 'Under 17', 'Mixed', 'singles'),
-(31, 'U15XD', 4, 'Under 15', 'Mixed', 'singles'),
-(32, 'Senior 40 Plus XD', 4, 'Over 40', 'Mixed', 'singles');
+INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`, `type`, `tournament_id`) VALUES
+(1, 'U17BS', 1, 'Under 17', 'M', 'singles', 0),
+(2, 'U15BS', 1, 'Under 15', 'M', 'singles', 0),
+(3, 'U15BD', 1, 'Under 15', 'M', 'doubles', 0),
+(4, 'U17BD', 2, 'Under 17', 'M', 'doubles', 0),
+(6, 'U15GS', 4, 'Under 15', 'F', 'singles', 0),
+(7, 'U15GD', 1, 'Under 15', 'F', 'doubles', 0),
+(8, 'U13BS', 1, 'Under 13', 'M', 'singles', 0),
+(11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M', 'singles', 0),
+(12, 'Open Womens Single', 4, 'Between 5 - 100', 'F', 'singles', 0),
+(13, 'Open XD', 4, 'Under 100', 'Mixed', 'mixed doubles', 0),
+(14, 'Open Mens Doubles', 4, 'Open', 'M', 'doubles', 0),
+(15, 'Open Women Doubles', 4, 'Open', 'F', 'doubles', 0),
+(16, 'U17GS', 4, 'Under 17', 'F', 'singles', 0),
+(17, 'U17GD', 4, 'Under 17', 'F', 'doubles', 0),
+(18, 'U17GD', 4, 'Under 17', 'F', 'doubles', 0),
+(19, 'U13GS', 4, 'Under 13', 'F', 'singles', 0),
+(20, 'Senior 40 Plus Mens Single', 4, 'Over 40', 'M', 'singles', 0),
+(21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M', 'doubles', 0),
+(22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F', 'singles', 0),
+(23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F', 'doubles', 0),
+(25, 'U19BS', 4, 'Under 19', 'M', 'singles', 0),
+(26, 'U19BD', 4, 'Under 19', 'M', 'doubles', 0),
+(27, 'U19GS', 4, 'Under 19', 'F', 'singles', 0),
+(28, 'U19GD', 4, 'Under 19', 'F', 'doubles', 0),
+(29, 'U19XD', 4, 'Under 19', 'Mixed', 'mixed doubles', 0),
+(30, 'U17XD', 4, 'Under 17', 'Mixed', 'singles', 0),
+(31, 'U15XD', 4, 'Under 15', 'Mixed', 'singles', 0),
+(32, 'Senior 40 Plus XD', 4, 'Over 40', 'Mixed', 'singles', 0);
 
 -- --------------------------------------------------------
 
@@ -150,7 +151,6 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (4, 1, 16, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (5, 3, 16, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
-(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (9, 1, 16, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
@@ -161,8 +161,15 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (14, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 1, NULL, 'Pre Quarter Finals', NULL, '12:29', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (15, 1, 11, NULL, 2, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '12:31', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (16, 3, 20, NULL, 10, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', '2025-01-03', '10:19', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
-(17, 3, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarterfinals', NULL, '2025-01-03 21:20:00', NULL, 2, 10, 11, 12, 0, 0, 0, 0, 0, 0, NULL, NULL),
-(18, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '06:07', '2025-01-04', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
+(17, 3, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Preliminary', '2024-12-30', '10:33', NULL, 2, 10, 11, 12, 21, 0, 0, 21, 2, 21, NULL, NULL),
+(18, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '06:07', '2025-01-04', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(19, 1, 11, NULL, 3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-04', '08:25', '2025-01-04', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(20, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Preliminary', '2025-01-03', '09:47', NULL, 6, 10, 12, 13, 21, 2, 2, 21, 21, 2, NULL, NULL),
+(21, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Preliminary', '2024-12-30', '12:58', NULL, 6, 2, 13, 12, 21, 4, 4, 21, 21, 2, NULL, NULL),
+(22, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Semifinals', NULL, '2025-01-04 08:37:00', NULL, 6, 2, 13, 12, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(23, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarterfinals', NULL, '2025-01-04 08:42:00', NULL, 10, 13, 12, 2, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(24, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', NULL, '8', '2025-01-04', 2, 3, 11, 12, 21, 2, 2, 21, 21, 3, NULL, NULL),
+(25, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', NULL, '10', '2025-01-04', 2, 13, 12, 6, 21, 2, 2, 21, 21, 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -304,6 +311,21 @@ INSERT INTO `users` (`id`, `username`, `password`, `mobile_no`, `notes`, `role`,
 (4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com'),
 (5, 'user2', '$2y$10$h2N1Jb3tCQ72X.KWuQaB8eUfBfJa61DULmbLDzMArIlUdtpj4im.m', '2222222222', NULL, 'user', '2024-12-31 15:28:19', 'user2@jdjdj.com');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_notes`
+--
+
+CREATE TABLE `user_notes` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `content` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -379,6 +401,13 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `username` (`username`);
 
 --
+-- Indexes for table `user_notes`
+--
+ALTER TABLE `user_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -404,7 +433,7 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `players`
@@ -435,6 +464,12 @@ ALTER TABLE `tournament_categories`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `user_notes`
+--
+ALTER TABLE `user_notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -478,6 +513,12 @@ ALTER TABLE `player_access`
 ALTER TABLE `tournament_categories`
   ADD CONSTRAINT `tournament_categories_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`),
   ADD CONSTRAINT `tournament_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
+
+--
+-- Constraints for table `user_notes`
+--
+ALTER TABLE `user_notes`
+  ADD CONSTRAINT `user_notes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
