@@ -40,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
     <form method="post">
         <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
+        <input type="text" name="username" id="username" required value="xxx">
         <br>
         <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
+        <input type="password" name="password" id="password" required value="xxx">
         <br>
         <button type="submit">Login</button>
     </form>
