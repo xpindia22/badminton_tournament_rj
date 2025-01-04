@@ -204,31 +204,31 @@
         <div class="left-section">
             <div class="slideshow-container">
                 <img src="images/tai (1).jpg" alt="Tai Tzu Ying" class="active">
-                <img src="images/eric/ej1 (6).png" alt="Eric James">
+                <img src="images/eric/ej (6).png" alt="Eric James">
                 <img src="images/tai (2).jpg" alt="Tai Tzu Ying">
                 <img src="images/tai (3).jpg" alt="Tai Tzu Ying">
-                <img src="images/eric/ej1 (1).png" alt="Eric James">
-                <img src="images/eric/ej1 (2).png" alt="Eric James">
-                <img src="images/eric/ej1 (3).png" alt="Eric James">
-                <img src="images/eric/ej1 (4).png" alt="Eric James">
-                <img src="images/eric/ej1 (5).png" alt="Eric James">
+                <img src="images/eric/ej (1).png" alt="Eric James">
+                <img src="images/eric/ej (2).png" alt="Eric James">
+                <img src="images/eric/ej (3).png" alt="Eric James">
+                <img src="images/eric/ej (4).png" alt="Eric James">
+                <img src="images/eric/ej (5).png" alt="Eric James">
 
                 <img src="images/tai (4).jpg" alt="Tai Tzu Ying">
                 <img src="images/tai (5).jpg" alt="Tai Tzu Ying">
                 <img src="images/tai (6).jpg" alt="Tai Tzu Ying">
                 <img src="images/tai (7).jpg" alt="Tai Tzu Ying">
                 <img src="images/tai (8).jpg" alt="Tai Tzu Ying">
-                <img src="images/eric/ej (1).png" alt="Eric James">
-                <img src="images/eric/ej (2).png" alt="Eric James">
-                <img src="images/eric/ej (3).png" alt="Eric James">
-                <img src="images/eric/ej (4).png" alt="Eric James">
-                <img src="images/eric/ej (5).png" alt="Eric James">
-                <img src="images/eric/ej (6).png" alt="Eric James">
                 <img src="images/eric/ej (7).png" alt="Eric James">
                 <img src="images/eric/ej (8).png" alt="Eric James">
                 <img src="images/eric/ej (9).png" alt="Eric James">
                 <img src="images/eric/ej (10).png" alt="Eric James">
                 <img src="images/eric/ej (11).png" alt="Eric James">
+                <img src="images/eric/ej (12).png" alt="Eric James">
+                <img src="images/eric/ej (13).png" alt="Eric James">
+                <img src="images/eric/ej (14).png" alt="Eric James">
+                <img src="images/eric/ej (15).png" alt="Eric James">
+                <img src="images/eric/ej (16).png" alt="Eric James">
+                <img src="images/eric/ej (17).png" alt="Eric James">
                 <button class="arrow left" onclick="prevSlide()">&#10094;</button>
                 <button class="arrow right" onclick="nextSlide()">&#10095;</button>
             </div>
