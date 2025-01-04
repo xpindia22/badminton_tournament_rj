@@ -1,32 +1,6 @@
 <?php
-// login.php
 include 'header.php';
-require 'auth.php';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($user_id, $hashed_password, $role);
-    $stmt->fetch();
-    $stmt->close();
-
-    if ($user_id && verify_password($password, $hashed_password)) {
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        $error = "Invalid username or password.";
-    }
-}
-?>
-
+?> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,11 +90,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         b {
             color: #333;
         }
+
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin: auto;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .slideshow-container img {
+            width: 100%;
+            display: none;
+        }
+
+        .slideshow-container img.active {
+            display: block;
+        }
     </style>
+    <script>
+        let currentIndex = 0;
+
+        function showSlides() {
+            const slides = document.querySelectorAll(".slideshow-container img");
+            slides.forEach((slide, index) => {
+                slide.classList.remove("active");
+                if (index === currentIndex) {
+                    slide.classList.add("active");
+                }
+            });
+            currentIndex = (currentIndex + 1) % slides.length;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            showSlides(); // Show the first slide immediately
+            setInterval(showSlides, 3000); // Change image every 3 seconds
+        });
+    </script>
 </head>
 <body>
     <!-- Header is included and remains fixed at the top -->
     <div class="container">
+        <div class="slideshow-container">
+            <img src="images/tai (1).jpg" alt="Tai Tzu Ying" class="active">
+            <img src="images/tai (2).jpg" alt="Tai Tzu Ying">
+            <img src="images/tai (3).jpg" alt="Tai Tzu Ying">
+            <img src="images/tai (4).jpg" alt="Tai Tzu Ying">
+            <img src="images/tai (5).jpg" alt="Tai Tzu Ying">
+            <img src="images/tai (6).jpg" alt="Tai Tzu Ying">
+            <img src="images/tai (7).jpg" alt="Tai Tzu Ying">
+            <img src="images/tai (8).jpg" alt="Tai Tzu Ying">
+            <img src="images/eric/ej (1).png" alt="Eric James">
+            <img src="images/eric/ej (2).png" alt="Eric James">
+        </div>
         <h1>Welcome to Badminton Tournament Login</h1>
         <p><em>Beta release</em></p>
         <?php if (isset($error)): ?>

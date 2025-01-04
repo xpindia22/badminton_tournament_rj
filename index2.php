@@ -137,11 +137,6 @@ include 'header.php';
             <img src="images/tai (3).jpg" alt="Tai Tzu Ying">
             <img src="images/tai (4).jpg" alt="Tai Tzu Ying">
             <img src="images/tai (5).jpg" alt="Tai Tzu Ying">
-            <img src="images/tai (6).jpg" alt="Tai Tzu Ying">
-            <img src="images/tai (7).jpg" alt="Tai Tzu Ying">
-            <img src="images/tai (8).jpg" alt="Tai Tzu Ying">
-            <img src="images/eric/ej (1).png" alt="Eric James">
-            <img src="images/eric/ej (2).png" alt="Eric James">
         </div>
         <h1>Welcome to Badminton Tournament Login</h1>
         <p><em>Beta release</em></p>
