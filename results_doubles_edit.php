@@ -17,6 +17,9 @@ if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
+// Define stages
+$stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
+
 // Handle updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['edit_match'])) {
@@ -74,7 +77,7 @@ $query = "
         m.id AS match_id,
         t.name AS tournament_name,
         c.name AS category_name,
-        c.type AS category_type, /* Singles, Doubles, or Mixed Doubles */
+        c.type AS category_type,
         p1.name AS team1_player1_name,
         p2.name AS team1_player2_name,
         p3.name AS team2_player1_name,
@@ -147,7 +150,59 @@ $result = $conn->query($query);
     <h1>Doubles Match Results</h1>
 
     <!-- Filter Form -->
-    <!-- Same filter form code -->
+    <form method="get">
+        <label for="tournament_id">Tournament:</label>
+        <select name="tournament_id" id="tournament_id">
+            <option value="">All Tournaments</option>
+            <?php while ($row = $tournaments->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>" <?= $tournament_id == $row['id'] ? 'selected' : '' ?>>
+                    <?= $row['name'] ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="category_id">Category:</label>
+        <select name="category_id" id="category_id">
+            <option value="">All Categories</option>
+            <?php while ($row = $categories->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>" <?= $category_id == $row['id'] ? 'selected' : '' ?>>
+                    <?= $row['name'] ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="player_id">Player:</label>
+        <select name="player_id" id="player_id">
+            <option value="">All Players</option>
+            <?php while ($row = $players->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>" <?= $player_id == $row['id'] ? 'selected' : '' ?>>
+                    <?= $row['name'] ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="match_date">Match Date:</label>
+        <select name="match_date" id="match_date">
+            <option value="">All Dates</option>
+            <?php while ($row = $dates->fetch_assoc()): ?>
+                <option value="<?= $row['match_date'] ?>" <?= $match_date == $row['match_date'] ? 'selected' : '' ?>>
+                    <?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="datetime">Match Time:</label>
+        <select name="datetime" id="datetime">
+            <option value="">All Times</option>
+            <?php while ($row = $datetimes->fetch_assoc()): ?>
+                <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
+                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
 
     <!-- Results Table -->
     <?php if ($result->num_rows > 0): ?>
@@ -175,7 +230,15 @@ $result = $conn->query($query);
                         <td><?= $row['category_name'] ?></td>
                         <td><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
                         <td><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
-                        <td><input type="text" name="stage" value="<?= $row['stage'] ?>"></td>
+                        <td>
+                            <select name="stage">
+                                <?php foreach ($stages as $stage): ?>
+                                    <option value="<?= $stage ?>" <?= $row['stage'] === $stage ? 'selected' : '' ?>>
+                                        <?= $stage ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
                         <td><input type="date" name="match_date" value="<?= $row['match_date'] ?>"></td>
                         <td><input type="time" name="match_time" value="<?= $row['match_time'] ?>"></td>
                         <td><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
