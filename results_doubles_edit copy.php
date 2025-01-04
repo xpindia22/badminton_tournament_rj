@@ -138,37 +138,12 @@ $result = $conn->query($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doubles Match Results</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 20px 0; 
-        }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 8px; 
-            text-align: center; 
-            vertical-align: middle; 
-        }
-        th { 
-            background-color: #f4f4f4; 
-        }
-        form { 
-            margin-bottom: 20px; 
-        }
-        label, select, button { 
-            margin-right: 10px; 
-        }
-        td.team-column { 
-            width: 25%; 
-            text-align: left; 
-        }
-        td.set-column { 
-            width: 3%; 
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        form { margin-bottom: 20px; }
+        label, select, button { margin-right: 10px; }
     </style>
 </head>
 <body>
@@ -253,8 +228,8 @@ $result = $conn->query($query);
                         <td><?= $row['match_id'] ?><input type="hidden" name="match_id" value="<?= $row['match_id'] ?>"></td>
                         <td><?= $row['tournament_name'] ?></td>
                         <td><?= $row['category_name'] ?></td>
-                        <td class="team-column"><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
-                        <td class="team-column"><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
+                        <td><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
+                        <td><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
                         <td>
                             <select name="stage">
                                 <?php foreach ($stages as $stage): ?>
@@ -266,9 +241,9 @@ $result = $conn->query($query);
                         </td>
                         <td><input type="date" name="match_date" value="<?= $row['match_date'] ?>"></td>
                         <td><input type="time" name="match_time" value="<?= $row['match_time'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
+                        <td><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
+                        <td><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
+                        <td><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
                         <td><?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?></td>
                         <td>
                             <button type="submit" name="edit_match">Edit</button>
