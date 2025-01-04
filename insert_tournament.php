@@ -1,17 +1,8 @@
 <?php
 include 'header.php';
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once 'conn.php';
-
-// // Database connection
-// $conn = new mysqli("localhost", "root", "xxx", "badminton_tournament");
-// if ($conn->connect_error) {
-//     die("Connection failed: " . $conn->connect_error);
-// }
+require 'auth.php';
+redirect_if_not_logged_in();
 
 // Add Tournament
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_tournament'])) {

@@ -1,12 +1,11 @@
-<?php include 'header.php'; ?>
+ 
 
 <?php
 // edit_results_doubles.php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+include 'header.php';
 require_once 'conn.php';
+require 'auth.php';
+redirect_if_not_logged_in();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
