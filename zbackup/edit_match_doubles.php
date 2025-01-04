@@ -1,12 +1,15 @@
 <?php include 'header.php'; ?>
 
 <?php
-// results_doubles.php
+// edit_match_doubles.php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'conn.php';
+$servername = "localhost";
+$username = "root";
+$password = "xxx";
+$dbname = "badminton_tournament";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -34,7 +37,7 @@ $query = "
         m.id AS match_id,
         t.name AS tournament_name,
         c.name AS category_name,
-        c.type AS category_type, /* Singles, Doubles, or Mixed Doubles */
+        c.type AS category_type, /* Doubles or Mixed Doubles */
         p1.name AS team1_player1_name,
         p2.name AS team1_player2_name,
         p3.name AS team2_player1_name,
@@ -93,7 +96,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doubles Match Results</title>
+    <title>Doubles Match Management</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -104,61 +107,11 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Doubles Match Results</h1>
+    <h1>Doubles Match Management</h1>
 
     <!-- Filter Form -->
     <form method="get">
-        <label for="tournament_id">Tournament:</label>
-        <select name="tournament_id" id="tournament_id">
-            <option value="">All Tournaments</option>
-            <?php while ($row = $tournaments->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $tournament_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="category_id">Category:</label>
-        <select name="category_id" id="category_id">
-            <option value="">All Categories</option>
-            <?php while ($row = $categories->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $category_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="player_id">Player:</label>
-        <select name="player_id" id="player_id">
-            <option value="">All Players</option>
-            <?php while ($row = $players->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $player_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="match_date">Match Date:</label>
-        <select name="match_date" id="match_date">
-            <option value="">All Dates</option>
-            <?php while ($row = $dates->fetch_assoc()): ?>
-                <option value="<?= $row['match_date'] ?>" <?= $match_date == $row['match_date'] ? 'selected' : '' ?>>
-                    <?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="datetime">Match Time:</label>
-        <select name="datetime" id="datetime">
-            <option value="">All Times</option>
-            <?php while ($row = $datetimes->fetch_assoc()): ?>
-                <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <button type="submit">Filter</button>
+        <!-- Similar filter form as above -->
     </form>
 
     <!-- Results Table -->
@@ -177,6 +130,7 @@ $result = $conn->query($query);
                 <th>Set 2</th>
                 <th>Set 3</th>
                 <th>Winner</th>
+                <th>Actions</th>
             </tr>
             <?php while ($row = $result->fetch_assoc()): 
                 $team1 = $row['team1_player1_name'] . " & " . $row['team1_player2_name'];
@@ -198,6 +152,14 @@ $result = $conn->query($query);
                     <td><?= $row['set2_team1_points'] . ' - ' . $row['set2_team2_points'] ?></td>
                     <td><?= $row['set3_team1_points'] . ' - ' . $row['set3_team2_points'] ?></td>
                     <td><?= $winner ?></td>
+                    <td>
+                        <?php if ($_SESSION['permissions']['edit']): ?>
+                            <a href="edit_match_doubles.php?id=<?= $row['match_id'] ?>">Edit</a>
+                        <?php endif; ?>
+                        <?php if ($_SESSION['permissions']['delete']): ?>
+                            <a href="delete_match_doubles.php?id=<?= $row['match_id'] ?>" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endwhile; ?>
         </table>

@@ -1,12 +1,15 @@
+<?php include 'header.php'; ?>
+
 <?php
 // results.php
-include 'header.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'conn.php';
- 
+$servername = "localhost";
+$username = "root";
+$password = "xxx";
+$dbname = "badminton_tournament";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

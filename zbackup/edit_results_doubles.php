@@ -1,17 +1,60 @@
 <?php include 'header.php'; ?>
 
 <?php
-// results_doubles.php
+// edit_results_doubles.php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'conn.php';
+$servername = "localhost";
+$username = "root";
+$password = "xxx";
+$dbname = "badminton_tournament";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
+}
+
+// Define stages
+$stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
+
+// Handle updates
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['edit_match'])) {
+        $match_id = $_POST['match_id'];
+        $stage = $_POST['stage'];
+        $match_date = $_POST['match_date'];
+        $match_time = $_POST['match_time'];
+        $set1_team1_points = $_POST['set1_team1_points'];
+        $set1_team2_points = $_POST['set1_team2_points'];
+        $set2_team1_points = $_POST['set2_team1_points'];
+        $set2_team2_points = $_POST['set2_team2_points'];
+        $set3_team1_points = $_POST['set3_team1_points'];
+        $set3_team2_points = $_POST['set3_team2_points'];
+
+        $update_query = "
+            UPDATE matches SET
+                stage = '$stage',
+                match_date = '$match_date',
+                match_time = '$match_time',
+                set1_team1_points = $set1_team1_points,
+                set1_team2_points = $set1_team2_points,
+                set2_team1_points = $set2_team1_points,
+                set2_team2_points = $set2_team2_points,
+                set3_team1_points = $set3_team1_points,
+                set3_team2_points = $set3_team2_points
+            WHERE id = $match_id
+        ";
+        $conn->query($update_query);
+    }
+
+    if (isset($_POST['delete_match'])) {
+        $match_id = $_POST['match_id'];
+        $delete_query = "DELETE FROM matches WHERE id = $match_id";
+        $conn->query($delete_query);
+    }
 }
 
 // Fetch filters
@@ -34,7 +77,7 @@ $query = "
         m.id AS match_id,
         t.name AS tournament_name,
         c.name AS category_name,
-        c.type AS category_type, /* Singles, Doubles, or Mixed Doubles */
+        c.type AS category_type,
         p1.name AS team1_player1_name,
         p2.name AS team1_player2_name,
         p3.name AS team2_player1_name,
@@ -95,13 +138,40 @@ $result = $conn->query($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doubles Match Results</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        form { margin-bottom: 20px; }
-        label, select, button { margin-right: 10px; }
-    </style>
+    body { 
+        font-family: Arial, sans-serif; 
+        margin: 20px; 
+    }
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin: 20px 0; 
+    }
+    th, td { 
+        border: 1px solid #ddd; 
+        padding: 8px; 
+        text-align: center; 
+        vertical-align: middle; 
+    }
+    th { 
+        background-color: #f4f4f4; 
+    }
+    form { 
+        margin-bottom: 20px; 
+    }
+    label, select, button { 
+        margin-right: 10px; 
+    }
+    td.team-column { 
+        width: 25%; /* Wider column for Team 1 and Team 2 */
+        text-align: left; /* Align text to the left */
+    }
+    td.set-column { 
+        width: 5px; /* Narrow columns for Set 1, Set 2, and Set 3 */
+        text-align: center; /* Center-align text for better appearance */
+    }
+</style>
+
 </head>
 <body>
     <h1>Doubles Match Results</h1>
@@ -177,28 +247,37 @@ $result = $conn->query($query);
                 <th>Set 2</th>
                 <th>Set 3</th>
                 <th>Winner</th>
+                <th>Actions</th>
             </tr>
-            <?php while ($row = $result->fetch_assoc()): 
-                $team1 = $row['team1_player1_name'] . " & " . $row['team1_player2_name'];
-                $team2 = $row['team2_player1_name'] . " & " . $row['team2_player2_name'];
-                $team1_total = $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'];
-                $team2_total = $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'];
-                $winner = $team1_total > $team2_total ? $team1 : ($team1_total < $team2_total ? $team2 : 'Draw');
-            ?>
-                <tr>
-                    <td><?= $row['match_id'] ?></td>
-                    <td><?= $row['tournament_name'] ?></td>
-                    <td><?= $row['category_name'] ?></td>
-                    <td><?= $team1 ?></td>
-                    <td><?= $team2 ?></td>
-                    <td><?= $row['stage'] ?></td>
-                    <td><?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?></td>
-                    <td><?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?></td>
-                    <td><?= $row['set1_team1_points'] . ' - ' . $row['set1_team2_points'] ?></td>
-                    <td><?= $row['set2_team1_points'] . ' - ' . $row['set2_team2_points'] ?></td>
-                    <td><?= $row['set3_team1_points'] . ' - ' . $row['set3_team2_points'] ?></td>
-                    <td><?= $winner ?></td>
-                </tr>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <form method="post">
+                    <tr>
+                        <td><?= $row['match_id'] ?><input type="hidden" name="match_id" value="<?= $row['match_id'] ?>"></td>
+                        <td><?= $row['tournament_name'] ?></td>
+                        <td><?= $row['category_name'] ?></td>
+                        <td class="team-column"><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
+                        <td class="team-column"><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
+                        <td>
+                            <select name="stage">
+                                <?php foreach ($stages as $stage): ?>
+                                    <option value="<?= $stage ?>" <?= $row['stage'] === $stage ? 'selected' : '' ?>>
+                                        <?= $stage ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td><input type="date" name="match_date" value="<?= $row['match_date'] ?>"></td>
+                        <td><input type="time" name="match_time" value="<?= $row['match_time'] ?>"></td>
+                        <td class="set-column"><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
+                        <td class="set-column"><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
+                        <td class="set-column"><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
+                        <td><?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?></td>
+                        <td>
+                            <button type="submit" name="edit_match">Edit</button>
+                            <button type="submit" name="delete_match" onclick="return confirm('Are you sure you want to delete this match?')">Delete</button>
+                        </td>
+                    </tr>
+                </form>
             <?php endwhile; ?>
         </table>
     <?php else: ?>
