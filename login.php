@@ -204,7 +204,7 @@
         <div class="left-section">
             <div class="slideshow-container">
                 <img src="images/tai (1).jpg" alt="Tai Tzu Ying" class="active">
-                <img src="images/eric/ej5 (6).png" alt="Eric James">
+                <img src="images/eric/ej1 (6).png" alt="Eric James">
 
                 <img src="images/tai (2).jpg" alt="Tai Tzu Ying">
                 <img src="images/tai (3).jpg" alt="Tai Tzu Ying">
