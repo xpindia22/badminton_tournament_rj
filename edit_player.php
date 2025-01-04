@@ -92,9 +92,6 @@ $players = $conn->query("
         <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
         <a href="logout.php" class="logout-link">Logout</a>
     </div>
-    <div class="image-container">
-    <img src="images/badminton-player.jpg" alt="Badminton Player">
-</div>
 
     <div class="container">
         <h1>Edit Player</h1>
