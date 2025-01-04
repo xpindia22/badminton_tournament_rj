@@ -25,6 +25,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Invalid username or password.";
     }
 }
+
+
+// Get all image files from the images directory and its subdirectories
+function get_images_from_directory($directory) {
+    $images = [];
+    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+    // Recursive directory iterator
+    $dir_iterator = new RecursiveDirectoryIterator($directory);
+    $iterator = new RecursiveIteratorIterator($dir_iterator);
+
+    foreach ($iterator as $file) {
+        if ($file->isFile() && in_array(strtolower($file->getExtension()), $allowed_extensions)) {
+            $images[] = $file->getPathname();
+        }
+    }
+
+    return $images;
+}
+
+// Fetch and shuffle images
+$images = get_images_from_directory('images');
+shuffle($images); // Randomize the image order
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -231,41 +254,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Left Section with Slideshow -->
         <div class="left-section">
             <div class="slideshow-container">
-                <img src="images/tai (1).jpg" alt="Tai Tzu Ying" class="active">
-                <img src="images/eric/ej (1).jpg" alt="Eric James">
-                <img src="images/tai (2).jpg" alt="Tai Tzu Ying">
-                <img src="images/tai (3).jpg" alt="Tai Tzu Ying">
-                <img src="images/eric/ej (1).JPEG" alt="Eric James">
-                <img src="images/eric/ej (2).JPEG" alt="Eric James">
-                <img src="images/eric/ej (3).JPEG" alt="Eric James">
-                <img src="images/eric/ej (4).JPEG" alt="Eric James">
-                <img src="images/eric/ej (5).JPEG" alt="Eric James">
-
-                <img src="images/tai (4).jpg" alt="Tai Tzu Ying">
-                <img src="images/tai (5).jpg" alt="Tai Tzu Ying">
-                <img src="images/tai (6).jpg" alt="Tai Tzu Ying">
-                <img src="images/tai (7).jpg" alt="Tai Tzu Ying">
-                <img src="images/tai (8).jpg" alt="Tai Tzu Ying">
-                <img src="images/eric/ej (7).JPEG" alt="Eric James">
-                <img src="images/eric/ej (8).JPEG" alt="Eric James">
-                <img src="images/eric/ej (9).JPEG" alt="Eric James">
-                <img src="images/eric/ej (10).JPEG" alt="Eric James">
-                <img src="images/eric/ej (11).JPEG" alt="Eric James">
-                <img src="images/eric/ej (12).JPEG" alt="Eric James">
-                <img src="images/eric/ej (13).JPEG" alt="Eric James">
-                <img src="images/eric/ej (14).JPEG" alt="Eric James">
-                <img src="images/eric/ej (15).JPEG" alt="Eric James">
-                <img src="images/eric/ej (16).JPEG" alt="Eric James">
-                <img src="images/eric/ej (17).JPEG" alt="Eric James">
-                <img src="images/eric/ej (100).PNG" alt="Eric James">
-                <img src="images/eric/ej (101).PNG" alt="Eric James">
-                <img src="images/eric/ej (102).PNG" alt="Eric James">
-                <img src="images/eric/ej (103).PNG" alt="Eric James">
-                <img src="images/eric/ej (104).PNG" alt="Eric James">
-                <img src="images/eric/ej (105).PNG" alt="Eric James">
-                <img src="images/eric/ej (106).PNG" alt="Eric James">
-                <img src="images/eric/ej (107).PNG" alt="Eric James">
-
+                <?php foreach ($images as $image): ?>
+                    <img src="<?= htmlspecialchars($image) ?>" alt="Slideshow Image">
+                <?php endforeach; ?>
                 <button class="arrow left" onclick="prevSlide()">&#10094;</button>
                 <button class="arrow right" onclick="nextSlide()">&#10095;</button>
             </div>
