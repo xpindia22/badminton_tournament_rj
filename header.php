@@ -44,6 +44,11 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <a href="insert_match.php">Insert Match</a>
             <a href="results.php">Results</a>
             <a href="matches.php">Edit Matches</a>
+            <a href="insert_match_doubles.php">Insert Doubles Match</a>
+
+            <a href="matches_doubles.php">Doubles Matches</a>
+            <a href="results_doubles.php">Doubles Results</a>
+
             <a href="logout.php">Logout</a>
         </div>
     </div>
