@@ -5,6 +5,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Include database connection and authentication files
+include 'header.php';
+
 require_once "conn.php";
 require 'auth.php';
 redirect_if_not_logged_in();

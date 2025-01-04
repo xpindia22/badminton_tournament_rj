@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 03, 2025 at 07:21 AM
+-- Generation Time: Jan 04, 2025 at 12:46 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -48,42 +48,43 @@ CREATE TABLE `categories` (
   `name` varchar(255) NOT NULL,
   `created_by` int(11) NOT NULL,
   `age_group` varchar(255) DEFAULT NULL,
-  `sex` varchar(10) DEFAULT NULL
+  `sex` varchar(10) DEFAULT NULL,
+  `type` enum('singles','doubles','mixed doubles') DEFAULT 'singles'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`) VALUES
-(1, 'U17BS', 1, 'Under 17', 'M'),
-(2, 'U15BS', 1, 'Under 15', 'M'),
-(3, 'U15BD', 1, 'Under 15', 'M'),
-(4, 'U17BD', 2, 'Under 17', 'M'),
-(6, 'U15GS', 4, 'Under 15', 'F'),
-(7, 'U15GD', 1, 'Under 15', 'F'),
-(8, 'U13BS', 1, 'Under 13', 'M'),
-(11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M'),
-(12, 'Open Womens Single', 4, 'Between 5 - 100', 'F'),
-(13, 'Open XD', 4, 'Under 100', 'Mixed'),
-(14, 'Open Mens Doubles', 4, 'Open', 'M'),
-(15, 'Open Women Doubles', 4, 'Open', 'F'),
-(16, 'U17GS', 4, 'Under 17', 'F'),
-(17, 'U17GD', 4, 'Under 17', 'F'),
-(18, 'U17GD', 4, 'Under 17', 'F'),
-(19, 'U13GS', 4, 'Under 13', 'F'),
-(20, 'Senior 40 Plus Mens Single', 4, 'Over 40', 'M'),
-(21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M'),
-(22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F'),
-(23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F'),
-(25, 'U19BS', 4, 'Under 19', 'M'),
-(26, 'U19BD', 4, 'Under 19', 'M'),
-(27, 'U19GS', 4, 'Under 19', 'F'),
-(28, 'U19GD', 4, 'Under 19', 'F'),
-(29, 'U19XD', 4, 'Under 19', 'Mixed'),
-(30, 'U17XD', 4, 'Under 17', 'Mixed'),
-(31, 'U15XD', 4, 'Under 15', 'Mixed'),
-(32, 'Senior 40 Plus XD', 4, 'Over 40', 'Mixed');
+INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`, `type`) VALUES
+(1, 'U17BS', 1, 'Under 17', 'M', 'singles'),
+(2, 'U15BS', 1, 'Under 15', 'M', 'singles'),
+(3, 'U15BD', 1, 'Under 15', 'M', 'doubles'),
+(4, 'U17BD', 2, 'Under 17', 'M', 'doubles'),
+(6, 'U15GS', 4, 'Under 15', 'F', 'singles'),
+(7, 'U15GD', 1, 'Under 15', 'F', 'doubles'),
+(8, 'U13BS', 1, 'Under 13', 'M', 'singles'),
+(11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M', 'singles'),
+(12, 'Open Womens Single', 4, 'Between 5 - 100', 'F', 'singles'),
+(13, 'Open XD', 4, 'Under 100', 'Mixed', 'mixed doubles'),
+(14, 'Open Mens Doubles', 4, 'Open', 'M', 'doubles'),
+(15, 'Open Women Doubles', 4, 'Open', 'F', 'doubles'),
+(16, 'U17GS', 4, 'Under 17', 'F', 'singles'),
+(17, 'U17GD', 4, 'Under 17', 'F', 'doubles'),
+(18, 'U17GD', 4, 'Under 17', 'F', 'doubles'),
+(19, 'U13GS', 4, 'Under 13', 'F', 'singles'),
+(20, 'Senior 40 Plus Mens Single', 4, 'Over 40', 'M', 'singles'),
+(21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M', 'doubles'),
+(22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F', 'singles'),
+(23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F', 'doubles'),
+(25, 'U19BS', 4, 'Under 19', 'M', 'singles'),
+(26, 'U19BD', 4, 'Under 19', 'M', 'doubles'),
+(27, 'U19GS', 4, 'Under 19', 'F', 'singles'),
+(28, 'U19GD', 4, 'Under 19', 'F', 'doubles'),
+(29, 'U19XD', 4, 'Under 19', 'Mixed', 'mixed doubles'),
+(30, 'U17XD', 4, 'Under 17', 'Mixed', 'singles'),
+(31, 'U15XD', 4, 'Under 15', 'Mixed', 'singles'),
+(32, 'Senior 40 Plus XD', 4, 'Over 40', 'Mixed', 'singles');
 
 -- --------------------------------------------------------
 
@@ -108,8 +109,8 @@ CREATE TABLE `matches` (
   `tournament_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `pool` enum('A','B') DEFAULT NULL,
-  `player1_id` int(11) NOT NULL,
-  `player2_id` int(11) NOT NULL,
+  `player1_id` int(11) DEFAULT NULL,
+  `player2_id` int(11) DEFAULT NULL,
   `pre_quarter` tinyint(1) DEFAULT 0,
   `quarter` tinyint(1) DEFAULT 0,
   `semi` tinyint(1) DEFAULT 0,
@@ -124,7 +125,7 @@ CREATE TABLE `matches` (
   `stage` varchar(22) NOT NULL,
   `match_date` date DEFAULT NULL,
   `match_time` varchar(255) NOT NULL,
-  `date` date NOT NULL,
+  `date` date DEFAULT NULL,
   `team1_player1_id` int(11) NOT NULL DEFAULT 0,
   `team1_player2_id` int(11) NOT NULL DEFAULT 0,
   `team2_player1_id` int(11) DEFAULT 0,
@@ -134,29 +135,34 @@ CREATE TABLE `matches` (
   `set2_team1_points` int(11) DEFAULT 0,
   `set2_team2_points` int(11) DEFAULT 0,
   `set3_team1_points` int(11) DEFAULT 0,
-  `set3_team2_points` int(11) DEFAULT 0
+  `set3_team2_points` int(11) DEFAULT 0,
+  `player3_id` int(11) DEFAULT NULL,
+  `player4_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `matches`
 --
 
-INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`, `date`, `team1_player1_id`, `team1_player2_id`, `team2_player1_id`, `team2_player2_id`, `set1_team1_points`, `set1_team2_points`, `set2_team1_points`, `set2_team2_points`, `set3_team1_points`, `set3_team2_points`) VALUES
-(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(4, 1, 3, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(5, 3, 7, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(9, 1, 3, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(10, 3, 20, NULL, 11, 12, 0, 0, 0, 0, 21, 11, 12, 21, 21, 16, NULL, 'Pre Quarter Finals', '2025-01-02', '18:13', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(11, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(12, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(13, 3, 11, NULL, 10, 6, 0, 0, 0, 0, 28, 26, 24, 26, 28, 2, NULL, 'Pre Quarter Finals', '2025-01-03', '11:35', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(14, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 1, NULL, 'Pre Quarter Finals', NULL, '12:29', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(15, 1, 11, NULL, 2, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '12:31', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id`, `player2_id`, `pre_quarter`, `quarter`, `semi`, `final`, `set1_player1_points`, `set1_player2_points`, `set2_player1_points`, `set2_player2_points`, `set3_player1_points`, `set3_player2_points`, `created_by`, `stage`, `match_date`, `match_time`, `date`, `team1_player1_id`, `team1_player2_id`, `team2_player1_id`, `team2_player2_id`, `set1_team1_points`, `set1_team2_points`, `set2_team1_points`, `set2_team2_points`, `set3_team1_points`, `set3_team2_points`, `player3_id`, `player4_id`) VALUES
+(1, 1, 2, 'A', 3, 2, 0, 0, 0, 0, 21, 11, 12, 21, 21, 13, 1, 'Pre Quarter Finals', '2024-12-31', '11:11AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(2, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 21, 12, 12, 21, 21, 12, 1, 'Quarter Finals', '2024-12-26', '12:12AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(3, 1, 1, 'A', 2, 3, 0, 0, 0, 0, 28, 2, 2, 21, 24, 2, 1, 'Finals', '2024-12-24', '01:12PM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(4, 1, 16, 'A', 1, 4, 0, 0, 0, 0, 21, 2, 1, 21, 21, 1, 1, 'Pre Quarter Finals', '2024-06-01', '01:01AM', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(5, 3, 16, NULL, 1, 4, 0, 0, 0, 0, 21, 2, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '20:53', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(6, 4, 4, NULL, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 'Quarterfinals', '2025-01-01', '06:55', '0000-00-00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(7, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-01', '12:15', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(9, 1, 16, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(10, 3, 20, NULL, 11, 12, 0, 0, 0, 0, 21, 11, 12, 21, 21, 16, NULL, 'Pre Quarter Finals', '2025-01-02', '18:13', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(11, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(12, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(13, 3, 11, NULL, 10, 6, 0, 0, 0, 0, 28, 26, 24, 26, 28, 2, NULL, 'Pre Quarter Finals', '2025-01-03', '11:35', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(14, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 1, NULL, 'Pre Quarter Finals', NULL, '12:29', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(15, 1, 11, NULL, 2, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '12:31', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(16, 3, 20, NULL, 10, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', '2025-01-03', '10:19', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(17, 3, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarterfinals', NULL, '2025-01-03 21:20:00', NULL, 2, 10, 11, 12, 0, 0, 0, 0, 0, 0, NULL, NULL),
+(18, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '06:07', '2025-01-04', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -332,7 +338,9 @@ ALTER TABLE `matches`
   ADD KEY `tournament_id` (`tournament_id`),
   ADD KEY `category_id` (`category_id`),
   ADD KEY `player1_id` (`player1_id`),
-  ADD KEY `player2_id` (`player2_id`);
+  ADD KEY `player2_id` (`player2_id`),
+  ADD KEY `fk_player3` (`player3_id`),
+  ADD KEY `fk_player4` (`player4_id`);
 
 --
 -- Indexes for table `players`
@@ -396,7 +404,7 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `players`
@@ -450,6 +458,8 @@ ALTER TABLE `category_access`
 -- Constraints for table `matches`
 --
 ALTER TABLE `matches`
+  ADD CONSTRAINT `fk_player3` FOREIGN KEY (`player3_id`) REFERENCES `players` (`id`),
+  ADD CONSTRAINT `fk_player4` FOREIGN KEY (`player4_id`) REFERENCES `players` (`id`),
   ADD CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`),
   ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`player1_id`) REFERENCES `players` (`id`),
