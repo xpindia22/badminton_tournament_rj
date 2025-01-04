@@ -83,8 +83,8 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                 <a href="#">Doubles Matches</a>
                 <div class="dropdown-content">
                     <a href="insert_match_doubles.php">Insert Doubles Match</a>
-                    <a href="matches_doubles.php">Doubles Matches</a>
-                    <a href="results_doubles.php">Doubles Results</a>
+                    <a href="results_doubles.php">Results Doubles Matches</a>
+                    <a href="edit_results_doubles.php">Edit Doubles Matches</a>
                 </div>
             </div>
 
