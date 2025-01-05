@@ -1,4 +1,4 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -83,25 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 
-// Fetch categories for the locked tournament, filtering for doubles and mixed doubles
+// Fetch categories for the locked tournament
 if ($lockedTournament) {
-    $stmt = $conn->prepare("
-        SELECT c.id, c.name, c.age_group, c.sex 
-        FROM categories c 
-        INNER JOIN tournament_categories tc ON c.id = tc.category_id 
-        WHERE tc.tournament_id = ? 
-        AND (c.name NOT LIKE '%S' AND (c.name LIKE '%D' OR c.name LIKE '%XD'))
-    ");
+    $stmt = $conn->prepare("SELECT c.id, c.name, c.age_group, c.sex FROM categories c INNER JOIN tournament_categories tc ON c.id = tc.category_id WHERE tc.tournament_id = ?");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
     $categories = $stmt->get_result();
     $stmt->close();
 } else {
-    $categories = $conn->query("
-        SELECT id, name, age_group, sex 
-        FROM categories 
-        WHERE name NOT LIKE '%S' AND (name LIKE '%D' OR name LIKE '%XD')
-    ");
+    $categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
 }
 
 // Fetch players
@@ -113,7 +103,7 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 <head>
     <title>Insert Doubles Match</title>
     <style>
-/* Your CSS styles here */
+/* General styles for the page */
 body {
     font-family: Arial, sans-serif;
     background-color: #f7f9fc;
@@ -121,6 +111,8 @@ body {
     padding: 0;
     color: #333;
 }
+
+/* Center the container */
 .container {
     max-width: 800px;
     margin: 50px auto;
@@ -129,57 +121,80 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
+
+/* Page heading */
 h1 {
     text-align: center;
     color: #007bff;
     font-size: 24px;
     margin-bottom: 20px;
 }
+
+/* Form styles */
 form {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
+
+/* Labels and inputs */
 label {
     font-weight: bold;
     margin-bottom: 5px;
     color: #555;
 }
+
 select, input, button {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    transition: all 0.2s ease-in-out;
     width: 100%;
+    box-sizing: border-box;
 }
+
+/* Input and select focus styles */
 select:focus, input:focus {
     border-color: #007bff;
     outline: none;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
 }
+
+/* Button styles */
 button {
     background-color: #007bff;
     color: #fff;
     border: none;
     cursor: pointer;
     font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
 }
+
 button:hover {
     background-color: #0056b3;
 }
+
+/* Message box styles */
 .message {
     padding: 15px;
     border-radius: 5px;
+    margin-bottom: 20px;
     font-size: 16px;
     text-align: center;
 }
+
 .message.success {
     background-color: #d4edda;
     color: #155724;
+    border: 1px solid #c3e6cb;
 }
+
 .message.error {
     background-color: #f8d7da;
     color: #721c24;
+    border: 1px solid #f5c6cb;
 }
     </style>
 </head>
@@ -187,9 +202,7 @@ button:hover {
     <div class="container">
         <h1>Insert Doubles Match</h1>
         <?php if ($message): ?>
-            <p class="message <?= strpos($message, 'success') !== false ? 'success' : 'error' ?>">
-                <?= htmlspecialchars($message) ?>
-            </p>
+            <p class="message"><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
 
         <?php if (!$lockedTournament): ?>
@@ -224,35 +237,47 @@ button:hover {
             <label for="team1_player1_id">Team 1 - Player 1:</label>
             <select name="team1_player1_id" id="team1_player1_id" required>
                 <option value="">Select Player</option>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = date('Y') - date('Y', strtotime($player['dob'])); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team1_player2_id">Team 1 - Player 2:</label>
             <select name="team1_player2_id" id="team1_player2_id" required>
                 <option value="">Select Player</option>
-                <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php $players->data_seek(0); // Reset pointer ?>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = date('Y') - date('Y', strtotime($player['dob'])); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team2_player1_id">Team 2 - Player 1:</label>
             <select name="team2_player1_id" id="team2_player1_id" required>
                 <option value="">Select Player</option>
-                <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php $players->data_seek(0); // Reset pointer ?>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = date('Y') - date('Y', strtotime($player['dob'])); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team2_player2_id">Team 2 - Player 2:</label>
             <select name="team2_player2_id" id="team2_player2_id" required>
                 <option value="">Select Player</option>
-                <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php $players->data_seek(0); // Reset pointer ?>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = date('Y') - date('Y', strtotime($player['dob'])); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
