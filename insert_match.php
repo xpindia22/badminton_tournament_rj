@@ -1,9 +1,16 @@
 <?php
+<<<<<<< HEAD
 // Enable error reporting for debugging
+=======
+>>>>>>> main
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -34,9 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
         $category_id = $_POST['category_id'];
         $player1_id = $_POST['player1_id'];
+<<<<<<< HEAD
         $player1_partner_id = $_POST['player1_partner_id'] ?? null;
         $player2_id = $_POST['player2_id'];
         $player2_partner_id = $_POST['player2_partner_id'] ?? null;
+=======
+        $player2_id = $_POST['player2_id'];
+>>>>>>> main
         $stage = $_POST['stage'];
         $date = $_POST['date'];
         $match_time = $_POST['time'];
@@ -49,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $conn->prepare("
             INSERT INTO matches (
+<<<<<<< HEAD
                 tournament_id, category_id, player1_id, player1_partner_id, 
                 player2_id, player2_partner_id, stage, date, match_time, 
                 set1_player1_points, set1_player2_points, set2_player1_points, 
@@ -61,6 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tournament_id, $category_id, $player1_id, $player1_partner_id,
             $player2_id, $player2_partner_id, $stage, $date, $match_time,
             $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
+=======
+                tournament_id, category_id, player1_id, player2_id, stage, 
+                date, match_time, set1_player1_points, set1_player2_points, 
+                set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
+            ) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param(
+            "iiiisssiiiiii",
+            $tournament_id, $category_id, $player1_id, $player2_id, $stage,
+            $date, $match_time, $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
+>>>>>>> main
         );
 
         if ($stmt->execute()) {
@@ -78,7 +102,11 @@ $tournaments = $conn->query("SELECT id, name FROM tournaments");
 // Fetch categories for the locked tournament
 if ($lockedTournament) {
     $stmt = $conn->prepare("
+<<<<<<< HEAD
         SELECT c.id, c.name, c.age_group, c.sex, c.type 
+=======
+        SELECT c.id, c.name, c.age_group, c.sex 
+>>>>>>> main
         FROM categories c
         INNER JOIN tournament_categories tc ON c.id = tc.category_id
         WHERE tc.tournament_id = ?
@@ -88,12 +116,19 @@ if ($lockedTournament) {
     $categories = $stmt->get_result();
     $stmt->close();
 } else {
+<<<<<<< HEAD
     $categories = $conn->query("SELECT id, name, age_group, sex, type FROM categories");
+=======
+    $categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
+>>>>>>> main
 }
 
 // Fetch players
 $players = $conn->query("SELECT id, name, dob, sex FROM players");
+<<<<<<< HEAD
 $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
+=======
+>>>>>>> main
 ?>
 
 <!DOCTYPE html>
@@ -101,6 +136,7 @@ $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
 <head>
     <title>Insert Match</title>
     <style>
+<<<<<<< HEAD
         .player-group {
             display: none;
         }
@@ -112,6 +148,90 @@ $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
             if (!dob) return "N/A";
             const birthDate = new Date(dob);
             if (isNaN(birthDate)) return "N/A";
+=======
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .top-bar {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logout-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        const players = <?= json_encode($players->fetch_all(MYSQLI_ASSOC)) ?>;
+
+        function calculateAge(dob) {
+            if (!dob) return "N/A"; // Handle missing or invalid DOB
+            const birthDate = new Date(dob);
+            if (isNaN(birthDate)) return "N/A"; // Handle invalid date format
+>>>>>>> main
 
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
@@ -122,6 +242,7 @@ $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
             return age;
         }
 
+<<<<<<< HEAD
         function isPlayerEligible(player, age, ageGroup, sex) {
             const ageMatch = ageGroup.match(/\d+/g);
             if (!ageMatch) return true;
@@ -149,11 +270,21 @@ $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
             playerDropdowns.forEach(dropdown => {
                 dropdown.innerHTML = '<option value="">Select Player</option>';
             });
+=======
+        function updatePlayerDropdown() {
+            const categoryId = document.getElementById('category_id').value;
+            const player1Dropdown = document.getElementById('player1_id');
+            const player2Dropdown = document.getElementById('player2_id');
+
+            player1Dropdown.innerHTML = '<option value="">Select Player</option>';
+            player2Dropdown.innerHTML = '<option value="">Select Player</option>';
+>>>>>>> main
 
             if (categoryId) {
                 const category = document.querySelector(`#category_id option[value="${categoryId}"]`);
                 const ageGroup = category.dataset.ageGroup;
                 const sex = category.dataset.sex;
+<<<<<<< HEAD
                 const isDoubles = category.dataset.type === "doubles";
 
                 playerGroup.forEach(group => {
@@ -165,28 +296,85 @@ $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
                     if (isPlayerEligible(player, age, ageGroup, sex)) {
                         const option = `<option value="${player.id}">${player.name} (${age}, ${player.sex})</option>`;
                         playerDropdowns.forEach(dropdown => dropdown.innerHTML += option);
+=======
+
+                players.forEach(player => {
+                    const age = calculateAge(player.dob); // Use corrected `dob` field
+                    if (isPlayerEligible(player, age, ageGroup, sex)) {
+                        const option = `<option value="${player.id}">${player.name} (${age}, ${player.sex})</option>`;
+                        player1Dropdown.innerHTML += option;
+                        player2Dropdown.innerHTML += option;
+>>>>>>> main
                     }
                 });
             }
         }
+
+        function isPlayerEligible(player, age, ageGroup, sex) {
+            const ageMatch = ageGroup.match(/\d+/g);
+            if (!ageMatch) return true; // No age restriction, all players are eligible
+
+            if (ageGroup.includes("Under")) {
+                const maxAge = parseInt(ageMatch[0], 10);
+                if (age > maxAge) return false; // Exclude players older than maxAge
+            } else if (ageGroup.includes("Plus")) {
+                const minAge = parseInt(ageMatch[0], 10);
+                if (age < 40 || age < minAge) return false; // Exclude players under 40 or under minAge
+            }
+
+            if (sex === 'M' && player.sex !== 'M') return false; // Exclude non-male players for male-only categories
+            if (sex === 'F' && player.sex !== 'F') return false; // Exclude non-female players for female-only categories
+            if (sex === 'Mixed' && (player.sex !== 'M' && player.sex !== 'F')) return false; // Exclude players not fitting mixed criteria
+
+            return true; // If all conditions pass, the player is eligible
+        }
     </script>
 </head>
 <body>
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> main
     <div class="container">
         <h1>Insert Match</h1>
         <?php if ($message): ?>
             <p class="message"><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
 
+<<<<<<< HEAD
+=======
+        <?php if (!$lockedTournament): ?>
+            <form method="post">
+                <label for="tournament_id">Select Tournament:</label>
+                <select name="tournament_id" id="tournament_id" required>
+                    <option value="">Select Tournament</option>
+                    <?php while ($row = $tournaments->fetch_assoc()): ?>
+                        <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
+                    <?php endwhile; ?>
+                </select>
+                <button type="submit" name="lock_tournament">Lock Tournament</button>
+            </form>
+        <?php else: ?>
+            <form method="post">
+                <p>Locked Tournament: <?= htmlspecialchars($_SESSION['locked_tournament_name'] ?? '') ?></p>
+                <button type="submit" name="unlock_tournament">Unlock Tournament</button>
+            </form>
+        <?php endif; ?>
+
+>>>>>>> main
         <form method="post">
             <label for="category_id">Category:</label>
             <select name="category_id" id="category_id" onchange="updatePlayerDropdown()" required>
                 <option value="">Select Category</option>
                 <?php while ($row = $categories->fetch_assoc()): ?>
+<<<<<<< HEAD
                     <option value="<?= $row['id'] ?>" 
                             data-age-group="<?= $row['age_group'] ?>" 
                             data-sex="<?= $row['sex'] ?>" 
                             data-type="<?= htmlspecialchars($row['type']) ?>"> 
+=======
+                    <option value="<?= $row['id'] ?>" data-age-group="<?= $row['age_group'] ?>" data-sex="<?= $row['sex'] ?>">
+>>>>>>> main
                         <?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['age_group']) ?>, <?= htmlspecialchars($row['sex']) ?>)
                     </option>
                 <?php endwhile; ?>
@@ -219,7 +407,11 @@ $playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
             <label for="date">Match Date:</label>
             <input type="date" name="date" required>
 
+<<<<<<< HEAD
             <label for="time">Match Time:</label>
+=======
+            <label for="match_time">Match Time:</label>
+>>>>>>> main
             <input type="time" name="time" required>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>

@@ -1,7 +1,8 @@
 <?php
+//conn.php
 $servername = "localhost";
-$username = "root"; // Use your MySQL username
-$password = "xxx"; // Use your MySQL password
+$username = "bd"; // Use your MySQL username
+$password = ".0ZX@4jh/I@M]BS]"; // Use your MySQL password
 $dbname = "badminton_tournament";
 
 // Create connection

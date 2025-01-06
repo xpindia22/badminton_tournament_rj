@@ -1,4 +1,6 @@
 <?php
+//manage_users.php
+include 'header.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -91,11 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Guest') ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
-
+ 
     <div class="container">
         <h1>Manage Users</h1>
         <?php if (!empty($message)): ?>

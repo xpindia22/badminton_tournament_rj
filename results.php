@@ -1,13 +1,12 @@
 <?php
-//results.php
+// results.php
+include 'header.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$servername = "localhost";
-$username = "root";
-$password = "xxx";
-$dbname = "badminton_tournament";
+require_once 'conn.php';
+ 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -19,11 +18,15 @@ if ($conn->connect_error) {
 $tournament_id = $_GET['tournament_id'] ?? '';
 $category_id = $_GET['category_id'] ?? '';
 $player_id = $_GET['player_id'] ?? '';
+$match_date = $_GET['match_date'] ?? '';
+$datetime = $_GET['datetime'] ?? '';
 
 // Fetch data for dropdowns
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 $categories = $conn->query("SELECT id, name FROM categories");
 $players = $conn->query("SELECT id, name FROM players");
+$dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
+$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
 
 // Build the query with optional filters
 $query = "
@@ -34,6 +37,8 @@ $query = "
         p1.name AS player1_name,
         p2.name AS player2_name,
         m.stage,
+        m.match_date,
+        m.match_time,
         m.set1_player1_points,
         m.set1_player2_points,
         m.set2_player1_points,
@@ -60,10 +65,17 @@ if ($player_id) {
     $query .= " AND (m.player1_id = $player_id OR m.player2_id = $player_id)";
 }
 
+if ($match_date) {
+    $query .= " AND m.match_date = '$match_date'";
+}
+
+if ($datetime) {
+    $query .= " AND m.match_time = '$datetime'";
+}
+
 $query .= " ORDER BY m.id";
 
 $result = $conn->query($query);
-
 ?>
 
 <!DOCTYPE html>
@@ -71,7 +83,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Results</title>
+    <title>All Tournament Results</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -82,7 +94,7 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Tournament Results</h1>
+    <h1>All Tournament Results</h1>
 
     <!-- Filter Form -->
     <form method="get">
@@ -116,6 +128,26 @@ $result = $conn->query($query);
             <?php endwhile; ?>
         </select>
 
+        <label for="match_date">Match Date:</label>
+        <select name="match_date" id="match_date">
+            <option value="">All Dates</option>
+            <?php while ($row = $dates->fetch_assoc()): ?>
+                <option value="<?= $row['match_date'] ?>" <?= $match_date == $row['match_date'] ? 'selected' : '' ?>>
+                    <?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="datetime">Match Time:</label>
+        <select name="datetime" id="datetime">
+            <option value="">All Times</option>
+            <?php while ($row = $datetimes->fetch_assoc()): ?>
+                <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
+                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
         <button type="submit">Filter</button>
     </form>
 
@@ -129,6 +161,8 @@ $result = $conn->query($query);
                 <th>Player 1</th>
                 <th>Player 2</th>
                 <th>Stage</th>
+                <th>Match Date</th>
+                <th>Match Time</th>
                 <th>Set 1</th>
                 <th>Set 2</th>
                 <th>Set 3</th>
@@ -146,6 +180,8 @@ $result = $conn->query($query);
                     <td><?= $row['player1_name'] ?></td>
                     <td><?= $row['player2_name'] ?></td>
                     <td><?= $row['stage'] ?></td>
+                    <td><?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?></td>
+                    <td><?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?></td>
                     <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
                     <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
                     <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>

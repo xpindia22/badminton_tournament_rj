@@ -1,4 +1,6 @@
 <?php
+//tournaments.php
+include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -93,10 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
     <div class="container">
         <h1><?= $is_admin ? "Manage All Tournaments" : "View Tournaments" ?></h1>
         <?php if (!empty($message)): ?>
