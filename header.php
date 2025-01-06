@@ -117,7 +117,7 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                     <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match_gd.php">Insert Girls Doubles</a>
                     <a href="results_gd.php">Result Girls Doubles</a>
-                    <a href="edit_results_doubles.php">Edit Girls Doubles</a>
+                    <a href="edit_results_gd.php">Edit Girls Doubles</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -127,7 +127,7 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                     <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match_xd.php">Create Mixed Doubles</a>
                     <a href="results_xd.php">Results Mixed Doubles</a>
-                    <a href="edit_results_doubles.php">Edit Mixed Doubles</a>
+                    <a href="edit_results_xd.php">Edit Mixed Doubles</a>
                 </div>
             </div>
             <a href="logout.php">Logout</a>
