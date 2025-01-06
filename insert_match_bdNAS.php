@@ -14,6 +14,11 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 $message = '';
 $lockedTournament = $_SESSION['locked_tournament'] ?? null;
 
+// Function to calculate age
+function calculate_age($dob) {
+    return date('Y') - date('Y', strtotime($dob));
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['lock_tournament'])) {
         $lockedTournament = intval($_POST['tournament_id']);
@@ -90,7 +95,7 @@ if ($lockedTournament) {
         FROM categories c 
         INNER JOIN tournament_categories tc ON c.id = tc.category_id 
         WHERE tc.tournament_id = ? 
-        AND c.name LIKE '%BD%'
+        AND (c.name NOT LIKE '%S' AND (c.name LIKE '%D' OR c.name LIKE '%XD'))
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
@@ -100,10 +105,9 @@ if ($lockedTournament) {
     $categories = $conn->query("
         SELECT id, name, age_group, sex 
         FROM categories 
-        WHERE name LIKE '%BD%'
+        WHERE name NOT LIKE '%S' AND (name LIKE '%D' OR name LIKE '%XD')
     ");
 }
-
 
 // Fetch players
 $players = $conn->query("SELECT id, name, dob, sex FROM players");
@@ -225,8 +229,11 @@ button:hover {
             <label for="team1_player1_id">Team 1 - Player 1:</label>
             <select name="team1_player1_id" id="team1_player1_id" required>
                 <option value="">Select Player</option>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = calculate_age($player['dob']); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
@@ -234,8 +241,11 @@ button:hover {
             <select name="team1_player2_id" id="team1_player2_id" required>
                 <option value="">Select Player</option>
                 <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = calculate_age($player['dob']); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
@@ -243,8 +253,11 @@ button:hover {
             <select name="team2_player1_id" id="team2_player1_id" required>
                 <option value="">Select Player</option>
                 <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = calculate_age($player['dob']); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
@@ -252,8 +265,11 @@ button:hover {
             <select name="team2_player2_id" id="team2_player2_id" required>
                 <option value="">Select Player</option>
                 <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php while ($player = $players->fetch_assoc()): 
+                    $age = calculate_age($player['dob']); ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?>, <?= htmlspecialchars($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
