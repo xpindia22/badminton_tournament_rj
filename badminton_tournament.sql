@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 04, 2025 at 04:52 AM
+-- Generation Time: Jan 06, 2025 at 12:43 PM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -65,19 +65,19 @@ INSERT INTO `categories` (`id`, `name`, `created_by`, `age_group`, `sex`, `type`
 (6, 'U15GS', 4, 'Under 15', 'F', 'singles', 0),
 (7, 'U15GD', 1, 'Under 15', 'F', 'doubles', 0),
 (8, 'U13BS', 1, 'Under 13', 'M', 'singles', 0),
-(11, 'Open Mens Singles', 4, 'Between 5 - 100', 'M', 'singles', 0),
-(12, 'Open Womens Single', 4, 'Between 5 - 100', 'F', 'singles', 0),
-(13, 'Open XD', 4, 'Under 100', 'Mixed', 'mixed doubles', 0),
-(14, 'Open Mens Doubles', 4, 'Open', 'M', 'doubles', 0),
-(15, 'Open Women Doubles', 4, 'Open', 'F', 'doubles', 0),
+(11, 'Open BS', 4, 'Between 5 - 100', 'M', 'singles', 0),
+(12, 'Open GS', 4, 'Between 5 - 100', 'F', 'singles', 0),
+(13, 'Open XD', 4, 'Between 5 - 100', 'Mixed', 'mixed doubles', 0),
+(14, 'Open BD', 4, 'Between 5 - 100', 'M', 'doubles', 0),
+(15, 'Open GD', 4, 'Between 5 - 100', 'F', 'doubles', 0),
 (16, 'U17GS', 4, 'Under 17', 'F', 'singles', 0),
 (17, 'U17GD', 4, 'Under 17', 'F', 'doubles', 0),
 (18, 'U17GD', 4, 'Under 17', 'F', 'doubles', 0),
 (19, 'U13GS', 4, 'Under 13', 'F', 'singles', 0),
-(20, 'Senior 40 Plus Mens Single', 4, 'Over 40', 'M', 'singles', 0),
-(21, 'Senior 40 Plus Mens Doubles', 4, 'Over 40', 'M', 'doubles', 0),
-(22, 'Senior 40 Plus Women Single', 4, 'Over 40', 'F', 'singles', 0),
-(23, 'Senior 40 Plus Women Doubles', 4, 'Over 40', 'F', 'doubles', 0),
+(20, 'Senior 40 Plus BS', 4, 'Over 40', 'M', 'singles', 0),
+(21, 'Senior 40 Plus BD', 4, 'Over 40', 'M', 'doubles', 0),
+(22, 'Senior 40 Plus GS', 4, 'Over 40', 'F', 'singles', 0),
+(23, 'Senior 40 Plus GD', 4, 'Over 40', 'F', 'doubles', 0),
 (25, 'U19BS', 4, 'Under 19', 'M', 'singles', 0),
 (26, 'U19BD', 4, 'Under 19', 'M', 'doubles', 0),
 (27, 'U19GS', 4, 'Under 19', 'F', 'singles', 0),
@@ -169,7 +169,15 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (22, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Semifinals', NULL, '2025-01-04 08:37:00', NULL, 6, 2, 13, 12, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (23, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarterfinals', NULL, '2025-01-04 08:42:00', NULL, 10, 13, 12, 2, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (24, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', NULL, '8', '2025-01-04', 2, 3, 11, 12, 21, 2, 2, 21, 21, 3, NULL, NULL),
-(25, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', NULL, '10', '2025-01-04', 2, 13, 12, 6, 21, 2, 2, 21, 21, 2, NULL, NULL);
+(25, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', NULL, '10', '2025-01-04', 2, 13, 12, 6, 21, 2, 2, 21, 21, 2, NULL, NULL),
+(26, 1, 26, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-06', '9', NULL, 2, 11, 13, 12, 24, 22, 22, 24, 21, 1, NULL, NULL),
+(27, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-06', '9', NULL, 9, 6, 2, 4, 1, 21, 21, 2, 1, 21, NULL, NULL),
+(28, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-06', '9', NULL, 9, 6, 2, 4, 1, 21, 21, 2, 1, 21, NULL, NULL),
+(29, 1, 26, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-06', '11', NULL, 12, 3, 6, 13, 21, 2, 2, 21, 21, 2, NULL, NULL),
+(30, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-06', '11', NULL, 13, 11, 2, 3, 21, 2, 2, 21, 21, 2, NULL, NULL),
+(31, 1, 21, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-06', '11', NULL, 6, 11, 12, 13, 21, 2, 2, 21, 21, 2, NULL, NULL),
+(32, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-06', '17', NULL, 4, 14, 1, 15, 21, 12, 13, 21, 21, 2, NULL, NULL),
+(33, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Semi Finals', '2025-01-06', '17', NULL, 19, 9, 17, 15, 21, 12, 13, 21, 21, 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -202,7 +210,15 @@ INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`, `
 (10, 'Gokulan', '1990-01-01', 35, 'M', '9', 4, 1),
 (11, 'Zanpear', '1978-05-01', 46, 'M', '6', 4, 1),
 (12, 'Pandyraj', '1968-01-01', 57, 'M', '7', 4, 20),
-(13, 'Vijay', '1970-01-30', 54, 'M', '8', 4, 1);
+(13, 'Vijay', '1970-01-30', 54, 'M', '8', 4, 1),
+(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', 'UID_677bbe9999e8f', 4, 1),
+(15, 'An Se Young', '2000-01-01', 25, 'F', 'UID_677bbebb3b149', 4, 1),
+(16, 'Okuhara', '1998-01-01', 27, 'F', 'UID_677bc0ddf116b', 4, 1),
+(17, 'Anitha Anthony', '2008-01-01', 17, 'F', 'UID_677bc10641ef2', 4, 1),
+(18, 'Carolina', '1995-06-06', 29, 'F', 'UID_677bc127daf31', 4, 1),
+(19, 'PV Sindhu', '1995-06-07', 29, 'F', 'UID_677bc162674ae', 4, 1),
+(20, 'Victor Axelsen', '1995-05-07', 29, 'M', 'UID_677bc1915e3b3', 4, 1),
+(21, 'Lin Dan', '1986-02-06', 38, 'M', 'UID_677bc1a51f3b6', 4, 1);
 
 -- --------------------------------------------------------
 
@@ -226,7 +242,15 @@ INSERT INTO `player_access` (`id`, `player_id`, `user_id`, `created_at`) VALUES
 (3, 10, 4, '2025-01-01 10:50:55'),
 (4, 11, 4, '2025-01-01 10:51:56'),
 (5, 12, 4, '2025-01-01 11:35:13'),
-(6, 13, 4, '2025-01-01 12:06:34');
+(6, 13, 4, '2025-01-01 12:06:34'),
+(7, 14, 4, '2025-01-06 11:29:29'),
+(8, 15, 4, '2025-01-06 11:30:03'),
+(9, 16, 4, '2025-01-06 11:39:10'),
+(10, 17, 4, '2025-01-06 11:39:50'),
+(11, 18, 4, '2025-01-06 11:40:23'),
+(12, 19, 4, '2025-01-06 11:41:22'),
+(13, 20, 4, '2025-01-06 11:42:09'),
+(14, 21, 4, '2025-01-06 11:42:29');
 
 -- --------------------------------------------------------
 
@@ -278,11 +302,20 @@ INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUE
 (35, 2, 1),
 (36, 4, 2),
 (37, 4, 3),
-(44, 1, 1),
-(45, 1, 2),
-(46, 1, 3),
-(47, 1, 14),
-(48, 1, 11);
+(74, 1, 1),
+(75, 1, 2),
+(76, 1, 3),
+(77, 1, 13),
+(78, 1, 17),
+(79, 1, 20),
+(80, 1, 21),
+(81, 1, 23),
+(82, 1, 3),
+(83, 1, 26),
+(84, 1, 14),
+(85, 1, 15),
+(86, 1, 13),
+(87, 1, 32);
 
 -- --------------------------------------------------------
 
@@ -433,19 +466,19 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `player_access`
 --
 ALTER TABLE `player_access`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tournaments`
@@ -457,7 +490,7 @@ ALTER TABLE `tournaments`
 -- AUTO_INCREMENT for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT for table `users`
