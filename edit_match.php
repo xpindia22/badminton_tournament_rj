@@ -1,7 +1,7 @@
-<?php include 'header.php'; ?>
 
 <?php
 // edit_match.php
+include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -119,10 +119,7 @@ $players = $conn->query("SELECT id, name FROM players");
 </head>
 
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($username) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
+ 
 
     <div class="container">
         <h1>Edit Match</h1>
