@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($match_date === false) {
             $message = "Invalid date format!";
         } else {
+           
             $match_date = $match_date->format('Y-m-d'); 
         }
 
@@ -79,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 
 if ($lockedTournament) {

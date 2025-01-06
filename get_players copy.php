@@ -5,14 +5,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['category_id'])) {
     $category_id = intval($_GET['category_id']);
 
     // Fetch category details (age group and sex)
-    $stmt = $conn->prepare("SELECT age_group, sex, name FROM categories WHERE id = ?");
+    $stmt = $conn->prepare("SELECT age_group, sex FROM categories WHERE id = ?");
     $stmt->bind_param("i", $category_id);
     $stmt->execute();
-    $stmt->bind_result($age_group, $sex, $category_name);
+    $stmt->bind_result($age_group, $sex);
     $stmt->fetch();
     $stmt->close();
 
-    if (!$age_group || !$sex || !$category_name) {
+    if (!$age_group || !$sex) {
         echo json_encode([]);
         exit;
     }
@@ -47,26 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['category_id'])) {
         }
     }
 
-    // Special handling for categories with "XD" (Mixed Doubles)
-    $players = [];
-    if (strpos($category_name, 'XD') !== false) {
-        // Fetch both male and female players
-        $stmt = $conn->prepare("SELECT id, name, dob, sex FROM players WHERE dob BETWEEN ? AND ?");
-        $stmt->bind_param("ss", $min_dob, $max_dob);
-    } else {
-        // Fetch players matching the category's sex
-        $stmt = $conn->prepare("SELECT id, name, dob, sex FROM players WHERE sex = ? AND dob BETWEEN ? AND ?");
-        $stmt->bind_param("sss", $sex, $min_dob, $max_dob);
-    }
-
+    // Fetch players based on the category's sex and DOB range
+    $stmt = $conn->prepare("SELECT id, name, dob, sex FROM players WHERE sex = ? AND dob BETWEEN ? AND ?");
+    $stmt->bind_param("sss", $sex, $min_dob, $max_dob);
     $stmt->execute();
     $result = $stmt->get_result();
 
+    $players = [];
     while ($row = $result->fetch_assoc()) {
         // Calculate player's age
         $age = date("Y") - date("Y", strtotime($row['dob']));
         if (date("md", strtotime($row['dob'])) > date("md")) {
-            $age--;
+            $age--; // Adjust age if the birthday hasn't occurred yet this year
         }
         $row['age'] = $age; // Add calculated age to the player data
         $players[] = $row;
