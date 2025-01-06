@@ -1,54 +1,42 @@
 <?php
-include 'db_connection.php'; // Replace with your DB connection file
+include 'conn.php'; // Adjust to your database connection file
+
 header('Content-Type: application/json');
 
-if (!isset($_GET['category_name'], $_GET['age_group'])) {
-    echo json_encode(['error' => 'Missing required parameters.']);
-    exit;
+$data = json_decode(file_get_contents('php://input'), true);
+$category_id = $data['category_id'];
+
+$stmt = $conn->prepare("SELECT age_group, sex FROM categories WHERE id = ?");
+$stmt->bind_param("i", $category_id);
+$stmt->execute();
+$stmt->bind_result($age_group, $category_sex);
+$stmt->fetch();
+$stmt->close();
+
+$age_range = explode('-', $age_group);
+$min_age = (int)$age_range[0];
+$max_age = (int)$age_range[1];
+
+$stmt = $conn->prepare("
+    SELECT id, name, dob, sex 
+    FROM players 
+    WHERE sex = ? 
+    AND TIMESTAMPDIFF(YEAR, dob, CURDATE()) BETWEEN ? AND ?
+");
+$stmt->bind_param("sii", $category_sex, $min_age, $max_age);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$players = [];
+while ($row = $result->fetch_assoc()) {
+    $age = date_diff(date_create($row['dob']), date_create('now'))->y;
+    $players[] = [
+        'id' => $row['id'],
+        'name' => $row['name'],
+        'age' => $age,
+        'sex' => $row['sex']
+    ];
 }
 
-$categoryName = $_GET['category_name'];
-$ageGroup = $_GET['age_group'];
-$ageBounds = explode('-', $ageGroup);
-
-if (count($ageBounds) !== 2) {
-    echo json_encode(['error' => 'Invalid age group format.']);
-    exit;
-}
-
-$minAge = intval($ageBounds[0]);
-$maxAge = intval($ageBounds[1]);
-
-$query = "SELECT id, name, dob, sex FROM players WHERE YEAR(CURDATE()) - YEAR(dob) BETWEEN ? AND ?";
-$maleQuery = $query . " AND sex = 'M'";
-$femaleQuery = $query . " AND sex = 'F'";
-
-if (strpos($categoryName, 'XD') !== false) {
-    $stmtMale = $conn->prepare($maleQuery);
-    $stmtMale->bind_param("ii", $minAge, $maxAge);
-    $stmtMale->execute();
-    $malePlayers = $stmtMale->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtMale->close();
-
-    $stmtFemale = $conn->prepare($femaleQuery);
-    $stmtFemale->bind_param("ii", $minAge, $maxAge);
-    $stmtFemale->execute();
-    $femalePlayers = $stmtFemale->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmtFemale->close();
-
-    echo json_encode(['male' => $malePlayers, 'female' => $femalePlayers]);
-} else {
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ii", $minAge, $maxAge);
-    if (strpos($categoryName, 'BD') !== false) {
-        $query .= " AND sex = 'M'";
-    } elseif (strpos($categoryName, 'GD') !== false) {
-        $query .= " AND sex = 'F'";
-    }
-    $stmt->execute();
-    $players = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-
-    echo json_encode(['players' => $players]);
-}
+echo json_encode(['players' => $players]);
 ?>
