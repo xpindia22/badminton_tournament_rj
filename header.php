@@ -91,6 +91,14 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                 </div>
             </div>
 
+            <div class="dropdown">
+                <a href="#">Mixed Doubles Matches</a>
+                <div class="dropdown-content">
+                    <a href="insert_match_xd.php">Create Mixed Doubles</a>
+                    <a href="results_doubles.php">Results Mixed Doubles</a>
+                    <a href="edit_results_doubles.php">Edit Mixed Doubles</a>
+                </div>
+            </div>
             <a href="logout.php">Logout</a>
         </div>
     </div>
