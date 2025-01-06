@@ -30,31 +30,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['locked_tournament'], $_SESSION['locked_tournament_name']);
         $lockedTournament = null;
     } else {
-        $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
-        $category_id = $_POST['category_id'];
-        $team1_player1_id = $_POST['team1_player1_id'];
-        $team1_player2_id = $_POST['team1_player2_id'];
-        $team2_player1_id = $_POST['team2_player1_id'];
-        $team2_player2_id = $_POST['team2_player2_id'];
-        $stage = $_POST['stage'];
+        // Fetch inputs with default values to avoid warnings
+        $tournament_id = $lockedTournament ?? ($_POST['tournament_id'] ?? null);
+        $category_id = $_POST['category_id'] ?? null;
+        $team1_player1_id = $_POST['team1_player1_id'] ?? null;
+        $team1_player2_id = $_POST['team1_player2_id'] ?? null;
+        $team2_player1_id = $_POST['team2_player1_id'] ?? null;
+        $team2_player2_id = $_POST['team2_player2_id'] ?? null;
+        $stage = $_POST['stage'] ?? null;
 
-        $dateInput = $_POST['date'];
-        $match_date = DateTime::createFromFormat('Y-m-d', $dateInput);
+        $dateInput = $_POST['date'] ?? null;
+        $match_date = $dateInput ? DateTime::createFromFormat('Y-m-d', $dateInput) : null;
         if ($match_date === false) {
             $message = "Invalid date format!";
         } else {
-            $match_date = $match_date->format('Y-m-d'); 
+            $match_date = $match_date ? $match_date->format('Y-m-d') : null; 
         }
 
-        $match_time = $_POST['time'];
-        $set1_team1 = $_POST['set1_team1_points'];
-        $set1_team2 = $_POST['set1_team2_points'];
-        $set2_team1 = $_POST['set2_team1_points'];
-        $set2_team2 = $_POST['set2_team2_points'];
+        $match_time = $_POST['time'] ?? null;
+        $set1_team1 = $_POST['set1_team1_points'] ?? null;
+        $set1_team2 = $_POST['set1_team2_points'] ?? null;
+        $set2_team1 = $_POST['set2_team1_points'] ?? null;
+        $set2_team2 = $_POST['set2_team2_points'] ?? null;
         $set3_team1 = $_POST['set3_team1_points'] ?? 0;
         $set3_team2 = $_POST['set3_team2_points'] ?? 0;
 
-        if ($match_date !== false) { 
+        // Validate required fields
+        if (empty($tournament_id) || empty($category_id) || empty($stage) || empty($match_date) || empty($match_time)) {
+            $message = "Please fill in all required fields.";
+        } else {
+            // Insert match details into the database
             $stmt = $conn->prepare("INSERT INTO matches (
                 tournament_id, category_id, team1_player1_id, team1_player2_id,
                 team2_player1_id, team2_player2_id, stage, match_date, match_time,
@@ -96,12 +101,10 @@ if ($lockedTournament) {
 } else {
     $categories = $conn->query("
         SELECT id, name, age_group, sex 
-        FROM categories 
+        FROM categories
         WHERE name LIKE '%GD%'
     ");
 }
-
-$players = $conn->query("SELECT id, name, dob, sex FROM players");
 ?>
 
 <!DOCTYPE html>
@@ -162,29 +165,13 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
         button:hover {
             background-color: #0056b3;
         }
-        .message {
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            text-align: center;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Insert Doubles Match</h1>
         <?php if ($message): ?>
-            <p class="message <?= strpos($message, 'success') !== false ? 'success' : 'error' ?>">
-                <?= htmlspecialchars($message) ?>
-            </p>
+            <p><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
 
         <?php if (!$lockedTournament): ?>
@@ -207,77 +194,28 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 
         <form method="post">
             <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" required>
+            <select name="category_id" id="category_id" required onchange="loadPlayers(this.value)">
                 <option value="">Select Category</option>
                 <?php while ($row = $categories->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>">
-                        <?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['age_group']) ?>, <?= htmlspecialchars($row['sex']) ?>)
-                    </option>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['age_group']) ?>, <?= htmlspecialchars($row['sex']) ?>)</option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team1_player1_id">Team 1 - Player 1:</label>
-            <select name="team1_player1_id" id="team1_player1_id" required>
-                <option value="">Select Player</option>
-                <?php 
-                $currentYear = date('Y');
-                while ($player = $players->fetch_assoc()): 
-                    $dobYear = date('Y', strtotime($player['dob']));
-                    $age = $currentYear - $dobYear;
-                ?>
-                    <option value="<?= $player['id'] ?>">
-                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
-                    </option>
-                <?php endwhile; ?>
-            </select>
+            <select name="team1_player1_id" id="team1_player1_id" required></select>
 
             <label for="team1_player2_id">Team 1 - Player 2:</label>
-            <select name="team1_player2_id" id="team1_player2_id" required>
-                <option value="">Select Player</option>
-                <?php 
-                $players->data_seek(0);
-                while ($player = $players->fetch_assoc()): 
-                    $dobYear = date('Y', strtotime($player['dob']));
-                    $age = $currentYear - $dobYear;
-                ?>
-                    <option value="<?= $player['id'] ?>">
-                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
-                    </option>
-                <?php endwhile; ?>
-            </select>
+            <select name="team1_player2_id" id="team1_player2_id" required></select>
 
             <label for="team2_player1_id">Team 2 - Player 1:</label>
-            <select name="team2_player1_id" id="team2_player1_id" required>
-                <option value="">Select Player</option>
-                <?php 
-                $players->data_seek(0);
-                while ($player = $players->fetch_assoc()): 
-                    $dobYear = date('Y', strtotime($player['dob']));
-                    $age = $currentYear - $dobYear;
-                ?>
-                    <option value="<?= $player['id'] ?>">
-                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
-                    </option>
-                <?php endwhile; ?>
-            </select>
+            <select name="team2_player1_id" id="team2_player1_id" required></select>
 
             <label for="team2_player2_id">Team 2 - Player 2:</label>
-            <select name="team2_player2_id" id="team2_player2_id" required>
-                <option value="">Select Player</option>
-                <?php 
-                $players->data_seek(0);
-                while ($player = $players->fetch_assoc()): 
-                    $dobYear = date('Y', strtotime($player['dob']));
-                    $age = $currentYear - $dobYear;
-                ?>
-                    <option value="<?= $player['id'] ?>">
-                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
-                    </option>
-                <?php endwhile; ?>
-            </select>
+            <select name="team2_player2_id" id="team2_player2_id" required></select>
 
             <label for="stage">Match Stage:</label>
             <select name="stage" id="stage" required>
+                <option value="">Select Stage</option>
                 <option value="Pre Quarter Finals">Pre Quarter Finals</option>
                 <option value="Quarter Finals">Quarter Finals</option>
                 <option value="Semi Finals">Semi Finals</option>
@@ -285,31 +223,54 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             </select>
 
             <label for="date">Match Date:</label>
-            <input type="date" name="date" required>
+            <input type="date" name="date" id="date" required>
 
             <label for="time">Match Time:</label>
-            <input type="time" name="time" required>
+            <input type="time" name="time" id="time" required>
 
             <label for="set1_team1_points">Set 1 Team 1 Points:</label>
-            <input type="number" name="set1_team1_points" required>
+            <input type="number" name="set1_team1_points" id="set1_team1_points" required>
 
             <label for="set1_team2_points">Set 1 Team 2 Points:</label>
-            <input type="number" name="set1_team2_points" required>
+            <input type="number" name="set1_team2_points" id="set1_team2_points" required>
 
             <label for="set2_team1_points">Set 2 Team 1 Points:</label>
-            <input type="number" name="set2_team1_points" required>
+            <input type="number" name="set2_team1_points" id="set2_team1_points" required>
 
             <label for="set2_team2_points">Set 2 Team 2 Points:</label>
-            <input type="number" name="set2_team2_points" required>
+            <input type="number" name="set2_team2_points" id="set2_team2_points" required>
 
             <label for="set3_team1_points">Set 3 Team 1 Points:</label>
-            <input type="number" name="set3_team1_points">
+            <input type="number" name="set3_team1_points" id="set3_team1_points">
 
             <label for="set3_team2_points">Set 3 Team 2 Points:</label>
-            <input type="number" name="set3_team2_points">
+            <input type="number" name="set3_team2_points" id="set3_team2_points">
 
             <button type="submit">Add Match</button>
         </form>
     </div>
+
+    <script>
+        function loadPlayers(categoryId) {
+            if (!categoryId) return;
+
+            fetch(`get_players.php?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const playerSelects = ['team1_player1_id', 'team1_player2_id', 'team2_player1_id', 'team2_player2_id'];
+                    playerSelects.forEach(selectId => {
+                        const select = document.getElementById(selectId);
+                        select.innerHTML = '<option value="">Select Player</option>';
+                        data.forEach(player => {
+                            const option = document.createElement('option');
+                            option.value = player.id;
+                            option.textContent = `${player.name} (${player.age} years, ${player.sex})`;
+                            select.appendChild(option);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching players:', error));
+        }
+    </script>
 </body>
 </html>
