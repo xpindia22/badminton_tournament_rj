@@ -38,13 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $team2_player2_id = $_POST['team2_player2_id'];
         $stage = $_POST['stage'];
 
-        // Validate and format the match_date
         $dateInput = $_POST['date'];
         $match_date = DateTime::createFromFormat('Y-m-d', $dateInput);
         if ($match_date === false) {
             $message = "Invalid date format!";
         } else {
-            $match_date = $match_date->format('Y-m-d'); // Ensure correct format
+            $match_date = $match_date->format('Y-m-d'); 
         }
 
         $match_time = $_POST['time'];
@@ -55,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $set3_team1 = $_POST['set3_team1_points'] ?? 0;
         $set3_team2 = $_POST['set3_team2_points'] ?? 0;
 
-        if ($match_date !== false) { // Proceed only if the date is valid
+        if ($match_date !== false) { 
             $stmt = $conn->prepare("INSERT INTO matches (
                 tournament_id, category_id, team1_player1_id, team1_player2_id,
                 team2_player1_id, team2_player2_id, stage, match_date, match_time,
@@ -80,10 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 
-// Fetch categories for the locked tournament, filtering for doubles and mixed doubles
 if ($lockedTournament) {
     $stmt = $conn->prepare("
         SELECT c.id, c.name, c.age_group, c.sex 
@@ -104,8 +101,6 @@ if ($lockedTournament) {
     ");
 }
 
-
-// Fetch players
 $players = $conn->query("SELECT id, name, dob, sex FROM players");
 ?>
 
@@ -114,74 +109,73 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 <head>
     <title>Insert Doubles Match</title>
     <style>
-/* Your CSS styles here */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f9fc;
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
-.container {
-    max-width: 800px;
-    margin: 50px auto;
-    background: #ffffff;
-    padding: 20px 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-h1 {
-    text-align: center;
-    color: #007bff;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-}
-select, input, button {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 100%;
-}
-select:focus, input:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-}
-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-button:hover {
-    background-color: #0056b3;
-}
-.message {
-    padding: 15px;
-    border-radius: 5px;
-    font-size: 16px;
-    text-align: center;
-}
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 20px 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        select, input, button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        select:focus, input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -225,35 +219,60 @@ button:hover {
             <label for="team1_player1_id">Team 1 - Player 1:</label>
             <select name="team1_player1_id" id="team1_player1_id" required>
                 <option value="">Select Player</option>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php 
+                $currentYear = date('Y');
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team1_player2_id">Team 1 - Player 2:</label>
             <select name="team1_player2_id" id="team1_player2_id" required>
                 <option value="">Select Player</option>
-                <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php 
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team2_player1_id">Team 2 - Player 1:</label>
             <select name="team2_player1_id" id="team2_player1_id" required>
                 <option value="">Select Player</option>
-                <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php 
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
             <label for="team2_player2_id">Team 2 - Player 2:</label>
             <select name="team2_player2_id" id="team2_player2_id" required>
                 <option value="">Select Player</option>
-                <?php $players->data_seek(0); ?>
-                <?php while ($player = $players->fetch_assoc()): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['name']) ?></option>
+                <?php 
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
 
