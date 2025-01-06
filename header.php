@@ -74,7 +74,6 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                 <a href="#">Singles Matches</a>
                 <div class="dropdown-content">
                     <a href="register.php">Register User</a>
-
                     <a href="insert_tournament.php">Insert Tournaments</a>
                     <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match.php">Insert Match</a>
@@ -88,7 +87,7 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                 <div class="dropdown-content">
                     <a href="register.php">Register User</a>
                     <a href="insert_match_bd.php">Insert Boys Doubles</a>
-                    <a href="results_doubles.php">Result Boys Doubles</a>
+                    <a href="results_bd.php">Result Boys Doubles</a>
                     <a href="edit_results_doubles.php">Edit Boys Doubles</a>
                 </div>
             </div>
@@ -98,7 +97,7 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                 <div class="dropdown-content">
                     <a href="register.php">Register User</a>
                     <a href="insert_match_gd.php">Insert Girls Doubles</a>
-                    <a href="results_doubles.php">Result Girls Doubles</a>
+                    <a href="results_gd.php">Result Girls Doubles</a>
                     <a href="edit_results_doubles.php">Edit Girls Doubles</a>
                 </div>
             </div>
@@ -106,9 +105,8 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                 <a href="#">Mixed Doubles</a>
                 <div class="dropdown-content">
                     <a href="register.php">Register User</a>
-
                     <a href="insert_match_xd.php">Create Mixed Doubles</a>
-                    <a href="results_doubles.php">Results Mixed Doubles</a>
+                    <a href="results_xd.php">Results Mixed Doubles</a>
                     <a href="edit_results_doubles.php">Edit Mixed Doubles</a>
                 </div>
             </div>
