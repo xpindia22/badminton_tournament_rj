@@ -92,7 +92,7 @@ if ($lockedTournament) {
         FROM categories c 
         INNER JOIN tournament_categories tc ON c.id = tc.category_id 
         WHERE tc.tournament_id = ? 
-        AND c.name LIKE '%BD%'
+        AND c.name LIKE '%XD%'
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
@@ -102,7 +102,7 @@ if ($lockedTournament) {
     $categories = $conn->query("
         SELECT id, name, age_group, sex 
         FROM categories
-        WHERE name LIKE '%BD%'
+        WHERE name LIKE '%XD%'
     ");
 }
 ?>
