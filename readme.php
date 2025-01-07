@@ -45,27 +45,26 @@ include 'header.php';
 </head>
 <body>
     <div class="container">
-        <h1>README</h1>
-        <p>Welcome to the <strong>Badminton Tournament</strong>. </p>
-
+        <h1>Welcome To Badminton Tournament Software.</h1>
+ 
         <h2>Software Overview</h2>
         <p>Badminton Tournament Software is designed to help create and manage  Badminton Tournaments efficiently. </p>
         <p>It includes the following features:</p>
         <ul>
-            <li>Register as user to Start your own Championship.</li>
-            <li>Comprehensive user management</li>
-            <li>Edit / delete manage your own tournaments/categories for tournament/players/matches</li>
-            <li>Dynamic data handling, Real-time updates</li>
+            <li><a href="register.php">Register Free</a> as user to Start your own <a href="insert_tournament.php">Championship</a>.</li>
+            <li>Comprehensive <a href="register.php">user management</a></li>
+            <li>Edit / delete manage your own <a href="insert_tournament.php">tournaments</a> / <a href="insert_category.php">categories</a> for tournament/players/matches</li>
+            <li>Dynamic data handling, Real-time updates of results.</li>
         </ul>
 
          <h2>Usage</h2>
          <ul>
             <li><a href="register.php">Register Free</a>  or <a href="login.php">Login</a> in with your credentials.</li>
-            <li>Navigate through the dashboard to access various features.</li>
+            <li>Navigate through the <a href="dashboard.php">Dashboard</a> to access various features.</li>
          </ul>
 
         <h2>Support</h2>
-        <p>If you encounter any issues, please contact the support team at <a href="mailto:xpindia@gmail.com">xpindia@gmail.com</a>. Whatsapp (text only +91-7432001215)</p>
+        <p>If you encounter any issues, please contact the support team at <a href="mailto:xpindia@gmail.com">xpindia@gmail.com</a>. <br>Whatsapp (text only +91-7432001215)</p>
 
         <div class="footer">
             <p>&copy; 2025 Dr Robert James JHCPL.IN. All rights reserved.</p>
