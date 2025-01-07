@@ -1,26 +1,25 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 // Include database connection
 require_once 'conn.php';
 
-// Fetch player rankings based on total points scored in matches by category
+// Fetch singles rankings based on total points scored by players across all matches
 $query = "
     SELECT 
         players.name AS player_name,
-        categories.name AS category_name,
+        players.uid AS player_uid,
+        players.sex AS player_sex,
+        players.age AS player_age,
         SUM(match_details.points_scored) AS total_points
     FROM 
         match_details
     JOIN 
         players ON match_details.player_id = players.id
-    JOIN 
-        categories ON match_details.category_id = categories.id
+    WHERE 
+        match_details.match_type = 'singles'
     GROUP BY 
-        players.id, categories.id
+        players.id
     ORDER BY 
-        categories.name ASC, total_points DESC;
+        total_points DESC;
 ";
 
 $result = $conn->query($query);
@@ -32,7 +31,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Rankings</title>
+    <title>Singles Rankings</title>
     <style>
         table {
             width: 100%;
@@ -51,22 +50,23 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Player Rankings</h1>
+    <h1>Singles Rankings</h1>
+    <p>Date: <?php echo date('Y-m-d'); ?></p>
+    <p>Time: <?php echo date('H:i:s'); ?></p>
     <?php
     if ($result->num_rows > 0) {
         echo "<table>";
-        echo "<tr><th>Rank</th><th>Player Name</th><th>Category</th><th>Total Points</th></tr>";
+        echo "<tr><th>Player Name</th><th>UID</th><th>Sex</th><th>Age</th><th>Total Points</th></tr>";
 
-        // Display data in a table with ranking
-        $rank = 1;
+        // Display data in a table
         while ($row = $result->fetch_assoc()) {
             echo "<tr>";
-            echo "<td>" . $rank . "</td>";
             echo "<td>" . htmlspecialchars($row['player_name']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['category_name']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['player_uid']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['player_sex']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['player_age']) . "</td>";
             echo "<td>" . htmlspecialchars($row['total_points']) . "</td>";
             echo "</tr>";
-            $rank++;
         }
 
         echo "</table>";

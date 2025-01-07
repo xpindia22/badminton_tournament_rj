@@ -85,7 +85,7 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <a href="dashboard.php">Dashboard</a>
             <a href="readme.php">Help-Readme</a>
             <a href="results.php">Singles Match Results</a>
-            <a href="results_doubles.php">Doubles Match Results</a>
+            <a href="ranking_singles.php">Ranking Singles</a>
  
             <div class="dropdown">
                 <a href="#">Singles Matches</a>
@@ -131,6 +131,15 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                     <a href="edit_results_xd.php">Edit Mixed Doubles</a>
                 </div>
             </div>
+            <div class="dropdown">
+                <a href="#">Player Ranking</a>
+                <div class="dropdown-content">
+                <a href="ranking_singles.php">Singles Ranking</a>
+                <a href="ranking_doubles.php">Double & Mixed Doubles</a>
+
+                </div>
+            </div>
+
             <a href="logout.php">Logout</a>
         </div>
     </div>

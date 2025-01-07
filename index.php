@@ -1,6 +1,7 @@
 <?php
 // login.php
 //include 'header.php';
+ 
 require 'auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
