@@ -1,11 +1,18 @@
 /* General Styles */
-body {
+/* body {
     font-family: Arial, sans-serif;
     margin: 20px;
     padding: 0;
     background: #f9f9f9;
+} */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
 }
-
 .container {
     max-width: 800px;
     margin: auto;
@@ -101,7 +108,7 @@ tbody tr:hover {
 .top-bar {
     background-color: #007bff;
     color: white;
-    padding: 10px 20px;
+    padding: 20px 20px;
     text-align: right;
     font-size: 16px;
     position: sticky;

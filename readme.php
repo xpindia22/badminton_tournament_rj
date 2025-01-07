@@ -45,8 +45,7 @@ include 'header.php';
 </head>
 <body>
     <div class="container">
-        <h1>Welcome To Badminton Tournament Software.</h1>
- 
+        <h1>Welcome To Badminton Tournament Software.</h1> 
         <h2>Software Overview</h2>
         <p>Badminton Tournament Software is designed to help create and manage  Badminton Tournaments efficiently. </p>
         <p>It includes the following features:</p>

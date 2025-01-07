@@ -18,44 +18,40 @@ $is_user = is_user();
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
         }
-        .card {
-            width: 300px;
-            background: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
             padding: 20px;
-            margin: 10px;
-            text-align: center;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .card h2 {
-            font-size: 20px;
+        h1, h2 {
+            color: #007BFF;
+        }
+        ul {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        li {
             margin-bottom: 10px;
         }
-        .card p {
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
         }
     </style>
 </head>
 <body>
- 
-
     <div class="container">
         <h1>Dashboard</h1>
         <div class="card-container">
