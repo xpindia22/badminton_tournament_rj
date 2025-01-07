@@ -2,7 +2,34 @@
 // Include database connection
 require_once 'conn.php';
 
-// Fetch singles rankings based on total points scored by players across all matches
+// Fetch filter data
+$tournaments = $conn->query("SELECT id, name FROM tournaments ORDER BY name ASC");
+$categories = $conn->query("SELECT id, name FROM categories ORDER BY name ASC");
+$players = $conn->query("SELECT id, name FROM players ORDER BY name ASC");
+
+// Get filter values from the request
+$selected_tournament = isset($_GET['tournament']) ? $_GET['tournament'] : '';
+$selected_category = isset($_GET['category']) ? $_GET['category'] : '';
+$selected_player = isset($_GET['player']) ? $_GET['player'] : '';
+$selected_date = isset($_GET['date']) ? $_GET['date'] : '';
+
+// Build the WHERE clause dynamically
+$where_clauses = [];
+if ($selected_tournament) {
+    $where_clauses[] = "tournaments.id = " . intval($selected_tournament);
+}
+if ($selected_category) {
+    $where_clauses[] = "categories.id = " . intval($selected_category);
+}
+if ($selected_player) {
+    $where_clauses[] = "players.id = " . intval($selected_player);
+}
+if ($selected_date) {
+    $where_clauses[] = "DATE(matches.match_date) = '" . $conn->real_escape_string($selected_date) . "'";
+}
+$where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
+
+// Fetch rankings based on filters
 $query = "
     SELECT 
         players.name AS player_name,
@@ -22,8 +49,9 @@ $query = "
         matches ON matches.player1_id = players.id OR matches.player2_id = players.id
     JOIN 
         categories ON matches.category_id = categories.id
-    WHERE 
-        categories.type = 'singles'
+    JOIN 
+        tournaments ON matches.tournament_id = tournaments.id
+    $where_sql
     GROUP BY 
         players.id
     ORDER BY 
@@ -31,7 +59,6 @@ $query = "
 ";
 
 $result = $conn->query($query);
-
 ?>
 
 <!DOCTYPE html>
@@ -55,10 +82,52 @@ $result = $conn->query($query);
         th {
             background-color: #f2f2f2;
         }
+        form {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Overall Singles Rankings</h1>
+    <h1>Singles Rankings</h1>
+
+    <!-- Filters -->
+    <form method="GET" action="">
+        <label for="tournament">Tournament:</label>
+        <select name="tournament" id="tournament">
+            <option value="">All</option>
+            <?php while ($row = $tournaments->fetch_assoc()): ?>
+                <option value="<?php echo $row['id']; ?>" <?php echo $selected_tournament == $row['id'] ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($row['name']); ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            <option value="">All</option>
+            <?php while ($row = $categories->fetch_assoc()): ?>
+                <option value="<?php echo $row['id']; ?>" <?php echo $selected_category == $row['id'] ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($row['name']); ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="player">Player:</label>
+        <select name="player" id="player">
+            <option value="">All</option>
+            <?php while ($row = $players->fetch_assoc()): ?>
+                <option value="<?php echo $row['id']; ?>" <?php echo $selected_player == $row['id'] ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($row['name']); ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" value="<?php echo htmlspecialchars($selected_date); ?>">
+
+        <button type="submit">Filter</button>
+    </form>
+
     <p>Date: <?php echo date('Y-m-d'); ?></p>
     <p>Time: <?php echo date('H:i:s'); ?></p>
     <?php
