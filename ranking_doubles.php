@@ -1,14 +1,41 @@
 <?php
+include 'header.php';
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Include database connection
 require_once 'conn.php';
 
-// Fetch filter data
+// Fetch tournaments for dropdown
 $tournaments = $conn->query("SELECT id, name FROM tournaments ORDER BY name ASC");
-$categories = $conn->query("SELECT id, name FROM categories ORDER BY name ASC");
+
+// Fetch categories dynamically based on the selected tournament
+$selected_tournament = isset($_GET['tournament']) ? $_GET['tournament'] : '';
+if ($selected_tournament) {
+    $categories_query = "
+        SELECT DISTINCT categories.id, categories.name 
+        FROM categories 
+        JOIN matches ON categories.id = matches.category_id
+        WHERE matches.tournament_id = " . intval($selected_tournament) . " 
+        AND (categories.name LIKE '%BD%' OR categories.name LIKE '%GD%' OR categories.name LIKE '%XD%')
+        ORDER BY categories.name ASC
+    ";
+} else {
+    $categories_query = "
+        SELECT DISTINCT categories.id, categories.name 
+        FROM categories 
+        WHERE categories.name LIKE '%BD%' OR categories.name LIKE '%GD%' OR categories.name LIKE '%XD%'
+        ORDER BY categories.name ASC
+    ";
+}
+$categories = $conn->query($categories_query);
+
+// Fetch players
 $players = $conn->query("SELECT id, name FROM players ORDER BY name ASC");
 
 // Get filter values from the request
-$selected_tournament = isset($_GET['tournament']) ? $_GET['tournament'] : '';
 $selected_category = isset($_GET['category']) ? $_GET['category'] : '';
 $selected_player = isset($_GET['player']) ? $_GET['player'] : '';
 $selected_date = isset($_GET['date']) ? $_GET['date'] : '';
@@ -22,43 +49,47 @@ if ($selected_category) {
     $where_clauses[] = "categories.id = " . intval($selected_category);
 }
 if ($selected_player) {
-    $where_clauses[] = "players.id = " . intval($selected_player);
+    $where_clauses[] = "(matches.team1_player1_id = " . intval($selected_player) . " 
+        OR matches.team1_player2_id = " . intval($selected_player) . " 
+        OR matches.team2_player1_id = " . intval($selected_player) . " 
+        OR matches.team2_player2_id = " . intval($selected_player) . ")";
 }
 if ($selected_date) {
     $where_clauses[] = "DATE(matches.match_date) = '" . $conn->real_escape_string($selected_date) . "'";
 }
+$where_clauses[] = "(categories.name LIKE '%BD%' OR categories.name LIKE '%GD%' OR categories.name LIKE '%XD%')"; // Only Doubles categories
+
 $where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
 
-// Fetch rankings based on filters
+// Query for Doubles rankings
 $query = "
     SELECT 
-        players.name AS player_name,
-        players.uid AS player_uid,
-        players.sex AS player_sex,
-        players.age AS player_age,
-        SUM(
-            CASE WHEN matches.player1_id = players.id THEN 
-                (matches.set1_player1_points + matches.set2_player1_points + matches.set3_player1_points)
-            WHEN matches.player2_id = players.id THEN
-                (matches.set1_player2_points + matches.set2_player2_points + matches.set3_player2_points)
-            ELSE 0 END
-        ) AS total_points
+        categories.name AS category_name,
+        CONCAT(player1.name, ' / ', player2.name) AS team_name,
+        COUNT(matches.id) AS no_of_matches,
+        SUM(matches.set1_team1_points + matches.set2_team1_points + matches.set3_team1_points) AS total_points
     FROM 
-        players
-    JOIN 
-        matches ON matches.player1_id = players.id OR matches.player2_id = players.id
+        matches
     JOIN 
         categories ON matches.category_id = categories.id
+    JOIN 
+        players AS player1 ON matches.team1_player1_id = player1.id
+    JOIN 
+        players AS player2 ON matches.team1_player2_id = player2.id
     JOIN 
         tournaments ON matches.tournament_id = tournaments.id
     $where_sql
     GROUP BY 
-        players.id
+        team_name, categories.name
     ORDER BY 
-        total_points DESC;
+        categories.name ASC, total_points DESC;
 ";
 
 $result = $conn->query($query);
+
+if (!$result) {
+    die("Query Error: " . $conn->error);
+}
 ?>
 
 <!DOCTYPE html>
@@ -66,7 +97,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Singles Rankings</title>
+    <title>Doubles Rankings</title>
     <style>
         table {
             width: 100%;
@@ -88,12 +119,12 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Singles Rankings</h1>
+    <h1>Doubles Rankings</h1>
 
     <!-- Filters -->
     <form method="GET" action="">
         <label for="tournament">Tournament:</label>
-        <select name="tournament" id="tournament">
+        <select name="tournament" id="tournament" onchange="this.form.submit()">
             <option value="">All</option>
             <?php while ($row = $tournaments->fetch_assoc()): ?>
                 <option value="<?php echo $row['id']; ?>" <?php echo $selected_tournament == $row['id'] ? 'selected' : ''; ?>>
@@ -105,11 +136,13 @@ $result = $conn->query($query);
         <label for="category">Category:</label>
         <select name="category" id="category">
             <option value="">All</option>
-            <?php while ($row = $categories->fetch_assoc()): ?>
-                <option value="<?php echo $row['id']; ?>" <?php echo $selected_category == $row['id'] ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($row['name']); ?>
-                </option>
-            <?php endwhile; ?>
+            <?php if ($categories): ?>
+                <?php while ($row = $categories->fetch_assoc()): ?>
+                    <option value="<?php echo $row['id']; ?>" <?php echo $selected_category == $row['id'] ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($row['name']); ?>
+                    </option>
+                <?php endwhile; ?>
+            <?php endif; ?>
         </select>
 
         <label for="player">Player:</label>
@@ -133,15 +166,14 @@ $result = $conn->query($query);
     <?php
     if ($result->num_rows > 0) {
         echo "<table>";
-        echo "<tr><th>Player Name</th><th>UID</th><th>Sex</th><th>Age</th><th>Total Points</th></tr>";
+        echo "<tr><th>Category</th><th>Team Name</th><th>No of Matches</th><th>Total Points</th></tr>";
 
         // Display data in a table
         while ($row = $result->fetch_assoc()) {
             echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['player_name']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['player_uid']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['player_sex']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['player_age']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['category_name']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['team_name']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['no_of_matches']) . "</td>";
             echo "<td>" . htmlspecialchars($row['total_points']) . "</td>";
             echo "</tr>";
         }
