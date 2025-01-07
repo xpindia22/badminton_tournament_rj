@@ -1,15 +1,9 @@
-<?php include 'header.php'; ?>
-
 <?php
-// edit_results_doubles.php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-$servername = "localhost";
-$username = "root";
-$password = "xxx";
-$dbname = "badminton_tournament";
+//edit_results_xd.php
+include 'header.php';
+require_once 'conn.php';
+require 'auth.php';
+redirect_if_not_logged_in();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -20,7 +14,7 @@ if ($conn->connect_error) {
 // Define stages
 $stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
 
-// Handle updates
+// Handle updates and deletes
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['edit_match'])) {
         $match_id = $_POST['match_id'];
@@ -57,27 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch filters
-$tournament_id = $_GET['tournament_id'] ?? '';
-$category_id = $_GET['category_id'] ?? '';
-$player_id = $_GET['player_id'] ?? '';
-$match_date = $_GET['match_date'] ?? '';
-$datetime = $_GET['datetime'] ?? '';
-
 // Fetch data for dropdowns
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
-$categories = $conn->query("SELECT id, name FROM categories");
 $players = $conn->query("SELECT id, name FROM players");
 $dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
 $datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
 
-// Build the query with optional filters
+// Fetch Mixed Doubles matches
 $query = "
     SELECT 
         m.id AS match_id,
         t.name AS tournament_name,
         c.name AS category_name,
-        c.type AS category_type,
         p1.name AS team1_player1_name,
         p2.name AS team1_player2_name,
         p3.name AS team2_player1_name,
@@ -98,35 +83,9 @@ $query = "
     LEFT JOIN players p2 ON m.team1_player2_id = p2.id
     LEFT JOIN players p3 ON m.team2_player1_id = p3.id
     LEFT JOIN players p4 ON m.team2_player2_id = p4.id
-    WHERE c.type IN ('doubles', 'mixed doubles')
+    WHERE c.type = 'mixed doubles'
+    ORDER BY m.id
 ";
-
-if ($tournament_id) {
-    $query .= " AND m.tournament_id = $tournament_id";
-}
-
-if ($category_id) {
-    $query .= " AND m.category_id = $category_id";
-}
-
-if ($player_id) {
-    $query .= " AND (
-        m.team1_player1_id = $player_id OR 
-        m.team1_player2_id = $player_id OR 
-        m.team2_player1_id = $player_id OR 
-        m.team2_player2_id = $player_id
-    )";
-}
-
-if ($match_date) {
-    $query .= " AND m.match_date = '$match_date'";
-}
-
-if ($datetime) {
-    $query .= " AND m.match_time = '$datetime'";
-}
-
-$query .= " ORDER BY m.id";
 
 $result = $conn->query($query);
 ?>
@@ -136,98 +95,20 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doubles Match Results</title>
+    <title>Mixed Doubles Match Results</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 20px 0; 
-        }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 8px; 
-            text-align: center; 
-            vertical-align: middle; 
-        }
-        th { 
-            background-color: #f4f4f4; 
-        }
-        form { 
-            margin-bottom: 20px; 
-        }
-        label, select, button { 
-            margin-right: 10px; 
-        }
-        td.team-column { 
-            width: 25%; 
-            text-align: left; 
-        }
-        td.set-column { 
-            width: 3%; 
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        td.team-column { width: 25%; text-align: left; }
+        td.set-column { width: 5%; text-align: center; }
+        form { margin-bottom: 20px; }
+        label, select, button { margin-right: 10px; }
     </style>
 </head>
 <body>
-    <h1>Doubles Match Results</h1>
-
-    <!-- Filter Form -->
-    <form method="get">
-        <label for="tournament_id">Tournament:</label>
-        <select name="tournament_id" id="tournament_id">
-            <option value="">All Tournaments</option>
-            <?php while ($row = $tournaments->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $tournament_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="category_id">Category:</label>
-        <select name="category_id" id="category_id">
-            <option value="">All Categories</option>
-            <?php while ($row = $categories->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $category_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="player_id">Player:</label>
-        <select name="player_id" id="player_id">
-            <option value="">All Players</option>
-            <?php while ($row = $players->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $player_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="match_date">Match Date:</label>
-        <select name="match_date" id="match_date">
-            <option value="">All Dates</option>
-            <?php while ($row = $dates->fetch_assoc()): ?>
-                <option value="<?= $row['match_date'] ?>" <?= $match_date == $row['match_date'] ? 'selected' : '' ?>>
-                    <?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="datetime">Match Time:</label>
-        <select name="datetime" id="datetime">
-            <option value="">All Times</option>
-            <?php while ($row = $datetimes->fetch_assoc()): ?>
-                <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <button type="submit">Filter</button>
-    </form>
+    <h1>Mixed Doubles Match Results</h1>
 
     <!-- Results Table -->
     <?php if ($result->num_rows > 0): ?>
@@ -269,7 +150,9 @@ $result = $conn->query($query);
                         <td class="set-column"><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
                         <td class="set-column"><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
                         <td class="set-column"><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
-                        <td><?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?></td>
+                        <td>
+                            <?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?>
+                        </td>
                         <td>
                             <button type="submit" name="edit_match">Edit</button>
                             <button type="submit" name="delete_match" onclick="return confirm('Are you sure you want to delete this match?')">Delete</button>
@@ -279,7 +162,7 @@ $result = $conn->query($query);
             <?php endwhile; ?>
         </table>
     <?php else: ?>
-        <p>No matches found for the selected filters.</p>
+        <p>No matches found.</p>
     <?php endif; ?>
     <?php $conn->close(); ?>
 </body>

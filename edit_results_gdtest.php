@@ -1,15 +1,9 @@
-<?php include 'header.php'; ?>
-
 <?php
-// edit_results_doubles.php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-$servername = "localhost";
-$username = "root";
-$password = "xxx";
-$dbname = "badminton_tournament";
+// edit_results_gd.php
+include 'header.php';
+require_once 'conn.php';
+require 'auth.php';
+redirect_if_not_logged_in();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -59,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch filters
 $tournament_id = $_GET['tournament_id'] ?? '';
+$category_type = $_GET['category_type'] ?? ''; // New: filter for BD, GD, XD
 $category_id = $_GET['category_id'] ?? '';
 $player_id = $_GET['player_id'] ?? '';
 $match_date = $_GET['match_date'] ?? '';
@@ -66,10 +61,11 @@ $datetime = $_GET['datetime'] ?? '';
 
 // Fetch data for dropdowns
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
-$categories = $conn->query("SELECT id, name FROM categories");
+$category_types = ['BD' => 'Boys Doubles', 'GD' => 'Girls Doubles', 'XD' => 'Mixed Doubles'];
+$categories = $conn->query("SELECT id, name FROM categories WHERE type IN ('BD', 'GD', 'XD')");
 $players = $conn->query("SELECT id, name FROM players");
-$dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
-$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
+$dates = $conn->query("SELECT DISTINCT match_date FROM matches WHERE category_id IN (SELECT id FROM categories WHERE type IN ('BD', 'GD', 'XD')) ORDER BY match_date");
+$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches WHERE category_id IN (SELECT id FROM categories WHERE type IN ('BD', 'GD', 'XD')) ORDER BY match_time");
 
 // Build the query with optional filters
 $query = "
@@ -98,11 +94,15 @@ $query = "
     LEFT JOIN players p2 ON m.team1_player2_id = p2.id
     LEFT JOIN players p3 ON m.team2_player1_id = p3.id
     LEFT JOIN players p4 ON m.team2_player2_id = p4.id
-    WHERE c.type IN ('doubles', 'mixed doubles')
+    WHERE c.type IN ('BD', 'GD', 'XD')
 ";
 
 if ($tournament_id) {
     $query .= " AND m.tournament_id = $tournament_id";
+}
+
+if ($category_type) {
+    $query .= " AND c.type = '$category_type'";
 }
 
 if ($category_id) {
@@ -136,45 +136,13 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doubles Match Results</title>
+    <title>Doubles Match Results (BD, GD, XD)</title>
     <style>
-    body { 
-        font-family: Arial, sans-serif; 
-        margin: 20px; 
-    }
-    table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        margin: 20px 0; 
-    }
-    th, td { 
-        border: 1px solid #ddd; 
-        padding: 8px; 
-        text-align: center; 
-        vertical-align: middle; 
-    }
-    th { 
-        background-color: #f4f4f4; 
-    }
-    form { 
-        margin-bottom: 20px; 
-    }
-    label, select, button { 
-        margin-right: 10px; 
-    }
-    td.team-column { 
-        width: 25%; /* Wider column for Team 1 and Team 2 */
-        text-align: left; /* Align text to the left */
-    }
-    td.set-column { 
-        width: 5px; /* Narrow columns for Set 1, Set 2, and Set 3 */
-        text-align: center; /* Center-align text for better appearance */
-    }
-</style>
-
+        /* Add your styles here */
+    </style>
 </head>
 <body>
-    <h1>Doubles Match Results</h1>
+    <h1>Doubles Match Results (BD, GD, XD)</h1>
 
     <!-- Filter Form -->
     <form method="get">
@@ -186,6 +154,16 @@ $result = $conn->query($query);
                     <?= $row['name'] ?>
                 </option>
             <?php endwhile; ?>
+        </select>
+
+        <label for="category_type">Type:</label>
+        <select name="category_type" id="category_type">
+            <option value="">All Types</option>
+            <?php foreach ($category_types as $key => $label): ?>
+                <option value="<?= $key ?>" <?= $category_type == $key ? 'selected' : '' ?>>
+                    <?= $label ?>
+                </option>
+            <?php endforeach; ?>
         </select>
 
         <label for="category_id">Category:</label>
@@ -213,7 +191,7 @@ $result = $conn->query($query);
             <option value="">All Dates</option>
             <?php while ($row = $dates->fetch_assoc()): ?>
                 <option value="<?= $row['match_date'] ?>" <?= $match_date == $row['match_date'] ? 'selected' : '' ?>>
-                    <?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?>
+                    <?= date("d-m-Y", strtotime($row['match_date'])) ?>
                 </option>
             <?php endwhile; ?>
         </select>
@@ -223,7 +201,7 @@ $result = $conn->query($query);
             <option value="">All Times</option>
             <?php while ($row = $datetimes->fetch_assoc()): ?>
                 <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
+                    <?= date("h:i A", strtotime($row['match_time'])) ?>
                 </option>
             <?php endwhile; ?>
         </select>
@@ -237,6 +215,7 @@ $result = $conn->query($query);
             <tr>
                 <th>Match ID</th>
                 <th>Tournament</th>
+                <th>Type</th>
                 <th>Category</th>
                 <th>Team 1</th>
                 <th>Team 2</th>
@@ -254,9 +233,10 @@ $result = $conn->query($query);
                     <tr>
                         <td><?= $row['match_id'] ?><input type="hidden" name="match_id" value="<?= $row['match_id'] ?>"></td>
                         <td><?= $row['tournament_name'] ?></td>
+                        <td><?= $category_types[$row['category_type']] ?></td>
                         <td><?= $row['category_name'] ?></td>
-                        <td class="team-column"><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
-                        <td class="team-column"><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
+                        <td><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
+                        <td><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
                         <td>
                             <select name="stage">
                                 <?php foreach ($stages as $stage): ?>
@@ -268,9 +248,9 @@ $result = $conn->query($query);
                         </td>
                         <td><input type="date" name="match_date" value="<?= $row['match_date'] ?>"></td>
                         <td><input type="time" name="match_time" value="<?= $row['match_time'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
+                        <td><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
+                        <td><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
+                        <td><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
                         <td><?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?></td>
                         <td>
                             <button type="submit" name="edit_match">Edit</button>
