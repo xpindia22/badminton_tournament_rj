@@ -99,14 +99,12 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doubles Rankings</title>
     <style>
-                body {
-            font-family: Arial, sans-serif;
-            line-height: 1.0;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 10;
-            padding: 0;
-        }
+        body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
         table {
             width: 100%;
             border-collapse: collapse;
