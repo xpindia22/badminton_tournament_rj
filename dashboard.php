@@ -49,6 +49,7 @@ $is_user = is_user();
             font-size: 0.9em;
             color: #666;
         }
+ 
     </style>
 </head>
 <body>

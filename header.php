@@ -9,70 +9,88 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Badminton Tournament</title>
     <style>
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; /* Use flexbox for row alignment */
+            justify-content: space-between; /* Space between welcome message and links */
+            align-items: center; /* Align items vertically in the center */
             background-color: #f4f4f4;
-             padding: 10px 20px;
+            padding: 10px 20px; /* Adjust padding for spacing */
             border-bottom: 1px solid #ccc;
         }
+
+        .header .welcome {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+
         .header .links {
             display: flex;
-            gap: 15px;
+            gap: 15px; /* Spacing between links */
             position: relative;
+            align-items: center; /* Align links vertically */
         }
+
         .header .links a {
             text-decoration: none;
             color: #333;
             font-family: Arial, sans-serif;
             font-size: 14px;
+            line-height: 1.5; /* Consistent vertical alignment */
+            display: inline-block;
+            padding: 5px 0;
         }
+
         .header .links a:hover {
             text-decoration: underline;
         }
+
         .dropdown {
             position: relative;
-            display: inline-block;
         }
+
         .dropdown-content {
-            display: none;
-            position: absolute;
+            display: none; /* Hidden by default */
+            position: absolute; /* Position relative to parent */
+            top: 100%; /* Position dropdown below the main link */
+            left: 0;
             background-color: #f9f9f9;
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1;
-            min-width: 200px; /* Ensures dropdown content is consistent */
+            min-width: 220px; /* Explicitly set width to ensure space for long text */
+            border-radius: 4px; /* Rounded corners */
+            overflow: hidden;
         }
+
         .dropdown-content a {
             color: #333;
             text-decoration: none;
-            display: block;
-            padding: 8px 16px;
-            white-space: nowrap; /* Prevents text from wrapping to new lines */
+            display: block; /* Ensures each link occupies one row */
+            width: 100%; /* Ensure links take full width of the dropdown */
+            padding: 10px 16px; /* Increased padding for better spacing */
+            white-space: nowrap; /* Prevents text wrapping */
+            border-bottom: 1px solid #ddd; /* Divider between links */
+            box-sizing: border-box; /* Include padding in width calculations */
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+
         .dropdown-content a:hover {
-            background-color: #f1f1f1;
+            background-color: #007bff; /* Highlight with primary color */
+            color: #fff; /* White text on hover */
         }
+
+        .dropdown-content a:last-child {
+            border-bottom: none; /* Remove divider for the last link */
+        }
+
         .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        @media screen and (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header .links {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .dropdown-content {
-                position: relative; /* Adjust position for smaller screens */
-                box-shadow: none;
-            }
+            display: block; /* Show dropdown on hover */
         }
     </style>
 </head>
@@ -134,9 +152,8 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <div class="dropdown">
                 <a href="#">Player Ranking</a>
                 <div class="dropdown-content">
-                <a href="ranking_singles.php">Singles Ranking</a>
-                <a href="ranking_doubles.php">Double & Mixed Doubles</a>
-
+                    <a href="ranking_singles.php">Singles Ranking</a>
+                    <a href="ranking_doubles.php">Double & Mixed Doubles</a>
                 </div>
             </div>
 
