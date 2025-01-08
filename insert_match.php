@@ -1,9 +1,16 @@
 <?php
+<<<<<<< HEAD
+// Enable error reporting for debugging
+=======
+>>>>>>> main
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
 include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -34,7 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
         $category_id = $_POST['category_id'];
         $player1_id = $_POST['player1_id'];
+<<<<<<< HEAD
+        $player1_partner_id = $_POST['player1_partner_id'] ?? null;
         $player2_id = $_POST['player2_id'];
+        $player2_partner_id = $_POST['player2_partner_id'] ?? null;
+=======
+        $player2_id = $_POST['player2_id'];
+>>>>>>> main
         $stage = $_POST['stage'];
         $date = $_POST['date'];
         $match_time = $_POST['time'];
@@ -47,6 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $conn->prepare("
             INSERT INTO matches (
+<<<<<<< HEAD
+                tournament_id, category_id, player1_id, player1_partner_id, 
+                player2_id, player2_partner_id, stage, date, match_time, 
+                set1_player1_points, set1_player2_points, set2_player1_points, 
+                set2_player2_points, set3_player1_points, set3_player2_points
+            ) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param(
+            "iiiiisssiiiiiii",
+            $tournament_id, $category_id, $player1_id, $player1_partner_id,
+            $player2_id, $player2_partner_id, $stage, $date, $match_time,
+            $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
+=======
                 tournament_id, category_id, player1_id, player2_id, stage, 
                 date, match_time, set1_player1_points, set1_player2_points, 
                 set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
@@ -57,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "iiiisssiiiiii",
             $tournament_id, $category_id, $player1_id, $player2_id, $stage,
             $date, $match_time, $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
+>>>>>>> main
         );
 
         if ($stmt->execute()) {
@@ -74,7 +102,11 @@ $tournaments = $conn->query("SELECT id, name FROM tournaments");
 // Fetch categories for the locked tournament
 if ($lockedTournament) {
     $stmt = $conn->prepare("
+<<<<<<< HEAD
+        SELECT c.id, c.name, c.age_group, c.sex, c.type 
+=======
         SELECT c.id, c.name, c.age_group, c.sex 
+>>>>>>> main
         FROM categories c
         INNER JOIN tournament_categories tc ON c.id = tc.category_id
         WHERE tc.tournament_id = ?
@@ -84,11 +116,19 @@ if ($lockedTournament) {
     $categories = $stmt->get_result();
     $stmt->close();
 } else {
+<<<<<<< HEAD
+    $categories = $conn->query("SELECT id, name, age_group, sex, type FROM categories");
+=======
     $categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
+>>>>>>> main
 }
 
 // Fetch players
 $players = $conn->query("SELECT id, name, dob, sex FROM players");
+<<<<<<< HEAD
+$playersData = $players ? $players->fetch_all(MYSQLI_ASSOC) : [];
+=======
+>>>>>>> main
 ?>
 
 <!DOCTYPE html>
@@ -96,6 +136,19 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 <head>
     <title>Insert Match</title>
     <style>
+<<<<<<< HEAD
+        .player-group {
+            display: none;
+        }
+    </style>
+    <script>
+        const players = <?= json_encode($playersData) ?>;
+
+        function calculateAge(dob) {
+            if (!dob) return "N/A";
+            const birthDate = new Date(dob);
+            if (isNaN(birthDate)) return "N/A";
+=======
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -178,6 +231,7 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             if (!dob) return "N/A"; // Handle missing or invalid DOB
             const birthDate = new Date(dob);
             if (isNaN(birthDate)) return "N/A"; // Handle invalid date format
+>>>>>>> main
 
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
@@ -188,6 +242,35 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             return age;
         }
 
+<<<<<<< HEAD
+        function isPlayerEligible(player, age, ageGroup, sex) {
+            const ageMatch = ageGroup.match(/\d+/g);
+            if (!ageMatch) return true;
+
+            if (ageGroup.includes("Under")) {
+                const maxAge = parseInt(ageMatch[0], 10);
+                if (age > maxAge) return false;
+            } else if (ageGroup.includes("Plus")) {
+                const minAge = parseInt(ageMatch[0], 10);
+                if (age < minAge) return false;
+            }
+
+            if (sex === 'M' && player.sex !== 'M') return false;
+            if (sex === 'F' && player.sex !== 'F') return false;
+            if (sex === 'Mixed' && (player.sex !== 'M' && player.sex !== 'F')) return false;
+
+            return true;
+        }
+
+        function updatePlayerDropdown() {
+            const categoryId = document.getElementById('category_id').value;
+            const playerDropdowns = document.querySelectorAll('.player-dropdown');
+            const playerGroup = document.querySelectorAll('.player-group');
+
+            playerDropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Player</option>';
+            });
+=======
         function updatePlayerDropdown() {
             const categoryId = document.getElementById('category_id').value;
             const player1Dropdown = document.getElementById('player1_id');
@@ -195,11 +278,25 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 
             player1Dropdown.innerHTML = '<option value="">Select Player</option>';
             player2Dropdown.innerHTML = '<option value="">Select Player</option>';
+>>>>>>> main
 
             if (categoryId) {
                 const category = document.querySelector(`#category_id option[value="${categoryId}"]`);
                 const ageGroup = category.dataset.ageGroup;
                 const sex = category.dataset.sex;
+<<<<<<< HEAD
+                const isDoubles = category.dataset.type === "doubles";
+
+                playerGroup.forEach(group => {
+                    group.style.display = isDoubles ? 'block' : 'none';
+                });
+
+                players.forEach(player => {
+                    const age = calculateAge(player.dob);
+                    if (isPlayerEligible(player, age, ageGroup, sex)) {
+                        const option = `<option value="${player.id}">${player.name} (${age}, ${player.sex})</option>`;
+                        playerDropdowns.forEach(dropdown => dropdown.innerHTML += option);
+=======
 
                 players.forEach(player => {
                     const age = calculateAge(player.dob); // Use corrected `dob` field
@@ -207,6 +304,7 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
                         const option = `<option value="${player.id}">${player.name} (${age}, ${player.sex})</option>`;
                         player1Dropdown.innerHTML += option;
                         player2Dropdown.innerHTML += option;
+>>>>>>> main
                     }
                 });
             }
@@ -233,13 +331,18 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
     </script>
 </head>
 <body>
+<<<<<<< HEAD
+=======
  
+>>>>>>> main
     <div class="container">
         <h1>Insert Match</h1>
         <?php if ($message): ?>
             <p class="message"><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
 
+<<<<<<< HEAD
+=======
         <?php if (!$lockedTournament): ?>
             <form method="post">
                 <label for="tournament_id">Select Tournament:</label>
@@ -258,29 +361,43 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             </form>
         <?php endif; ?>
 
+>>>>>>> main
         <form method="post">
             <label for="category_id">Category:</label>
             <select name="category_id" id="category_id" onchange="updatePlayerDropdown()" required>
                 <option value="">Select Category</option>
                 <?php while ($row = $categories->fetch_assoc()): ?>
+<<<<<<< HEAD
+                    <option value="<?= $row['id'] ?>" 
+                            data-age-group="<?= $row['age_group'] ?>" 
+                            data-sex="<?= $row['sex'] ?>" 
+                            data-type="<?= htmlspecialchars($row['type']) ?>"> 
+=======
                     <option value="<?= $row['id'] ?>" data-age-group="<?= $row['age_group'] ?>" data-sex="<?= $row['sex'] ?>">
+>>>>>>> main
                         <?= htmlspecialchars($row['name']) ?> (<?= htmlspecialchars($row['age_group']) ?>, <?= htmlspecialchars($row['sex']) ?>)
                     </option>
                 <?php endwhile; ?>
             </select>
 
-            <label for="player1_id">Player 1:</label>
-            <select name="player1_id" id="player1_id" required>
-                <option value="">Select Player</option>
-            </select>
+            <div class="player-group">
+                <label for="player1_id">Player 1:</label>
+                <select name="player1_id" id="player1_id" class="player-dropdown" required></select>
 
-            <label for="player2_id">Player 2:</label>
-            <select name="player2_id" id="player2_id" required>
-                <option value="">Select Player</option>
-            </select>
+                <label for="player1_partner_id">Player 1 Partner:</label>
+                <select name="player1_partner_id" id="player1_partner_id" class="player-dropdown" required></select>
+            </div>
+
+            <div class="player-group">
+                <label for="player2_id">Player 2:</label>
+                <select name="player2_id" id="player2_id" class="player-dropdown" required></select>
+
+                <label for="player2_partner_id">Player 2 Partner:</label>
+                <select name="player2_partner_id" id="player2_partner_id" class="player-dropdown" required></select>
+            </div>
 
             <label for="stage">Match Stage:</label>
-            <select name="stage" id="stage" required>
+            <select name="stage" required>
                 <option value="Pre Quarter Finals">Pre Quarter Finals</option>
                 <option value="Quarter Finals">Quarter Finals</option>
                 <option value="Semi Finals">Semi Finals</option>
@@ -290,7 +407,11 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             <label for="date">Match Date:</label>
             <input type="date" name="date" required>
 
+<<<<<<< HEAD
+            <label for="time">Match Time:</label>
+=======
             <label for="match_time">Match Time:</label>
+>>>>>>> main
             <input type="time" name="time" required>
 
             <label for="set1_player1_points">Set 1 Player 1 Points:</label>
