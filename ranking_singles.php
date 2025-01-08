@@ -94,17 +94,18 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Singles Rankings</title>
     <style>
-                body {
+            body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.0;
             background-color: #f4f4f4;
             color: #333;
-            margin: 0;
+            margin: 10;
             padding: 0;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            
         }
         table, th, td {
             border: 1px solid black;

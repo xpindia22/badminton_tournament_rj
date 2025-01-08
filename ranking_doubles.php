@@ -101,10 +101,10 @@ if (!$result) {
     <style>
                 body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.0;
             background-color: #f4f4f4;
             color: #333;
-            margin: 0;
+            margin: 10;
             padding: 0;
         }
         table {

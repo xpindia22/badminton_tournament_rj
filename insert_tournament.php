@@ -112,7 +112,7 @@ if (!$categories_result) {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
             margin: 0;
-            padding: 20px;
+            padding: 0px;
         }
 
         h1 {

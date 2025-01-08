@@ -136,7 +136,7 @@ $result = $conn->query($query);
     <style>
     body { 
         font-family: Arial, sans-serif; 
-        margin: 20px; 
+        margin: 0px; 
     }
     table { 
         width: 100%; 

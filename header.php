@@ -18,7 +18,7 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             justify-content: space-between;
             align-items: center;
             background-color: #f4f4f4;
-            padding: 10px 20px;
+             padding: 10px 20px;
             border-bottom: 1px solid #ccc;
         }
         .header .links {
