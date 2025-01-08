@@ -94,32 +94,103 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Singles Rankings</title>
     <style>
-            body {
-            font-family: Arial, sans-serif;
-            line-height: 1.0;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 10;
-            padding: 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        form {
-            margin-bottom: 20px;
-        }
+/* Reset margins and padding for the body */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+/* Header styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f4f4f4;
+    padding: 10px 20px; /* Ensure consistent padding */
+    border-bottom: 1px solid #ccc;
+    margin: 0; /* Remove default margins */
+}
+
+/* Welcome message */
+.header .welcome {
+    font-size: 14px;
+    color: #333;
+    margin: 0; /* Remove unwanted margins */
+}
+
+/* Links container */
+.header .links {
+    display: flex;
+    gap: 15px; /* Consistent spacing between links */
+    position: relative;
+    margin: 0; /* Remove unwanted margins */
+    padding: 0; /* Remove unwanted paddings */
+    align-items: center;
+}
+
+/* Individual links */
+.header .links a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    padding: 5px 0;
+    margin: 0; /* Ensure no extra space */
+}
+
+/* Dropdown styling */
+.dropdown {
+    position: relative;
+    margin: 0; /* Remove extra space */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    min-width: 220px;
+    border-radius: 4px;
+}
+
+.dropdown-content a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    padding: 10px 16px;
+    border-bottom: 1px solid #ddd;
+}
+
+.dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    padding: 1px;
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+form {
+    margin-bottom: 20px;
+}
     </style>
 </head>
 <body>
