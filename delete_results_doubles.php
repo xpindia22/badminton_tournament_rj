@@ -1,16 +1,12 @@
-<?php include 'header.php'; ?>
-
 <?php
 // edit_results_doubles.php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$servername = "localhost";
-$username = "root";
-$password = "xxx";
-$dbname = "badminton_tournament";
-
+require_once 'conn.php';
+//require_once 'permissions.php';
+include 'header.php'; 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {

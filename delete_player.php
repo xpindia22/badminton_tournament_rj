@@ -1,5 +1,6 @@
 <?php
 //delete_player.php
+//require_once 'permissions.php';
 include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();

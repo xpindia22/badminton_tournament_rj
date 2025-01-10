@@ -1,9 +1,7 @@
 <?php
 // login.php
-//include 'header.php';
+include 'header.php';
 //require_once 'permissions.php';
- 
-require 'auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];

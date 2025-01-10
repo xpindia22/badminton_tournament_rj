@@ -1,37 +1,20 @@
 <?php
-// auth.php
-
-// Start session only if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once "conn.php";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Database connection failed: " . $conn->connect_error);
-}
-
-// Functions for authentication and authorization
-function is_logged_in() {
-    return isset($_SESSION['user_id']);
-}
-
-function is_admin() {
-    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
-}
-
-function is_user() {
-    return isset($_SESSION['role']) && $_SESSION['role'] === 'user';
-}
+require_once 'conn.php';
+require_once 'permissions.php';
 
 function redirect_if_not_logged_in() {
-    if (!is_logged_in()) {
+    if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
         exit;
     }
+}
+
+function is_logged_in() {
+    return isset($_SESSION['user_id']);
 }
 
 function hash_password($password) {
@@ -41,4 +24,3 @@ function hash_password($password) {
 function verify_password($password, $hash) {
     return password_verify($password, $hash);
 }
-?>

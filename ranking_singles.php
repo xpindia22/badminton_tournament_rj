@@ -1,5 +1,7 @@
 <?php
 include 'header.php';
+//require_once 'permissions.php';
+
 // Enable error reporting for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

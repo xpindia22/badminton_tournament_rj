@@ -1,5 +1,7 @@
 <?php
 // Include database connection
+//require_once 'permissions.php';
+
 require_once 'conn.php';
 
 // Fetch singles rankings based on total points scored by players across all matches

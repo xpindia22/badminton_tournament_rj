@@ -1,6 +1,6 @@
 <?php
-// edit_tournament.php
-require 'auth.php';
+include 'header.php';
+//require_once 'permissions.php';
 redirect_if_not_logged_in();
 
 ini_set('display_errors', 1);

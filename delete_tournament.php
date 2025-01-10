@@ -1,6 +1,8 @@
 <?php
 // delete_tournament.php
 require 'auth.php';
+//require_once 'permissions.php';
+
 redirect_if_not_logged_in();
 
 ini_set('display_errors', 1);

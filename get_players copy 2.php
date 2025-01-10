@@ -1,5 +1,6 @@
 <?php
 require 'auth.php';
+//require_once 'permissions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['category_id'])) {
     $category_id = intval($_GET['category_id']);

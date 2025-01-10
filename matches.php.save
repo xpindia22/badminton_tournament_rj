@@ -1,5 +1,7 @@
 <?php
 //matches.php
+//require_once 'permissions.php';
+
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -23,6 +25,7 @@ $query = "
 ";
 $result = $conn->query($query);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -1,7 +1,35 @@
 <?php
 // login.php
- 
+
 require 'auth.php';
+// //require_once 'permissions.php';
+
+// Start session-based permissions
+session_start();
+
+// Simulating role assignment during login (default role for non-logged-in users)
+if (!isset($_SESSION['role'])) {
+    $_SESSION['role'] = 'visitor';
+}
+
+// Function to check permissions
+function has_permission($action) {
+    $role_permissions = [
+        'admin' => ['add', 'edit', 'delete', 'update', 'view'],
+        'user' => ['edit', 'view'],
+        'visitor' => ['view'],
+    ];
+
+    $role = $_SESSION['role'];
+    return in_array($action, $role_permissions[$role]);
+}
+
+// Restrict page access for visitors
+function restrict_page_for_visitor($page) {
+    if ($_SESSION['role'] == 'visitor' && !in_array($page, ['home', 'about', 'contact'])) {
+        die("Access denied for visitors.");
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
@@ -26,13 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
 // Get all image files from the images directory and its subdirectories
 function get_images_from_directory($directory) {
     $images = [];
     $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
 
-    // Recursive directory iterator
     $dir_iterator = new RecursiveDirectoryIterator($directory);
     $iterator = new RecursiveIteratorIterator($dir_iterator);
 

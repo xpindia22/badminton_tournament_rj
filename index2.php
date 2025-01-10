@@ -1,5 +1,7 @@
 <?php
 include 'header.php';
+//require_once 'permissions.php';
+
 ?> 
 <!DOCTYPE html>
 <html lang="en">

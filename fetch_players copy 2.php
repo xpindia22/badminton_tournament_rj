@@ -1,5 +1,7 @@
 <?php
 //fetch_player.php
+//require_once 'permissions.php';
+
 header('Content-Type: application/json');
 
 $conn = new mysqli("localhost", "root", "xxx", "badminton_tournament");

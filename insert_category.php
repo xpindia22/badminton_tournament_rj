@@ -1,6 +1,7 @@
 <?php
 // insert_category.php
 include 'header.php';
+//require_once 'permissions.php';
 
 require 'auth.php';
 redirect_if_not_logged_in();

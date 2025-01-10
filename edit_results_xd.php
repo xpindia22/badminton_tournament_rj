@@ -3,6 +3,9 @@
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
+//require_once 'permissions.php';
+
+
 redirect_if_not_logged_in();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
