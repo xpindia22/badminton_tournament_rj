@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 07, 2025 at 12:41 PM
+-- Generation Time: Jan 10, 2025 at 06:01 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -155,8 +155,6 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (8, 1, 8, NULL, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '09:19', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (9, 1, 16, NULL, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-01', '22:22', '2025-01-01', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (10, 3, 20, NULL, 11, 12, 0, 0, 0, 0, 21, 11, 12, 21, 21, 16, NULL, 'Pre Quarter Finals', '2025-01-02', '18:13', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
-(11, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
-(12, 4, 20, NULL, 6, 12, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '11:01', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (13, 3, 11, NULL, 10, 6, 0, 0, 0, 0, 28, 26, 24, 26, 28, 2, NULL, 'Pre Quarter Finals', '2025-01-03', '11:35', '2025-01-02', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (14, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 1, NULL, 'Pre Quarter Finals', NULL, '12:29', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
 (15, 1, 11, NULL, 2, 6, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '12:31', '2025-01-03', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL),
@@ -210,6 +208,7 @@ CREATE TABLE `players` (
   `sex` enum('M','F') NOT NULL,
   `uid` varchar(100) NOT NULL,
   `created_by` int(11) DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `category_id` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -217,25 +216,25 @@ CREATE TABLE `players` (
 -- Dumping data for table `players`
 --
 
-INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`, `category_id`) VALUES
-(1, 'Sreesha', '2008-01-01', 16, 'F', '3', 1, 0),
-(2, 'Eric James', '2009-05-02', 15, 'M', '1', 1, 0),
-(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1, 0),
-(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1, 0),
-(6, 'Lee Chong Wei', '1980-01-03', 44, 'M', '5', 1, 0),
-(9, 'Lakshaya', '2010-01-01', 15, 'F', '10', 4, 1),
-(10, 'Gokulan', '1990-01-01', 35, 'M', '9', 4, 1),
-(11, 'Zanpear', '1978-05-01', 46, 'M', '6', 4, 1),
-(12, 'Pandyraj', '1968-01-01', 57, 'M', '7', 4, 20),
-(13, 'Vijay', '1970-01-30', 54, 'M', '8', 4, 1),
-(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', '11', 4, 1),
-(15, 'An Se Young', '2000-01-01', 25, 'F', 'UID_677bbebb3b149', 4, 1),
-(16, 'Okuhara', '1998-01-01', 27, 'F', 'UID_677bc0ddf116b', 4, 1),
-(17, 'Anitha Anthony', '2008-01-01', 17, 'F', 'UID_677bc10641ef2', 4, 1),
-(18, 'Carolina', '1995-06-06', 29, 'F', 'UID_677bc127daf31', 4, 1),
-(19, 'PV Sindhu', '1995-06-07', 29, 'F', '12', 4, 1),
-(20, 'Victor Axelsen', '1995-05-07', 29, 'M', 'UID_677bc1915e3b3', 4, 1),
-(21, 'Lin Dan', '1986-02-06', 38, 'M', 'UID_677bc1a51f3b6', 4, 1);
+INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `created_by`, `updated_at`, `category_id`) VALUES
+(1, 'Sreesha', '2008-01-01', 16, 'F', '3', 1, '2025-01-10 04:18:58', 0),
+(2, 'Eric James', '2009-05-02', 15, 'M', '1', 1, '2025-01-10 04:18:58', 0),
+(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', 1, '2025-01-10 04:18:58', 0),
+(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', 1, '2025-01-10 04:18:58', 0),
+(6, 'Lee Chong Wei', '1980-01-03', 44, 'M', '5', 1, '2025-01-10 04:18:58', 0),
+(9, 'Lakshaya', '2010-01-01', 15, 'F', '10', 4, '2025-01-10 04:18:58', 1),
+(10, 'Gokulan', '1990-01-01', 35, 'M', '9', 4, '2025-01-10 04:18:58', 1),
+(11, 'Zanpear', '1978-05-01', 46, 'M', '6', 4, '2025-01-10 04:18:58', 1),
+(12, 'Pandyraj', '1968-01-01', 57, 'M', '7', 4, '2025-01-10 04:18:58', 20),
+(13, 'Vijay', '1970-01-30', 54, 'M', '8', 4, '2025-01-10 04:18:58', 1),
+(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', '11', 4, '2025-01-10 04:18:58', 1),
+(15, 'An Se Young', '2000-01-01', 25, 'F', 'UID_677bbebb3b149', 4, '2025-01-10 04:18:58', 1),
+(16, 'Okuhara', '1998-01-01', 27, 'F', 'UID_677bc0ddf116b', 4, '2025-01-10 04:18:58', 1),
+(17, 'Anitha Anthony', '2008-01-01', 17, 'F', 'UID_677bc10641ef2', 4, '2025-01-10 04:18:58', 1),
+(18, 'Carolina', '1995-06-06', 29, 'F', 'UID_677bc127daf31', 4, '2025-01-10 04:18:58', 1),
+(19, 'PV Sindhu', '1995-06-07', 29, 'F', '12', 4, '2025-01-10 04:18:58', 1),
+(20, 'Victor Axelsen', '1995-05-07', 29, 'M', 'UID_677bc1915e3b3', 4, '2025-01-10 04:18:58', 1),
+(21, 'Lin Dan', '1986-02-06', 38, 'M', 'UID_677bc1a51f3b6', 4, '2025-01-10 04:18:58', 1);
 
 -- --------------------------------------------------------
 
@@ -289,10 +288,12 @@ CREATE TABLE `tournaments` (
 INSERT INTO `tournaments` (`id`, `name`, `created_by`, `year`) VALUES
 (1, 'ABPL3', 1, 2024),
 (2, 'Super Series 2024', 2, 2024),
-(3, 'Winter Series', 3, 2024),
-(4, 'Senior Championship', 5, 2015),
-(5, 'Winners Trophy', 1, 2025),
-(6, 'ACE Championship', 1, 2025);
+(3, 'Winter Series', 4, 2024),
+(6, 'ACE Championship', 1, 2025),
+(7, 'xxxxsx', 1, 2025),
+(13, 'uuuuh', 5, 2025),
+(14, 'xxxxaa', 4, 2025),
+(15, 'xxdds', 4, 2025);
 
 -- --------------------------------------------------------
 
@@ -317,8 +318,6 @@ INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUE
 (33, 3, 11),
 (34, 3, 20),
 (35, 2, 1),
-(36, 4, 2),
-(37, 4, 3),
 (74, 1, 1),
 (75, 1, 2),
 (76, 1, 3),
@@ -332,7 +331,11 @@ INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUE
 (84, 1, 14),
 (85, 1, 15),
 (86, 1, 13),
-(87, 1, 32);
+(87, 1, 32),
+(94, 7, 1),
+(97, 13, 18),
+(98, 14, 11),
+(99, 15, 11);
 
 -- --------------------------------------------------------
 
@@ -344,22 +347,24 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `mobile_no` varchar(15) DEFAULT NULL,
+  `mobile_no` varchar(20) DEFAULT NULL,
   `notes` text DEFAULT NULL,
-  `role` enum('admin','user','visitor') NOT NULL,
+  `role` enum('admin','user','visitor','moderator') NOT NULL DEFAULT 'visitor',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `email` varchar(255) DEFAULT NULL
+  `email` varchar(255) DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `mobile_no`, `notes`, `role`, `created_at`, `email`) VALUES
-(1, 'user', '$2y$10$q0I/ctXI5pI0oUUcaTsqV.mTNeYf8evE0xKimNAvhSEooL7CIFjAW', '11111111', 'First user', 'user', '2024-12-29 03:50:28', 'user@user.com'),
-(2, 'admin', '$2y$10$Vzemd6vNZoJ7tsir9lxqKuBfkPhks/ZL3mB6YRRNKRLg3H8THFdba', '7432001215', 'Admin account', 'admin', '2024-12-29 04:11:42', 'admin@admin.com'),
-(4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com'),
-(5, 'user2', '$2y$10$h2N1Jb3tCQ72X.KWuQaB8eUfBfJa61DULmbLDzMArIlUdtpj4im.m', '2222222222', NULL, 'user', '2024-12-31 15:28:19', 'user2@jdjdj.com');
+INSERT INTO `users` (`id`, `username`, `password`, `mobile_no`, `notes`, `role`, `created_at`, `email`, `last_login`) VALUES
+(1, 'user', '$2y$10$q0I/ctXI5pI0oUUcaTsqV.mTNeYf8evE0xKimNAvhSEooL7CIFjAW', '11111111', 'First user', 'user', '2024-12-29 03:50:28', 'user@user.com', NULL),
+(2, 'admin', '$2y$10$Vzemd6vNZoJ7tsir9lxqKuBfkPhks/ZL3mB6YRRNKRLg3H8THFdba', '7432001215', 'Admin account', 'admin', '2024-12-29 04:11:42', 'admin@admin.com', NULL),
+(4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com', NULL),
+(5, 'user2', '$2y$10$h2N1Jb3tCQ72X.KWuQaB8eUfBfJa61DULmbLDzMArIlUdtpj4im.m', '2222222222', NULL, 'user', '2024-12-31 15:28:19', 'user2@jdjdj.com', NULL),
+(6, 'user1', '$2y$10$630Wk4DbeWyToUcclXn66.2YMBCpUb8/ZwAvZwsbMU72PF3nNWdB2', '2222222222', NULL, 'user', '2025-01-10 05:55:38', 'asda@sd.asda', NULL);
 
 -- --------------------------------------------------------
 
@@ -440,7 +445,8 @@ ALTER TABLE `player_access`
 -- Indexes for table `tournaments`
 --
 ALTER TABLE `tournaments`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `created_by` (`created_by`);
 
 --
 -- Indexes for table `tournament_categories`
@@ -514,19 +520,19 @@ ALTER TABLE `player_access`
 -- AUTO_INCREMENT for table `tournaments`
 --
 ALTER TABLE `tournaments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `user_notes`
@@ -558,7 +564,7 @@ ALTER TABLE `category_access`
 ALTER TABLE `matches`
   ADD CONSTRAINT `fk_player3` FOREIGN KEY (`player3_id`) REFERENCES `players` (`id`),
   ADD CONSTRAINT `fk_player4` FOREIGN KEY (`player4_id`) REFERENCES `players` (`id`),
-  ADD CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`),
+  ADD CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`player1_id`) REFERENCES `players` (`id`),
   ADD CONSTRAINT `matches_ibfk_4` FOREIGN KEY (`player2_id`) REFERENCES `players` (`id`);
@@ -577,10 +583,17 @@ ALTER TABLE `player_access`
   ADD CONSTRAINT `player_access_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `tournaments`
+--
+ALTER TABLE `tournaments`
+  ADD CONSTRAINT `tournaments_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tournaments_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  ADD CONSTRAINT `tournament_categories_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`),
+  ADD CONSTRAINT `tournament_categories_ibfk_1` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `tournament_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
 
 --
