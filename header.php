@@ -107,8 +107,8 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
                     <a href="insert_tournament.php">Insert Tournaments</a>
                     <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match.php">Insert Match</a>
-                    <a href="results.php">Results</a>
-                    <a href="matches.php">Edit Matches</a>
+                    <a href="results_singles.php">Singles Results</a>
+                    <a href="matches.php">Edit Singles Matches</a>
                 </div>
             </div>
 
