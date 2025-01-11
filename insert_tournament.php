@@ -1,7 +1,9 @@
 <?php
+ob_start(); // Start output buffering
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 
 include 'header.php';
 require 'fetch_tournaments.php'; // Include the reusable fetch logic
@@ -56,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_tournament'])) {
     $tournament_id = intval($_POST['tournament_id']);
     $tournament_name = trim($conn->real_escape_string($_POST['tournament_name']));
-    $categories = trim($conn->real_escape_string($_POST['categories']));
 
     if (empty($tournament_name)) {
         die("Tournament name cannot be empty.");
@@ -77,23 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_tournament'])) 
         die("Error updating tournament: " . $conn->error);
     }
 
-    // Update the categories
-    $sql = "DELETE FROM tournament_categories WHERE tournament_id=$tournament_id";
-    if (!$conn->query($sql)) {
-        die("Error clearing categories: " . $conn->error);
-    }
-
-    $categories_array = explode(',', $categories);
-    foreach ($categories_array as $category_name) {
-        $category_name = trim($category_name);
-        if (!empty($category_name)) {
-            $category_id_result = $conn->query("SELECT id FROM categories WHERE name='$category_name'");
-            if ($category_id_result && $category_id_result->num_rows > 0) {
-                $category_id = $category_id_result->fetch_assoc()['id'];
-                $conn->query("INSERT INTO tournament_categories (tournament_id, category_id) VALUES ($tournament_id, $category_id)");
-            }
-        }
-    }
+    // Redirect to prevent resubmission
+    header("Location: insert_tournament.php?status=updated");
+    exit;
 }
 
 // Delete Tournament
@@ -134,10 +121,133 @@ if (!$categories_result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Tournaments</title>
-    <!-- Add your existing CSS here -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        form {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        form h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        form input, form select, form button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        table thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .actions button, .actions a {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .actions .edit {
+            background-color: #28a745;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+        }
+
+        .actions .edit:hover {
+            background-color: #218838;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
     <h1>Manage Tournaments</h1>
+
+    <?php if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
+        <p style="color: green; text-align: center;">Tournament updated successfully!</p>
+    <?php endif; ?>
 
     <div class="form-container">
         <!-- Add Tournament Form -->
@@ -166,38 +276,33 @@ if (!$categories_result) {
         </form>
     </div>
 
-    <!-- Tournament Table -->
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Owner</th>
                 <th>Categories</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($tournaments as $row): ?>
-                <tr>
-                    <form method="POST">
-                        <td><?= $row['tournament_id'] ?></td>
+                <form method="POST">
+                    <tr>
+                        <td><?= htmlspecialchars($row['tournament_id']) ?></td>
                         <td>
-                            <input type="text" name="tournament_name" value="<?= htmlspecialchars($row['tournament_name']) ?>">
+                            <input type="text" name="tournament_name" value="<?= htmlspecialchars($row['tournament_name']) ?>" required>
                         </td>
-                        <td>
-                            <input type="text" name="categories" value="<?= htmlspecialchars($row['categories'] ?? '') ?>">
-                        </td>
+                        <td><?= htmlspecialchars($row['owner_name'] ?? 'Unknown') ?></td>
+                        <td><?= htmlspecialchars($row['categories'] ?? 'None') ?></td>
                         <td class="actions">
                             <input type="hidden" name="tournament_id" value="<?= $row['tournament_id'] ?>">
-                            <?php if ($currentUserRole === 'admin' || $row['created_by'] == $currentUserId): ?>
-                                <button type="submit" name="update_tournament">Save</button>
-                                <a href="?delete_tournament=<?= $row['tournament_id'] ?>" class="delete" onclick="return confirm('Are you sure?')">Delete</a>
-                            <?php else: ?>
-                                <span>No Actions Available</span>
-                            <?php endif; ?>
+                            <button type="submit" name="update_tournament" class="edit">Save</button>
+                            <a href="?delete_tournament=<?= $row['tournament_id'] ?>" class="delete" onclick="return confirm('Are you sure?')">Delete</a>
                         </td>
-                    </form>
-                </tr>
+                    </tr>
+                </form>
             <?php endforeach; ?>
         </tbody>
     </table>

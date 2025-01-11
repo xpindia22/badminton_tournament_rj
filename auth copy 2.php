@@ -24,4 +24,3 @@ function hash_password($password) {
 function verify_password($password, $hash) {
     return password_verify($password, $hash);
 }
-?>

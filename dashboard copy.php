@@ -3,16 +3,12 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
-// Include required files
 require_once 'auth.php'; // Ensure this path is correct
-require_once 'permissions.php'; // Include permissions file
 redirect_if_not_logged_in();
 
 // Include the header after checking login status
 include 'header.php';
 
-// Fetch session information
 $username = htmlspecialchars($_SESSION['username']);
 $is_admin = is_admin();
 $is_user = is_user();
@@ -76,7 +72,7 @@ $is_user = is_user();
 <body>
     <div class="container">
         <h1>Dashboard</h1>
-        <p>Welcome, <?= $username; ?>!</p>
+        <!-- <p>Welcome, <?= $username; ?>!</p> -->
         <div class="card-container">
             <!-- Admin Links -->
             <?php if ($is_admin): ?>
