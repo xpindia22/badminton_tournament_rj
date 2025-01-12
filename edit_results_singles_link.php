@@ -1,17 +1,21 @@
 <?php
-// results.php
+//edit_results_singles_link.php >> it will redirect to edit_results_singles.php
 include 'header.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'conn.php';
-//require_once 'permissions.php';
-$conn = new mysqli($servername, $username, $password, $dbname);
+require_once 'auth.php';
+require_once 'permissions.php';
+redirect_if_not_logged_in();
 
+$conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
+
+$user_id = $_SESSION['user_id'];
+$is_admin = is_admin();
 
 // Fetch filters
 $tournament_id = $_GET['tournament_id'] ?? '';
@@ -43,7 +47,8 @@ $query = "
         m.set2_player1_points,
         m.set2_player2_points,
         m.set3_player1_points,
-        m.set3_player2_points
+        m.set3_player2_points,
+        m.created_by
     FROM matches m
     INNER JOIN tournaments t ON m.tournament_id = t.id
     INNER JOIN categories c ON m.category_id = c.id
@@ -51,6 +56,10 @@ $query = "
     INNER JOIN players p2 ON m.player2_id = p2.id
     WHERE 1=1
 ";
+
+if (!$is_admin) {
+    $query .= " AND m.created_by = $user_id";
+}
 
 if ($tournament_id) {
     $query .= " AND m.tournament_id = $tournament_id";
@@ -83,17 +92,9 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Tournament Results</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <style>
-         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* body { font-family: Arial, sans-serif; margin: 20px;  } */
+        body { font-family: Arial, sans-serif; margin: 0px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         th { background-color: #f4f4f4; }
@@ -104,23 +105,13 @@ $result = $conn->query($query);
 <body>
     <h1>All Tournament Results</h1>
 
-    <!-- Filter Form -->
+       <!-- Filter Form -->
     <form method="get">
         <label for="tournament_id">Tournament:</label>
         <select name="tournament_id" id="tournament_id">
             <option value="">All Tournaments</option>
             <?php while ($row = $tournaments->fetch_assoc()): ?>
                 <option value="<?= $row['id'] ?>" <?= $tournament_id == $row['id'] ? 'selected' : '' ?>>
-                    <?= $row['name'] ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="category_id">Category:</label>
-        <select name="category_id" id="category_id">
-            <option value="">All Categories</option>
-            <?php while ($row = $categories->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" <?= $category_id == $row['id'] ? 'selected' : '' ?>>
                     <?= $row['name'] ?>
                 </option>
             <?php endwhile; ?>
@@ -162,47 +153,50 @@ $result = $conn->query($query);
     <!-- Results Table -->
     <?php if ($result->num_rows > 0): ?>
         <table>
-    <tr>
-        <th>Match ID</th>
-        <th>Tournament</th>
-        <th>Category</th>
-        <th>Player 1</th>
-        <th>Player 2</th>
-        <th>Stage</th>
-        <th>Match Date</th>
-        <th>Match Time</th>
-        <th>Set 1</th>
-        <th>Set 2</th>
-        <th>Set 3</th>
-        <th>Winner</th>
-        <th>Actions</th>
-    </tr>
-    <?php while ($row = $result->fetch_assoc()): 
-        $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
-        $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
-        $winner = $p1_total > $p2_total ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
-    ?>
-        <tr>
-            <td><?= $row['match_id'] ?></td>
-            <td><?= $row['tournament_name'] ?></td>
-            <td><?= $row['category_name'] ?></td>
-            <td><?= $row['player1_name'] ?></td>
-            <td><?= $row['player2_name'] ?></td>
-            <td><?= $row['stage'] ?></td>
-            <td><?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?></td>
-            <td><?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?></td>
-            <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
-            <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
-            <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>
-            <td><?= $winner ?></td>
-            <td>
-                <a href="edit_match.php?match_id=<?= $row['match_id'] ?>">Edit</a> |
-                <a href="delete_match.php?match_id=<?= $row['match_id'] ?>" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
-            </td>
-        </tr>
-    <?php endwhile; ?>
-</table>
-
+            <tr>
+                <th>Match ID</th>
+                <th>Tournament</th>
+                <th>Category</th>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Stage</th>
+                <th>Match Date</th>
+                <th>Match Time</th>
+                <th>Set 1</th>
+                <th>Set 2</th>
+                <th>Set 3</th>
+                <th>Winner</th>
+                <th>Actions</th>
+            </tr>
+            <?php while ($row = $result->fetch_assoc()): 
+                $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
+                $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
+                $winner = $p1_total > $p2_total ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
+            ?>
+                <tr>
+                    <td><?= $row['match_id'] ?></td>
+                    <td><?= $row['tournament_name'] ?></td>
+                    <td><?= $row['category_name'] ?></td>
+                    <td><?= $row['player1_name'] ?></td>
+                    <td><?= $row['player2_name'] ?></td>
+                    <td><?= $row['stage'] ?></td>
+                    <td><?= $row['match_date'] ? date("d-m-Y", strtotime($row['match_date'])) : 'N/A' ?></td>
+                    <td><?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?></td>
+                    <td><?= $row['set1_player1_points'] ?> - <?= $row['set1_player2_points'] ?></td>
+                    <td><?= $row['set2_player1_points'] ?> - <?= $row['set2_player2_points'] ?></td>
+                    <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>
+                    <td><?= $winner ?></td>
+                    <td>
+                        <?php if ($is_admin || $row['created_by'] == $user_id): ?>
+                            <a href="edit_results_singles.php?id=<?= $row['match_id'] ?>">Edit</a> |
+                            <a href="delete_match.php?id=<?= $row['match_id'] ?>" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
+                        <?php else: ?>
+                            N/A
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
     <?php else: ?>
         <p>No matches found for the selected filters.</p>
     <?php endif; ?>

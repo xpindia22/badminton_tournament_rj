@@ -3,8 +3,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'conn.php';
-require_once 'permissions.php';
+require_once 'conn.php'; // Include database connection
+require_once 'permissions.php'; // Include permissions functions
 
 function redirect_if_not_logged_in() {
     if (!isset($_SESSION['user_id'])) {
