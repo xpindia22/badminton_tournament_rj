@@ -95,11 +95,13 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
         <!-- Navigation Links -->
         <div class="links">
             <a href="dashboard.php">Dashboard</a>
-            <a href="readme.php">Help-Readme</a>
+            <!-- <a href="readme.php">Help-Readme</a> -->
             <a href="results.php">Singles Match Results</a>
-            <a href="ranking_singles.php">Ranking Singles</a>
-            <a href="add_moderator.php">Add Moderator</a>
-            <a href="filter.php">Filter</a>
+            <!-- <a href="ranking_singles.php">Ranking Singles</a> -->
+            <!-- <a href="add_moderator.php">Add Moderator</a> -->
+            <a href="filter_doubles_userbased.php">Filter Doubles UserBased</a>
+            <a href="filter_singles_userbased.php">Filter Singles UserBased</a>
+
 
 
 
