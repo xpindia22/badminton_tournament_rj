@@ -17,6 +17,9 @@ if (!$userResult) {
 // Initialize variables
 $championships = [];
 $categories = [];
+$matches = [];
+$selectedCategoryId = null;
+$selectedCategoryName = '';
 
 if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
     $userId = (int)$_GET['user_id'];
@@ -38,18 +41,57 @@ if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
     // Fetch categories linked to the championships
     if (!empty($championships)) {
         $champIds = implode(',', array_column($championships, 'id'));
-        $catQuery = "SELECT c.id, c.name, c.tournament_id 
-                     FROM categories c
-                     INNER JOIN tournament_categories tc ON c.id = tc.category_id
-                     WHERE c.tournament_id IN ($champIds)";
-        $catResult = $conn->query($catQuery);
-        if ($catResult) {
-            while ($row = $catResult->fetch_assoc()) {
-                $categories[] = $row;
+
+        if (!empty($champIds)) {
+            $catQuery = "SELECT c.id, c.name, c.tournament_id 
+                         FROM categories c
+                         INNER JOIN tournament_categories tc ON c.id = tc.category_id
+                         WHERE c.tournament_id IN ($champIds)";
+            $catResult = $conn->query($catQuery);
+            if ($catResult) {
+                while ($row = $catResult->fetch_assoc()) {
+                    $categories[] = $row;
+                }
+            } else {
+                die("Error fetching categories: " . $conn->error);
             }
-        } else {
-            die("Error fetching categories: " . $conn->error);
         }
+    }
+}
+
+if (isset($_GET['category_id']) && !empty($_GET['category_id'])) {
+    $selectedCategoryId = (int)$_GET['category_id'];
+
+    // Fetch the selected category name
+    foreach ($categories as $category) {
+        if ($category['id'] == $selectedCategoryId) {
+            $selectedCategoryName = $category['name'];
+            break;
+        }
+    }
+
+    // Fetch matches for the selected category
+    $matchQuery = "SELECT m.id, m.stage, m.match_date, m.match_time, 
+                          p1.name AS player1_name, p2.name AS player2_name, 
+                          m.set1_player1_points, m.set1_player2_points, 
+                          m.set2_player1_points, m.set2_player2_points, 
+                          m.set3_player1_points, m.set3_player2_points,
+                          CASE 
+                              WHEN m.set1_player1_points + m.set2_player1_points + m.set3_player1_points > 
+                                   m.set1_player2_points + m.set2_player2_points + m.set3_player2_points THEN p1.name
+                              ELSE p2.name
+                          END AS winner
+                   FROM matches m
+                   LEFT JOIN players p1 ON m.player1_id = p1.id
+                   LEFT JOIN players p2 ON m.player2_id = p2.id
+                   WHERE m.category_id = $selectedCategoryId";
+    $matchResult = $conn->query($matchQuery);
+    if ($matchResult) {
+        while ($row = $matchResult->fetch_assoc()) {
+            $matches[] = $row;
+        }
+    } else {
+        die("Error fetching matches: " . $conn->error);
     }
 }
 ?>
@@ -82,6 +124,10 @@ if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
             padding: 5px;
             margin-right: 10px;
         }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
     </style>
 </head>
 <body>
@@ -92,49 +138,58 @@ if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
     <select name="user_id" id="user" onchange="this.form.submit()">
         <option value="">-- Select User/Moderator --</option>
         <?php while ($row = $userResult->fetch_assoc()): ?>
-            <option value="<?= $row['id'] ?>" <?= isset($userId) && $userId == $row['id'] ? 'selected' : '' ?>>
+            <option value="<?= $row['id'] ?>" <?= isset($_GET['user_id']) && $_GET['user_id'] == $row['id'] ? 'selected' : '' ?>>
                 <?= htmlspecialchars($row['name']) ?> (<?= ucfirst(htmlspecialchars($row['role'])) ?>)
             </option>
         <?php endwhile; ?>
     </select>
+
+    <label for="category">Select Category:</label>
+    <select name="category_id" id="category" onchange="this.form.submit()">
+        <option value="">-- Select Category --</option>
+        <?php foreach ($categories as $category): ?>
+            <option value="<?= $category['id'] ?>" <?= isset($selectedCategoryId) && $selectedCategoryId == $category['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($category['name']) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
 </form>
 
-<?php if (!empty($championships)): ?>
-    <h3>Championships</h3>
+<?php if (!empty($matches)): ?>
+    <h3>Matches (Category: <?= htmlspecialchars($selectedCategoryName) ?>)</h3>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
+                <th>Match (Category)</th>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Stage</th>
+                <th>Set 1 (P1 - P2)</th>
+                <th>Set 2 (P1 - P2)</th>
+                <th>Set 3 (P1 - P2)</th>
+                <th>Winner</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($championships as $championship): ?>
+            <?php foreach ($matches as $match): ?>
                 <tr>
-                    <td><?= $championship['id'] ?></td>
-                    <td><?= htmlspecialchars($championship['name']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-<?php endif; ?>
-
-<?php if (!empty($categories)): ?>
-    <h3>Categories</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Championship ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($categories as $category): ?>
-                <tr>
-                    <td><?= $category['id'] ?></td>
-                    <td><?= htmlspecialchars($category['name']) ?></td>
-                    <td><?= $category['tournament_id'] ?></td>
+                    <td><?= htmlspecialchars($selectedCategoryName) ?></td>
+                    <td><?= htmlspecialchars($match['player1_name']) ?></td>
+                    <td><?= htmlspecialchars($match['player2_name']) ?></td>
+                    <td><?= htmlspecialchars($match['match_date']) ?></td>
+                    <td><?= htmlspecialchars($match['match_time']) ?></td>
+                    <td><?= htmlspecialchars($match['stage']) ?></td>
+                    <td><?= $match['set1_player1_points'] ?> - <?= $match['set1_player2_points'] ?></td>
+                    <td><?= $match['set2_player1_points'] ?> - <?= $match['set2_player2_points'] ?></td>
+                    <td><?= $match['set3_player1_points'] ?> - <?= $match['set3_player2_points'] ?></td>
+                    <td><?= htmlspecialchars($match['winner']) ?></td>
+                    <td>
+                        <a href="edit_match.php?id=<?= $match['id'] ?>">Edit</a> |
+                        <a href="delete_match.php?id=<?= $match['id'] ?>" onclick="return confirm('Are you sure you want to delete this match?');">Delete</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
