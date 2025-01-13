@@ -4,38 +4,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+
 include 'header.php';
+require 'fetch_tournaments.php'; // Include the reusable fetch logic
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
 
 $currentUserId = $_SESSION['user_id']; // Get logged-in user ID
 $currentUserRole = $_SESSION['role']; // Get logged-in user role ('admin', 'user')
-
-// Function to fetch tournaments with categories and moderators
-function fetchTournaments($conn) {
-    $query = "
-        SELECT 
-            t.id AS tournament_id, 
-            t.name AS tournament_name, 
-            u.username AS owner_name, 
-            GROUP_CONCAT(DISTINCT c.name ORDER BY c.name SEPARATOR ', ') AS categories,
-            GROUP_CONCAT(DISTINCT m.username ORDER BY m.username SEPARATOR ', ') AS moderators
-        FROM tournaments t
-        LEFT JOIN users u ON t.created_by = u.id
-        LEFT JOIN tournament_categories tc ON t.id = tc.tournament_id
-        LEFT JOIN categories c ON tc.category_id = c.id
-        LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
-        LEFT JOIN users m ON tm.user_id = m.id
-        GROUP BY t.id
-        ORDER BY t.name;
-    ";
-    $result = $conn->query($query);
-    if (!$result) {
-        die("Error fetching tournaments: " . $conn->error);
-    }
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
 
 // Add Tournament
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_tournament'])) {
@@ -53,40 +30,88 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_tournament'])) {
     }
 }
 
-// Add Moderator to Tournament
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_moderator'])) {
+// Add Category to Tournament
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
     $tournament_id = intval($_POST['tournament_id']);
-    $moderator_id = intval($_POST['moderator_id']);
+    $category_id = intval($_POST['category_id']);
 
-    if ($tournament_id === 0 || $moderator_id === 0) {
-        die("Please select a valid tournament and moderator.");
+    if ($tournament_id === 0 || $category_id === 0) {
+        die("Please select a valid tournament and category.");
     }
 
-    $insertQuery = "INSERT INTO tournament_moderators (tournament_id, user_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE user_id = user_id";
-    $stmt = $conn->prepare($insertQuery);
-    $stmt->bind_param('ii', $tournament_id, $moderator_id);
-
-    if ($stmt->execute()) {
-        echo "<p style='color: green;'>Moderator added to the tournament.</p>";
-    } else {
-        echo "<p style='color: red;'>Error adding moderator: " . htmlspecialchars($stmt->error) . "</p>";
+    // Check if the user has access to assign a category to the selected tournament
+    if ($currentUserRole !== 'admin') {
+        $result = $conn->query("SELECT created_by FROM tournaments WHERE id = $tournament_id");
+        $row = $result->fetch_assoc();
+        if ($row['created_by'] != $currentUserId) {
+            die("You do not have permission to assign categories to this tournament.");
+        }
     }
-    $stmt->close();
+
+    $sql = "INSERT INTO tournament_categories (tournament_id, category_id) VALUES ($tournament_id, $category_id)";
+    if (!$conn->query($sql)) {
+        die("Error assigning category: " . $conn->error);
+    }
 }
 
-// Fetch all tournaments with their categories and moderators
-$tournaments = fetchTournaments($conn);
+// Update Tournament
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_tournament'])) {
+    $tournament_id = intval($_POST['tournament_id']);
+    $tournament_name = trim($conn->real_escape_string($_POST['tournament_name']));
+
+    if (empty($tournament_name)) {
+        die("Tournament name cannot be empty.");
+    }
+
+    // Restrict updates to admins or the tournament creator
+    if ($currentUserRole !== 'admin') {
+        $result = $conn->query("SELECT created_by FROM tournaments WHERE id = $tournament_id");
+        $row = $result->fetch_assoc();
+        if ($row['created_by'] != $currentUserId) {
+            die("You do not have permission to update this tournament.");
+        }
+    }
+
+    // Update the tournament name
+    $sql = "UPDATE tournaments SET name='$tournament_name' WHERE id=$tournament_id";
+    if (!$conn->query($sql)) {
+        die("Error updating tournament: " . $conn->error);
+    }
+
+    // Redirect to prevent resubmission
+    header("Location: insert_tournament.php?status=updated");
+    exit;
+}
+
+// Delete Tournament
+if (isset($_GET['delete_tournament'])) {
+    $tournament_id = intval($_GET['delete_tournament']);
+
+    // Restrict deletion to admins or the tournament creator
+    if ($currentUserRole !== 'admin') {
+        $result = $conn->query("SELECT created_by FROM tournaments WHERE id = $tournament_id");
+        $row = $result->fetch_assoc();
+        if ($row['created_by'] != $currentUserId) {
+            die("You do not have permission to delete this tournament.");
+        }
+    }
+
+    $sql = "DELETE FROM tournaments WHERE id=$tournament_id";
+    if (!$conn->query($sql)) {
+        die("Error deleting tournament: " . $conn->error);
+    }
+
+    $sql = "DELETE FROM tournament_categories WHERE tournament_id=$tournament_id";
+    $conn->query($sql);
+}
+
+// Fetch all tournaments with their categories using `fetchTournaments`
+$tournaments = fetchTournaments($conn, $currentUserId, $currentUserRole);
 
 // Fetch all categories for the dropdown
 $categories_result = $conn->query("SELECT * FROM categories");
 if (!$categories_result) {
     die("Error fetching categories: " . $conn->error);
-}
-
-// Fetch all users for moderator dropdown
-$users_result = $conn->query("SELECT id, username FROM users ORDER BY username");
-if (!$users_result) {
-    die("Error fetching users: " . $conn->error);
 }
 ?>
 
@@ -220,6 +245,10 @@ if (!$users_result) {
 <body>
     <h1>Manage Tournaments</h1>
 
+    <?php if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
+        <p style="color: green; text-align: center;">Tournament updated successfully!</p>
+    <?php endif; ?>
+
     <div class="form-container">
         <!-- Add Tournament Form -->
         <form method="POST">
@@ -245,24 +274,6 @@ if (!$users_result) {
             </select>
             <button type="submit" name="add_category">Assign Category</button>
         </form>
-
-        <!-- Assign Moderators to Tournaments Form -->
-        <form method="POST">
-            <h2>Assign Moderator</h2>
-            <select name="tournament_id" required>
-                <option value="">Select Tournament</option>
-                <?php foreach ($tournaments as $tournament): ?>
-                    <option value="<?= $tournament['tournament_id'] ?>"><?= htmlspecialchars($tournament['tournament_name']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <select name="moderator_id" required>
-                <option value="">Select Moderator</option>
-                <?php while ($user = $users_result->fetch_assoc()): ?>
-                    <option value="<?= $user['id'] ?>"><?= htmlspecialchars($user['username']) ?></option>
-                <?php endwhile; ?>
-            </select>
-            <button type="submit" name="add_moderator">Assign Moderator</button>
-        </form>
     </div>
 
     <table>
@@ -272,7 +283,6 @@ if (!$users_result) {
                 <th>Name</th>
                 <th>Owner</th>
                 <th>Categories</th>
-                <th>Moderators</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -286,7 +296,6 @@ if (!$users_result) {
                         </td>
                         <td><?= htmlspecialchars($row['owner_name'] ?? 'Unknown') ?></td>
                         <td><?= htmlspecialchars($row['categories'] ?? 'None') ?></td>
-                        <td><?= htmlspecialchars($row['moderators'] ?? 'None') ?></td>
                         <td class="actions">
                             <input type="hidden" name="tournament_id" value="<?= $row['tournament_id'] ?>">
                             <button type="submit" name="update_tournament" class="edit">Save</button>

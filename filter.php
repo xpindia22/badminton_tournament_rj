@@ -6,15 +6,16 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+include "header.php";
 // Fetch users and moderators
-$userQuery = "SELECT id, name, role FROM users WHERE role IN ('user', 'moderator')";
+$userQuery = "SELECT id, username AS name, role FROM users WHERE role IN ('user', 'moderator')";
 $userResult = $conn->query($userQuery);
 if (!$userResult) {
     die("Error fetching users: " . $conn->error);
 }
 
 // Fetch championships
-$champQuery = "SELECT id, name FROM championships";
+$champQuery = "SELECT id, name FROM tournaments";
 $champResult = $conn->query($champQuery);
 if (!$champResult) {
     die("Error fetching championships: " . $conn->error);
@@ -27,7 +28,7 @@ if (isset($_GET['championship_id'])) {
     $championshipId = (int)$_GET['championship_id'];
 
     // Fetch categories
-    $catQuery = "SELECT id, name FROM categories WHERE championship_id = $championshipId";
+    $catQuery = "SELECT id, name FROM categories WHERE tournament_id = $championshipId";
     $catResult = $conn->query($catQuery);
     if ($catResult) {
         while ($row = $catResult->fetch_assoc()) {
@@ -38,7 +39,7 @@ if (isset($_GET['championship_id'])) {
     }
 
     // Fetch matches
-    $matchQuery = "SELECT id, name FROM matches WHERE championship_id = $championshipId";
+    $matchQuery = "SELECT id, stage AS name FROM matches WHERE tournament_id = $championshipId";
     $matchResult = $conn->query($matchQuery);
     if ($matchResult) {
         while ($row = $matchResult->fetch_assoc()) {
