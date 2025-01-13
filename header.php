@@ -98,6 +98,10 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <a href="readme.php">Help-Readme</a>
             <a href="results.php">Singles Match Results</a>
             <a href="ranking_singles.php">Ranking Singles</a>
+            <a href="add_moderator.php">Add Moderator</a>
+            <a href="filter.php">Filter</a>
+
+
 
             <!-- Dropdown: Singles Matches -->
             <div class="dropdown">

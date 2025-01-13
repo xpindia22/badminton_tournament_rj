@@ -1,4 +1,5 @@
 <?php
+include "header.php";
 require_once 'conn.php';
 
 // Enable error reporting for debugging
@@ -6,47 +7,49 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include "header.php";
-// Fetch users and moderators
+// Fetch all users and moderators
 $userQuery = "SELECT id, username AS name, role FROM users WHERE role IN ('user', 'moderator')";
 $userResult = $conn->query($userQuery);
 if (!$userResult) {
     die("Error fetching users: " . $conn->error);
 }
 
-// Fetch championships
-$champQuery = "SELECT id, name FROM tournaments";
-$champResult = $conn->query($champQuery);
-if (!$champResult) {
-    die("Error fetching championships: " . $conn->error);
-}
-
-// Fetch categories and matches dynamically if a championship is selected
+// Initialize variables
+$championships = [];
 $categories = [];
-$matches = [];
-if (isset($_GET['championship_id'])) {
-    $championshipId = (int)$_GET['championship_id'];
 
-    // Fetch categories
-    $catQuery = "SELECT id, name FROM categories WHERE tournament_id = $championshipId";
-    $catResult = $conn->query($catQuery);
-    if ($catResult) {
-        while ($row = $catResult->fetch_assoc()) {
-            $categories[] = $row;
+if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
+    $userId = (int)$_GET['user_id'];
+
+    // Fetch championships created by or moderated by the selected user
+    $champQuery = "SELECT DISTINCT t.id, t.name 
+                   FROM tournaments t
+                   LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
+                   WHERE t.created_by = $userId OR tm.user_id = $userId";
+    $champResult = $conn->query($champQuery);
+    if ($champResult) {
+        while ($row = $champResult->fetch_assoc()) {
+            $championships[] = $row;
         }
     } else {
-        die("Error fetching categories: " . $conn->error);
+        die("Error fetching championships: " . $conn->error);
     }
 
-    // Fetch matches
-    $matchQuery = "SELECT id, stage AS name FROM matches WHERE tournament_id = $championshipId";
-    $matchResult = $conn->query($matchQuery);
-    if ($matchResult) {
-        while ($row = $matchResult->fetch_assoc()) {
-            $matches[] = $row;
+    // Fetch categories linked to the championships
+    if (!empty($championships)) {
+        $champIds = implode(',', array_column($championships, 'id'));
+        $catQuery = "SELECT c.id, c.name, c.tournament_id 
+                     FROM categories c
+                     INNER JOIN tournament_categories tc ON c.id = tc.category_id
+                     WHERE c.tournament_id IN ($champIds)";
+        $catResult = $conn->query($catQuery);
+        if ($catResult) {
+            while ($row = $catResult->fetch_assoc()) {
+                $categories[] = $row;
+            }
+        } else {
+            die("Error fetching categories: " . $conn->error);
         }
-    } else {
-        die("Error fetching matches: " . $conn->error);
     }
 }
 ?>
@@ -86,21 +89,35 @@ if (isset($_GET['championship_id'])) {
 <h2>Filter Championships</h2>
 <form method="GET">
     <label for="user">Select User/Moderator:</label>
-    <select name="user_id" id="user">
+    <select name="user_id" id="user" onchange="this.form.submit()">
         <option value="">-- Select User/Moderator --</option>
         <?php while ($row = $userResult->fetch_assoc()): ?>
-            <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?> (<?= ucfirst(htmlspecialchars($row['role'])) ?>)</option>
-        <?php endwhile; ?>
-    </select>
-
-    <label for="championship">Select Championship:</label>
-    <select name="championship_id" id="championship" onchange="this.form.submit()">
-        <option value="">-- Select Championship --</option>
-        <?php while ($row = $champResult->fetch_assoc()): ?>
-            <option value="<?= $row['id'] ?>" <?= isset($championshipId) && $championshipId == $row['id'] ? 'selected' : '' ?>><?= htmlspecialchars($row['name']) ?></option>
+            <option value="<?= $row['id'] ?>" <?= isset($userId) && $userId == $row['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($row['name']) ?> (<?= ucfirst(htmlspecialchars($row['role'])) ?>)
+            </option>
         <?php endwhile; ?>
     </select>
 </form>
+
+<?php if (!empty($championships)): ?>
+    <h3>Championships</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($championships as $championship): ?>
+                <tr>
+                    <td><?= $championship['id'] ?></td>
+                    <td><?= htmlspecialchars($championship['name']) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
 
 <?php if (!empty($categories)): ?>
     <h3>Categories</h3>
@@ -109,6 +126,7 @@ if (isset($_GET['championship_id'])) {
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Championship ID</th>
             </tr>
         </thead>
         <tbody>
@@ -116,26 +134,7 @@ if (isset($_GET['championship_id'])) {
                 <tr>
                     <td><?= $category['id'] ?></td>
                     <td><?= htmlspecialchars($category['name']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-<?php endif; ?>
-
-<?php if (!empty($matches)): ?>
-    <h3>Matches</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($matches as $match): ?>
-                <tr>
-                    <td><?= $match['id'] ?></td>
-                    <td><?= htmlspecialchars($match['name']) ?></td>
+                    <td><?= $category['tournament_id'] ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

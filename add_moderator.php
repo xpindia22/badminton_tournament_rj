@@ -1,4 +1,5 @@
 <?php
+include 'header.php';
 require_once 'conn.php'; // Include database connection settings
 
 if ($conn->connect_error) {
