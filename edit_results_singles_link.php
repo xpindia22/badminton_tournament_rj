@@ -47,7 +47,8 @@ $query = "
         m.set2_player2_points,
         m.set3_player1_points,
         m.set3_player2_points,
-        m.created_by
+        m.created_by,
+        tm.user_id AS moderator_id
     FROM matches m
     INNER JOIN tournaments t ON m.tournament_id = t.id
     INNER JOIN categories c ON m.category_id = c.id
@@ -172,6 +173,7 @@ $result = $conn->query($query);
                 $p1_total = $row['set1_player1_points'] + $row['set2_player1_points'] + $row['set3_player1_points'];
                 $p2_total = $row['set1_player2_points'] + $row['set2_player2_points'] + $row['set3_player2_points'];
                 $winner = $p1_total > $p2_total ? $row['player1_name'] : ($p1_total < $p2_total ? $row['player2_name'] : 'Draw');
+                $can_edit_or_delete = $is_admin || ($row['created_by'] == $user_id) || ($row['moderator_id'] == $user_id);
             ?>
                 <tr>
                     <td><?= $row['match_id'] ?></td>
@@ -187,7 +189,7 @@ $result = $conn->query($query);
                     <td><?= $row['set3_player1_points'] ?> - <?= $row['set3_player2_points'] ?></td>
                     <td><?= $winner ?></td>
                     <td>
-                        <?php if ($is_admin || $row['created_by'] == $user_id): ?>
+                        <?php if ($can_edit_or_delete): ?>
                             <a href="edit_results_singles.php?id=<?= $row['match_id'] ?>">Edit</a> |
                             <a href="delete_match.php?id=<?= $row['match_id'] ?>" onclick="return confirm('Are you sure you want to delete this match?')">Delete</a>
                         <?php else: ?>
