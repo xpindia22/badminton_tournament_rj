@@ -15,6 +15,24 @@ redirect_if_not_logged_in();
 // Get the logged-in user's ID
 $userId = $_SESSION['user_id'];
 
+// Helper function to check if a user can edit/delete matches
+function can_edit_or_delete($userId, $tournamentId, $conn) {
+    $query = "
+        SELECT 1
+        FROM tournaments t
+        LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
+        WHERE (t.created_by = ? OR tm.user_id = ?) AND t.id = ?
+    ";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('iii', $userId, $userId, $tournamentId);
+    $stmt->execute();
+    $stmt->store_result();
+    $result = $stmt->num_rows > 0;
+    $stmt->free_result();
+    $stmt->close();
+    return $result;
+}
+
 // Fetch tournaments with matches and moderators
 $tournamentQuery = "
     SELECT t.id AS tournament_id,
@@ -45,33 +63,12 @@ if (!$tournamentResult) {
     die("Error fetching tournaments: " . $conn->error);
 }
 
-// Fetch users
-$userQuery = "SELECT id, username FROM users ORDER BY username";
-$userResult = $conn->query($userQuery);
-if (!$userResult) {
-    die("Error fetching users: " . $conn->error);
-}
-
-// Helper function to check if a user can edit/delete matches
-function can_edit_or_delete($userId, $tournamentId, $conn) {
-    $query = "
-        SELECT 1
-        FROM tournaments t
-        LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
-        WHERE (t.created_by = ? OR tm.user_id = ?) AND t.id = ?
-    ";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('iii', $userId, $userId, $tournamentId);
-    $stmt->execute();
-    $stmt->store_result();
-    return $stmt->num_rows > 0; // Returns true if the user is either the creator or a moderator
-}
-
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['edit_match'])) {
         if (!isset($_POST['match_id']) || !is_numeric($_POST['match_id'])) {
             echo "<p style='color: red;'>Invalid match ID.</p>";
+            var_dump($_POST); // Debugging: Output form submission data
             exit;
         }
 
@@ -83,39 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param('i', $matchId);
         $stmt->execute();
         $stmt->bind_result($tournamentId);
-        if ($stmt->fetch() && can_edit_or_delete($userId, $tournamentId, $conn)) {
-            header("Location: edit_match.php?match_id=" . $matchId);
-            exit;
-        } else {
-            echo "<p style='color: red;'>You do not have permission to edit this match.</p>";
-        }
-        $stmt->close();
-    } elseif (isset($_POST['delete_match'])) {
-        $matchId = $_POST['match_id'];
-
-        // Get the tournament ID for the match
-        $tournamentIdQuery = "SELECT tournament_id FROM matches WHERE id = ?";
-        $stmt = $conn->prepare($tournamentIdQuery);
-        $stmt->bind_param('i', $matchId);
-        $stmt->execute();
-        $stmt->bind_result($tournamentId);
         $stmt->fetch();
         $stmt->close();
 
-        // Check if the user has permissions
-        if (can_edit_or_delete($userId, $tournamentId, $conn)) {
-            // Delete the match
-            $deleteMatchQuery = "DELETE FROM matches WHERE id = ?";
-            $stmt = $conn->prepare($deleteMatchQuery);
-            $stmt->bind_param('i', $matchId);
-            if ($stmt->execute()) {
-                echo "<p style='color: green;'>Match deleted successfully.</p>";
-            } else {
-                echo "<p style='color: red;'>Error deleting match: " . htmlspecialchars($stmt->error) . "</p>";
-            }
-            $stmt->close();
+        if ($tournamentId && can_edit_or_delete($userId, $tournamentId, $conn)) {
+            header("Location: edit_match.php?match_id=" . $matchId);
+            exit;
         } else {
-            echo "<p style='color: red;'>You do not have permission to delete this match.</p>";
+            echo "<p style='color: red;'>You do not have permission to edit this match or the match does not exist.</p>";
         }
     }
 }
@@ -147,32 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <h1>Assign a Moderator to a Tournament</h1>
-    <form action="" method="POST">
-        <label for="tournament_id">Select Tournament:</label>
-        <select name="tournament_id" id="tournament_id" required>
-            <option value="">-- Select Tournament --</option>
-            <?php $tournamentResult->data_seek(0); while ($tournament = $tournamentResult->fetch_assoc()) { ?>
-                <option value="<?php echo $tournament['tournament_id']; ?>">
-                    <?php echo htmlspecialchars($tournament['tournament_name']); ?>
-                </option>
-            <?php } ?>
-        </select>
-        <br><br>
-
-        <label for="moderator_id">Select Moderator:</label>
-        <select name="moderator_id" id="moderator_id" required>
-            <option value="">-- Select User --</option>
-            <?php while ($user = $userResult->fetch_assoc()) { ?>
-                <option value="<?php echo $user['id']; ?>">
-                    <?php echo htmlspecialchars($user['username']); ?>
-                </option>
-            <?php } ?>
-        </select>
-        <br><br>
-
-        <button type="submit" name="edit">Add Moderator</button>
-    </form>
-
     <h2>Tournaments and Moderators</h2>
     <table>
         <thead>
@@ -192,27 +138,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo "<td>" . htmlspecialchars($row['moderators']) . "</td>";
                 echo "<td>";
 
-                // Display matches
                 $matches = $row['matches'] !== '' ? explode('; ', $row['matches']) : [];
                 foreach ($matches as $match) {
-                    echo htmlspecialchars($match);
+                    if (preg_match('/Match ID: (\d+),/', $match, $matchIdMatches)) {
+                        $matchId = $matchIdMatches[1];
+                        echo htmlspecialchars($match);
 
-                    // Check if the user can edit/delete this match
-                    if (can_edit_or_delete($userId, $row['tournament_id'], $conn)) {
-                        echo " <form action='' method='POST' style='display:inline;'>";
-                        echo "<input type='hidden' name='match_id' value='" . htmlspecialchars(explode(': ', $match)[1]) . "'>";
-                        echo "<button type='submit' name='edit_match'>Edit</button>";
-                        echo "<button type='submit' name='delete_match'>Delete</button>";
-                        echo "</form>";
+                        if (can_edit_or_delete($userId, $row['tournament_id'], $conn)) {
+                            echo " <form action='' method='POST' style='display:inline;'>";
+                            echo "<input type='hidden' name='match_id' value='" . htmlspecialchars($matchId) . "'>";
+                            echo "<button type='submit' name='edit_match'>Edit</button>";
+                            echo "</form>";
+                        }
+                        echo "<br>";
+                    } else {
+                        echo "<p style='color: red;'>Error extracting Match ID for: " . htmlspecialchars($match) . "</p>";
                     }
-                    echo "<br>";
                 }
                 echo "</td>";
-
-                echo "<td>";
-                echo "</td>";
+                echo "<td></td>";
                 echo "</tr>";
             }
+            $tournamentResult->free();
             ?>
         </tbody>
     </table>
