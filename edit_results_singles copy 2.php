@@ -16,23 +16,6 @@ if (!$match_id) {
     exit;
 }
 
-// Check if the user has permission to edit this match
-$query_permission = "
-    SELECT m.id
-    FROM matches m
-    LEFT JOIN tournaments t ON m.tournament_id = t.id
-    LEFT JOIN tournament_moderators tm ON tm.tournament_id = t.id
-    WHERE m.id = ? AND (m.created_by = ? OR tm.user_id = ?)
-";
-$stmt_permission = $conn->prepare($query_permission);
-$stmt_permission->bind_param("iii", $match_id, $_SESSION['user_id'], $_SESSION['user_id']);
-$stmt_permission->execute();
-$permission_result = $stmt_permission->get_result();
-
-if ($permission_result->num_rows === 0) {
-    die("You do not have permission to edit this match.");
-}
-
 // Fetch match details
 $query = "SELECT * FROM matches WHERE id = ?";
 $stmt = $conn->prepare($query);
@@ -49,6 +32,11 @@ $match = $result->fetch_assoc();
 if (!$match) {
     header("Location: results_singles.php?error=match_not_found");
     exit;
+}
+
+// Ensure the user has permission to edit this match
+if (!is_admin() && $match['created_by'] != $_SESSION['user_id']) {
+    die("You do not have permission to edit this match.");
 }
 
 // Handle form submission for editing the match
@@ -98,12 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $match_id
     );
 
-    if ($stmt->execute()) {
-        header("Location: results_singles.php?success=updated");
-        exit;
-    } else {
-        die("Error updating match: " . $stmt->error);
-    }
+    $stmt->execute();
+
+    header("Location: results_singles.php?success=updated");
+    exit;
 }
 
 // Predefined stages for dropdown
@@ -120,6 +106,7 @@ $match_time_formatted = date("H:i", strtotime($match['match_time']));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Match</title>
     <link rel="stylesheet" href="styles.css">
+ 
 </head>
 <body>
     <h1>Edit Match</h1>

@@ -1,4 +1,5 @@
 <?php
+//edit_results_singles_link.php >> it will redirect to edit_results_singles.php
 include 'header.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -53,12 +54,11 @@ $query = "
     INNER JOIN categories c ON m.category_id = c.id
     INNER JOIN players p1 ON m.player1_id = p1.id
     INNER JOIN players p2 ON m.player2_id = p2.id
-    LEFT JOIN tournament_moderators tm ON tm.tournament_id = t.id
-    WHERE m.deleted_at IS NULL
+    WHERE 1=1
 ";
 
 if (!$is_admin) {
-    $query .= " AND (m.created_by = $user_id OR tm.user_id = $user_id)";
+    $query .= " AND m.created_by = $user_id";
 }
 
 if ($tournament_id) {
@@ -105,7 +105,7 @@ $result = $conn->query($query);
 <body>
     <h1>All Tournament Results</h1>
 
-    <!-- Filter Form -->
+       <!-- Filter Form -->
     <form method="get">
         <label for="tournament_id">Tournament:</label>
         <select name="tournament_id" id="tournament_id">
