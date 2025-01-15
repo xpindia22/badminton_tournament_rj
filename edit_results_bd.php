@@ -14,15 +14,25 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $conn = new mysqli($servername, $username, $password, $dbname);
+
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-// Define stages based on ENUM in the database
+// Define stages
 $stages = ['Pre Quarter Finals', 'Quarter Finals', 'Semifinals', 'Finals', 'Preliminary'];
 
+// Redirect logic handler
+function redirect_with_message($location, $message) {
+    header("Location: $location?$message");
+    exit;
+}
+
 // Get logged-in user information
-$user_id = $_SESSION['user_id'] ?? null;
+if (!isset($_SESSION['user_id'])) {
+    redirect_with_message('login.php', 'error=not_logged_in');
+}
+$user_id = $_SESSION['user_id'];
 
 // Handle updates and deletes
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -41,14 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Validate mandatory fields
         if (!$stage || !$match_date || !$match_time) {
-            echo "Error: Missing required fields!";
-            exit;
+            redirect_with_message('results_bd.php', 'error=missing_fields');
         }
 
         // Validate that stage is one of the allowed values
         if (!in_array($stage, $stages)) {
-            echo "Error: Invalid stage value!";
-            exit;
+            redirect_with_message('results_bd.php', 'error=invalid_stage');
         }
 
         $update_query = "
@@ -87,9 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            echo "Match updated successfully!";
+            redirect_with_message('results_bd.php', 'success=edited');
         } else {
-            echo "No changes made or invalid permissions.";
+            redirect_with_message('results_bd.php', 'error=no_changes');
         }
     }
 
@@ -108,9 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            echo "Match deleted successfully!";
+            redirect_with_message('results_bd.php', 'success=deleted');
         } else {
-            echo "Error: Unable to delete match or invalid permissions.";
+            redirect_with_message('results_bd.php', 'error=delete_failed');
         }
     }
 }
@@ -155,7 +163,6 @@ $stmt->bind_param("ii", $user_id, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -178,18 +185,19 @@ $result = $stmt->get_result();
                 <th>Stage</th>
                 <th>Match Date</th>
                 <th>Match Time</th>
-                <th>Set 1</th>
-                <th>Set 2</th>
-                <th>Set 3</th>
+                <th>Set 1 (Team 1 - Team 2)</th>
+                <th>Set 2 (Team 1 - Team 2)</th>
+                <th>Set 3 (Team 1 - Team 2)</th>
                 <th>Winner</th>
                 <th>Actions</th>
             </tr>
             <?php while ($row = $result->fetch_assoc()): ?>
                 <form method="post">
                     <?php
-                    $team1_total = $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'];
-                    $team2_total = $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'];
-                    $winner = $team1_total > $team2_total ? 'Team 1' : ($team1_total < $team2_total ? 'Team 2' : 'Draw');
+                    // Determine overall winner
+                    $team1_points = $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'];
+                    $team2_points = $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'];
+                    $overall_winner = $team1_points > $team2_points ? 'Team 1' : ($team1_points < $team2_points ? 'Team 2' : 'Draw');
                     ?>
                     <tr>
                         <td><?= $row['match_id'] ?><input type="hidden" name="match_id" value="<?= $row['match_id'] ?>"></td>
@@ -223,7 +231,7 @@ $result = $stmt->get_result();
                             -
                             <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>" style="width: 50px;">
                         </td>
-                        <td><?= $winner ?></td>
+                        <td><?= $overall_winner ?></td>
                         <td>
                             <button type="submit" name="edit_match">Edit</button>
                             <button type="submit" name="delete_match" onclick="return confirm('Are you sure you want to delete this match?')">Delete</button>
