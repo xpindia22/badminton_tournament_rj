@@ -1,10 +1,11 @@
 <?php
-// edit_results_gd.php
+//edit_results_xd.php
 include 'header.php';
 require_once 'conn.php';
+require 'auth.php';
 //require_once 'permissions.php';
 
-require 'auth.php';
+
 redirect_if_not_logged_in();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -16,7 +17,7 @@ if ($conn->connect_error) {
 // Define stages
 $stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
 
-// Handle updates
+// Handle updates and deletes
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['edit_match'])) {
         $match_id = $_POST['match_id'];
@@ -53,7 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch data for Girls Doubles
+// Fetch data for dropdowns
+$tournaments = $conn->query("SELECT id, name FROM tournaments");
+$players = $conn->query("SELECT id, name FROM players");
+$dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
+$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
+
+// Fetch Mixed Doubles matches
 $query = "
     SELECT 
         m.id AS match_id,
@@ -79,7 +86,7 @@ $query = "
     LEFT JOIN players p2 ON m.team1_player2_id = p2.id
     LEFT JOIN players p3 ON m.team2_player1_id = p3.id
     LEFT JOIN players p4 ON m.team2_player2_id = p4.id
-    WHERE c.type = 'doubles' AND c.sex = 'F'
+    WHERE c.type = 'mixed doubles'
     ORDER BY m.id
 ";
 
@@ -91,11 +98,11 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Girls Doubles Match Results</title>
+    <title>Mixed Doubles Match Results</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0a; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         th { background-color: #f4f4f4; }
         td.team-column { width: 25%; text-align: left; }
         td.set-column { width: 5%; text-align: center; }
@@ -104,7 +111,7 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Girls Doubles Match Results</h1>
+    <h1>Mixed Doubles Match Results</h1>
 
     <!-- Results Table -->
     <?php if ($result->num_rows > 0): ?>
@@ -146,7 +153,9 @@ $result = $conn->query($query);
                         <td class="set-column"><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
                         <td class="set-column"><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
                         <td class="set-column"><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
-                        <td><?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?></td>
+                        <td>
+                            <?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?>
+                        </td>
                         <td>
                             <button type="submit" name="edit_match">Edit</button>
                             <button type="submit" name="delete_match" onclick="return confirm('Are you sure you want to delete this match?')">Delete</button>

@@ -1,4 +1,5 @@
 <?php
+//add_moderator_championship.php
 include 'header.php';
 require_once 'conn.php'; // Include database connection settings
 
