@@ -90,9 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
 
             if ($stmt->affected_rows > 0) {
-                redirect_with_message('results_xd.php', 'success=match_updated');
+                redirect_with_message('edit_results_xd.php', 'success=match_updated');
             } else {
-                redirect_with_message('results_xd.php', 'error=no_changes');
+                redirect_with_message('edit_results_xd.php', 'error=no_changes');
             }
         } else {
             redirect_with_message('edit_results_xd.php', 'error=query_failed');
@@ -118,9 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
 
                 if ($stmt->affected_rows > 0) {
-                    redirect_with_message('results_xd.php', 'success=match_deleted');
+                    redirect_with_message('edit_results_xd.php', 'success=match_deleted');
                 } else {
-                    redirect_with_message('results_xd.php', 'error=delete_failed');
+                    redirect_with_message('edit_results_xd.php', 'error=delete_failed');
                 }
             } else {
                 redirect_with_message('edit_results_xd.php', 'error=query_failed');
@@ -170,7 +170,6 @@ $stmt->bind_param("ii", $user_id, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
