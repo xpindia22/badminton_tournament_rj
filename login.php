@@ -53,14 +53,53 @@ shuffle($images); // Randomize the image order
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <style>
-        /* Include your existing CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            width: 80%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .left-section {
+            flex: 1;
+            position: relative;
+        }
+        .slideshow-container img {
+            width: 100%;
+            height: auto;
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .slideshow-container img.active {
+            display: block;
+        }
+        .right-section {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+        }
+        .error {
+            color: red;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        form label, form input, form button {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <?php include 'header.php'; ?>
-    </div>
-
     <div class="container">
         <div class="left-section">
             <div class="slideshow-container">
@@ -86,5 +125,25 @@ shuffle($images); // Randomize the image order
             </form>
         </div>
     </div>
+    <script>
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.slideshow-container img');
+
+        function showSlides() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === slideIndex) {
+                    slide.classList.add('active');
+                }
+            });
+            slideIndex = (slideIndex + 1) % slides.length;
+            setTimeout(showSlides, 3000); // Change image every 3 seconds
+        }
+
+        if (slides.length > 0) {
+            slides[0].classList.add('active'); // Start with the first image
+            showSlides();
+        }
+    </script>
 </body>
 </html>

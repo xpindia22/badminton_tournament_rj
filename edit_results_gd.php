@@ -92,9 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
 
             if ($stmt->affected_rows > 0) {
-                redirect_with_message('edit_results_gd.php', 'success=match_updated');
+                redirect_with_message('results_gd.php', 'success=match_updated');
             } else {
-                redirect_with_message('edit_results_gd.php', 'error=no_changes');
+                redirect_with_message('results_gd.php', 'error=no_changes');
             }
         } else {
             redirect_with_message('edit_results_gd.php', 'error=query_failed');
@@ -120,9 +120,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
 
                 if ($stmt->affected_rows > 0) {
-                    redirect_with_message('edit_results_gd.php', 'success=match_deleted');
+                    redirect_with_message('results_gd.php', 'success=match_deleted');
                 } else {
-                    redirect_with_message('edit_results_gd.php', 'error=delete_failed');
+                    redirect_with_message('results_gd.php', 'error=delete_failed');
                 }
             } else {
                 redirect_with_message('edit_results_gd.php', 'error=query_failed');
@@ -173,6 +173,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
