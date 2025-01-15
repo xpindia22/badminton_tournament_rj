@@ -1,5 +1,5 @@
 <?php
-include 'header.php';
+// include 'header.php';
 require_once 'permissions.php';
 
 ini_set('display_errors', 1);
@@ -27,7 +27,7 @@ function redirect_with_message($location, $message) {
     header("Location: $location?$message");
     exit;
 }
-
+ 
 // Get logged-in user information
 if (!isset($_SESSION['user_id'])) {
     redirect_with_message('login.php', 'error=not_logged_in');
@@ -124,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch Boys Doubles matches with permission check
+// Fetch Boys Doubles matches with permission check
 $query = "
     SELECT 
         m.id AS match_id,
@@ -150,18 +151,23 @@ $query = "
     LEFT JOIN players p2 ON m.team1_player2_id = p2.id
     LEFT JOIN players p3 ON m.team2_player1_id = p3.id
     LEFT JOIN players p4 ON m.team2_player2_id = p4.id
-    WHERE c.type = 'doubles' AND c.sex = 'M'
-    AND (m.created_by = ? OR EXISTS (
-        SELECT 1 FROM tournaments t 
-        INNER JOIN tournament_moderators tm ON t.id = tm.tournament_id
-        WHERE t.id = m.tournament_id AND tm.user_id = ?
-    ))
+    WHERE c.type = 'doubles' 
+      AND c.sex = 'M'
+      AND (
+          m.created_by = ? OR EXISTS (
+              SELECT 1 
+              FROM tournament_moderators tm 
+              WHERE tm.tournament_id = m.tournament_id 
+                AND tm.user_id = ?
+          )
+      )
     ORDER BY m.id
 ";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ii", $user_id, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
