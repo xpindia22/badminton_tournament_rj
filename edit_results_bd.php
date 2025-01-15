@@ -1,7 +1,5 @@
-<?php include 'header.php'; ?>
-
 <?php
-// results_doubles.php
+include 'header.php';
 require_once 'permissions.php';
 
 ini_set('display_errors', 1);
@@ -10,59 +8,114 @@ error_reporting(E_ALL);
 
 require_once 'conn.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Start session if not already active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+$conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-// Define stages
-$stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
+// Define stages based on ENUM in the database
+$stages = ['Pre Quarter Finals', 'Quarter Finals', 'Semifinals', 'Finals', 'Preliminary'];
+
+// Get logged-in user information
+$user_id = $_SESSION['user_id'] ?? null;
 
 // Handle updates and deletes
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['edit_match'])) {
-        $match_id = $_POST['match_id'];
-        $stage = $_POST['stage'];
-        $match_date = $_POST['match_date'];
-        $match_time = $_POST['match_time'];
-        $set1_team1_points = $_POST['set1_team1_points'];
-        $set1_team2_points = $_POST['set1_team2_points'];
-        $set2_team1_points = $_POST['set2_team1_points'];
-        $set2_team2_points = $_POST['set2_team2_points'];
-        $set3_team1_points = $_POST['set3_team1_points'];
-        $set3_team2_points = $_POST['set3_team2_points'];
+        $match_id = $_POST['match_id'] ?? null;
+        $stage = $_POST['stage'] ?? null;
+        $match_date = $_POST['match_date'] ?? null;
+        $match_time = $_POST['match_time'] ?? null;
+
+        $set1_team1_points = $_POST['set1_team1_points'] ?? 0;
+        $set1_team2_points = $_POST['set1_team2_points'] ?? 0;
+        $set2_team1_points = $_POST['set2_team1_points'] ?? 0;
+        $set2_team2_points = $_POST['set2_team2_points'] ?? 0;
+        $set3_team1_points = $_POST['set3_team1_points'] ?? 0;
+        $set3_team2_points = $_POST['set3_team2_points'] ?? 0;
+
+        // Validate mandatory fields
+        if (!$stage || !$match_date || !$match_time) {
+            echo "Error: Missing required fields!";
+            exit;
+        }
+
+        // Validate that stage is one of the allowed values
+        if (!in_array($stage, $stages)) {
+            echo "Error: Invalid stage value!";
+            exit;
+        }
 
         $update_query = "
             UPDATE matches SET
-                stage = '$stage',
-                match_date = '$match_date',
-                match_time = '$match_time',
-                set1_team1_points = $set1_team1_points,
-                set1_team2_points = $set1_team2_points,
-                set2_team1_points = $set2_team1_points,
-                set2_team2_points = $set2_team2_points,
-                set3_team1_points = $set3_team1_points,
-                set3_team2_points = $set3_team2_points
-            WHERE id = $match_id
+                stage = ?,
+                match_date = ?,
+                match_time = ?,
+                set1_team1_points = ?,
+                set1_team2_points = ?,
+                set2_team1_points = ?,
+                set2_team2_points = ?,
+                set3_team1_points = ?,
+                set3_team2_points = ?
+            WHERE id = ? AND (created_by = ? OR EXISTS (
+                SELECT 1 FROM tournaments t 
+                INNER JOIN tournament_moderators tm ON t.id = tm.tournament_id
+                WHERE t.id = matches.tournament_id AND tm.user_id = ?
+            ))
         ";
-        $conn->query($update_query);
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param(
+            "sssiiiiiiiii",
+            $stage,
+            $match_date,
+            $match_time,
+            $set1_team1_points,
+            $set1_team2_points,
+            $set2_team1_points,
+            $set2_team2_points,
+            $set3_team1_points,
+            $set3_team2_points,
+            $match_id,
+            $user_id,
+            $user_id
+        );
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            echo "Match updated successfully!";
+        } else {
+            echo "No changes made or invalid permissions.";
+        }
     }
 
     if (isset($_POST['delete_match'])) {
-        $match_id = $_POST['match_id'];
-        $delete_query = "DELETE FROM matches WHERE id = $match_id";
-        $conn->query($delete_query);
+        $match_id = $_POST['match_id'] ?? null;
+        $delete_query = "
+            DELETE FROM matches 
+            WHERE id = ? AND (created_by = ? OR EXISTS (
+                SELECT 1 FROM tournaments t 
+                INNER JOIN tournament_moderators tm ON t.id = tm.tournament_id
+                WHERE t.id = matches.tournament_id AND tm.user_id = ?
+            ))
+        ";
+        $stmt = $conn->prepare($delete_query);
+        $stmt->bind_param("iii", $match_id, $user_id, $user_id);
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            echo "Match deleted successfully!";
+        } else {
+            echo "Error: Unable to delete match or invalid permissions.";
+        }
     }
 }
 
-// Fetch dropdown data
-$tournaments = $conn->query("SELECT id, name FROM tournaments");
-$players = $conn->query("SELECT id, name FROM players");
-$dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
-$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
-
-// Fetch Boys Doubles matches
+// Fetch Boys Doubles matches with permission check
 $query = "
     SELECT 
         m.id AS match_id,
@@ -80,7 +133,8 @@ $query = "
         m.set2_team1_points,
         m.set2_team2_points,
         m.set3_team1_points,
-        m.set3_team2_points
+        m.set3_team2_points,
+        m.created_by
     FROM matches m
     INNER JOIN tournaments t ON m.tournament_id = t.id
     INNER JOIN categories c ON m.category_id = c.id
@@ -89,10 +143,17 @@ $query = "
     LEFT JOIN players p3 ON m.team2_player1_id = p3.id
     LEFT JOIN players p4 ON m.team2_player2_id = p4.id
     WHERE c.type = 'doubles' AND c.sex = 'M'
+    AND (m.created_by = ? OR EXISTS (
+        SELECT 1 FROM tournaments t 
+        INNER JOIN tournament_moderators tm ON t.id = tm.tournament_id
+        WHERE t.id = m.tournament_id AND tm.user_id = ?
+    ))
     ORDER BY m.id
 ";
-
-$result = $conn->query($query);
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ii", $user_id, $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -101,23 +162,13 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boys Doubles Match Results</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        td.team-column { width: 25%; text-align: left; }
-        td.set-column { width: 5%; text-align: center; }
-        form { margin-bottom: 20px; }
-        label, select, button { margin-right: 10px; }
-    </style>
 </head>
 <body>
     <h1>Boys Doubles Match Results</h1>
 
     <!-- Results Table -->
     <?php if ($result->num_rows > 0): ?>
-        <table>
+        <table border="1" cellspacing="0" cellpadding="5">
             <tr>
                 <th>Match ID</th>
                 <th>Tournament</th>
@@ -135,12 +186,17 @@ $result = $conn->query($query);
             </tr>
             <?php while ($row = $result->fetch_assoc()): ?>
                 <form method="post">
+                    <?php
+                    $team1_total = $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'];
+                    $team2_total = $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'];
+                    $winner = $team1_total > $team2_total ? 'Team 1' : ($team1_total < $team2_total ? 'Team 2' : 'Draw');
+                    ?>
                     <tr>
                         <td><?= $row['match_id'] ?><input type="hidden" name="match_id" value="<?= $row['match_id'] ?>"></td>
                         <td><?= $row['tournament_name'] ?></td>
                         <td><?= $row['category_name'] ?></td>
-                        <td class="team-column"><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
-                        <td class="team-column"><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
+                        <td><?= $row['team1_player1_name'] . " & " . $row['team1_player2_name'] ?></td>
+                        <td><?= $row['team2_player1_name'] . " & " . $row['team2_player2_name'] ?></td>
                         <td>
                             <select name="stage">
                                 <?php foreach ($stages as $stage): ?>
@@ -152,12 +208,22 @@ $result = $conn->query($query);
                         </td>
                         <td><input type="date" name="match_date" value="<?= $row['match_date'] ?>"></td>
                         <td><input type="time" name="match_time" value="<?= $row['match_time'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>"> - <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>"> - <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>"></td>
-                        <td class="set-column"><input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>"> - <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>"></td>
                         <td>
-                            <?= $row['set1_team1_points'] + $row['set2_team1_points'] + $row['set3_team1_points'] > $row['set1_team2_points'] + $row['set2_team2_points'] + $row['set3_team2_points'] ? "Team 1" : "Team 2" ?>
+                            <input type="number" name="set1_team1_points" value="<?= $row['set1_team1_points'] ?>" style="width: 50px;">
+                            -
+                            <input type="number" name="set1_team2_points" value="<?= $row['set1_team2_points'] ?>" style="width: 50px;">
                         </td>
+                        <td>
+                            <input type="number" name="set2_team1_points" value="<?= $row['set2_team1_points'] ?>" style="width: 50px;">
+                            -
+                            <input type="number" name="set2_team2_points" value="<?= $row['set2_team2_points'] ?>" style="width: 50px;">
+                        </td>
+                        <td>
+                            <input type="number" name="set3_team1_points" value="<?= $row['set3_team1_points'] ?>" style="width: 50px;">
+                            -
+                            <input type="number" name="set3_team2_points" value="<?= $row['set3_team2_points'] ?>" style="width: 50px;">
+                        </td>
+                        <td><?= $winner ?></td>
                         <td>
                             <button type="submit" name="edit_match">Edit</button>
                             <button type="submit" name="delete_match" onclick="return confirm('Are you sure you want to delete this match?')">Delete</button>
