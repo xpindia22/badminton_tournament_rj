@@ -114,28 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_category'])) {
     $stmt->close();
 }
 
-// Assign Moderator to Tournament
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_moderator'])) {
-    $tournament_id = intval($_POST['tournament_id']);
-    $moderator_id = intval($_POST['moderator_id']);
-
-    if ($tournament_id === 0 || $moderator_id === 0) {
-        die("Please select a valid tournament and moderator.");
-    }
-
-    $insertQuery = "INSERT INTO tournament_moderators (tournament_id, user_id) VALUES (?, ?) 
-                    ON DUPLICATE KEY UPDATE user_id = user_id";
-    $stmt = $conn->prepare($insertQuery);
-    $stmt->bind_param('ii', $tournament_id, $moderator_id);
-
-    if ($stmt->execute()) {
-        echo "<p style='color: green;'>Moderator assigned successfully.</p>";
-    } else {
-        echo "<p style='color: red;'>Error assigning moderator: " . htmlspecialchars($stmt->error) . "</p>";
-    }
-    $stmt->close();
-}
-
 $tournaments = fetchTournaments($conn);
 $categories_result = $conn->query("SELECT * FROM categories");
 $users_result = $conn->query("SELECT id, username FROM users ORDER BY username");
@@ -148,42 +126,125 @@ $users_result = $conn->query("SELECT id, username FROM users ORDER BY username")
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Tournaments</title>
     <style>
-    /* Existing styles */
-    .small-button {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 5px;
-        font-size: 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 5px;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
 
-    .small-button:hover {
-        background-color: #c82333;
-    }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-    .moderator-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        align-items: center;
-    }
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
 
-    .moderator-item {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        color: #333;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-</style>
+        form {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
 
+        form h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        form input, form select, form button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        table thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .actions button, .actions a {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .actions .edit {
+            background-color: #28a745;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+        }
+
+        .actions .edit:hover {
+            background-color: #218838;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
     <h1>Manage Tournaments</h1>
@@ -196,7 +257,7 @@ $users_result = $conn->query("SELECT id, username FROM users ORDER BY username")
             <button type="submit" name="add_tournament">Add Tournament</button>
         </form>
 
-        <!-- Assign Categories Form -->
+        <!-- Assign Categories to Tournaments Form -->
         <form method="POST">
             <h2>Assign Categories</h2>
             <select name="tournament_id" required>
@@ -212,24 +273,6 @@ $users_result = $conn->query("SELECT id, username FROM users ORDER BY username")
                 <?php endwhile; ?>
             </select>
             <button type="submit" name="add_category">Assign Category</button>
-        </form>
-
-        <!-- Assign Moderators Form -->
-        <form method="POST">
-            <h2>Assign Moderators</h2>
-            <select name="tournament_id" required>
-                <option value="">Select Tournament</option>
-                <?php foreach ($tournaments as $tournament): ?>
-                    <option value="<?= $tournament['tournament_id'] ?>"><?= htmlspecialchars($tournament['tournament_name']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <select name="moderator_id" required>
-                <option value="">Select Moderator</option>
-                <?php while ($user = $users_result->fetch_assoc()): ?>
-                    <option value="<?= $user['id'] ?>"><?= htmlspecialchars($user['username']) ?></option>
-                <?php endwhile; ?>
-            </select>
-            <button type="submit" name="add_moderator">Assign Moderator</button>
         </form>
     </div>
 
@@ -254,27 +297,7 @@ $users_result = $conn->query("SELECT id, username FROM users ORDER BY username")
                         </td>
                         <td><?= htmlspecialchars($row['owner_name'] ?? 'Unknown') ?></td>
                         <td><?= htmlspecialchars($row['categories'] ?? 'None') ?></td>
-                        <td>
-                            <?= htmlspecialchars($row['moderators'] ?? 'None') ?>
-                            <?php
-                            // Generate remove buttons for moderators
-                            if (!empty($row['moderators'])):
-                                $moderators = explode(', ', $row['moderators']);
-                                foreach ($moderators as $moderator):
-                                    $moderator_id_query = $conn->prepare("SELECT id FROM users WHERE username = ?");
-                                    $moderator_id_query->bind_param('s', $moderator);
-                                    $moderator_id_query->execute();
-                                    $moderator_id_query->bind_result($moderator_id);
-                                    $moderator_id_query->fetch();
-                                    $moderator_id_query->close();
-                            ?>
-                                <form method="POST" style="display:inline;">
-                                    <input type="hidden" name="tournament_id" value="<?= $row['tournament_id'] ?>">
-                                    <input type="hidden" name="moderator_id" value="<?= $moderator_id ?>">
-                                    <button type="submit" name="remove_moderator" class="delete">Remove <?= htmlspecialchars($moderator) ?></button>
-                                </form>
-                            <?php endforeach; endif; ?>
-                        </td>
+                        <td><?= htmlspecialchars($row['moderators'] ?? 'None') ?></td>
                         <td class="actions">
                             <input type="hidden" name="tournament_id" value="<?= $row['tournament_id'] ?>">
                             <button type="submit" name="update_tournament" class="edit">Save</button>

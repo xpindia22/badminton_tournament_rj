@@ -96,10 +96,19 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
         <div class="links">
             <a href="dashboard.php">Dashboard</a>
             <a href="results.php">Singles Match Results</a>
-            <a href="filter_doubles_userbased.php">Filter Doubles UserBased</a>
-            <a href="filter_singles_userbased.php">Filter Singles UserBased</a>
 
             <!-- Dropdown: Singles Matches -->
+            <div class="dropdown">
+                <a href="#">Admin Zone</a>
+                <div class="dropdown-content">
+                    <a href="register.php">Register User</a>
+                    <a href="insert_tournament.php">Insert Tournaments</a>
+                    <a href="insert_player.php">Insert Player</a>
+                    <a href="insert_match.php">Insert Match</a>
+                    <a href="add_moderator.php">Add Moderator</a>
+                    <a href="insert_tournament.php">Insert Tournament</a>
+                </div>
+            </div>
             <div class="dropdown">
                 <a href="#">Singles Matches</a>
                 <div class="dropdown-content">
