@@ -16,29 +16,12 @@ if (!$match_id) {
     exit;
 }
 
-// Check if the user has permission to edit this match
-$query_permission = "
-    SELECT m.id
-    FROM matches m
-    LEFT JOIN tournaments t ON m.tournament_id = t.id
-    LEFT JOIN tournament_moderators tm ON tm.tournament_id = t.id
-    WHERE m.id = ? AND (m.created_by = ? OR tm.user_id = ?)
-";
-$stmt_permission = $conn->prepare($query_permission);
-$stmt_permission->bind_param("iii", $match_id, $_SESSION['user_id'], $_SESSION['user_id']);
-$stmt_permission->execute();
-$permission_result = $stmt_permission->get_result();
-
-if ($permission_result->num_rows === 0) {
-    die("You do not have permission to edit this match.");
-}
-
 // Fetch match details
 $query = "SELECT * FROM matches WHERE id = ?";
 $stmt = $conn->prepare($query);
 
 if (!$stmt) {
-    die("Error preparing query: " . $conn->error);
+    die("Error preparing match details query: " . $conn->error);
 }
 
 $stmt->bind_param("i", $match_id);
@@ -51,9 +34,31 @@ if (!$match) {
     exit;
 }
 
+// Ensure the user has permission to edit this match
+$query_permission = "
+    SELECT m.id
+    FROM matches m
+    INNER JOIN tournaments t ON m.tournament_id = t.id
+    LEFT JOIN tournament_moderators tm ON tm.tournament_id = t.id
+    WHERE m.id = ? AND (m.created_by = ? OR tm.user_id = ?)
+";
+$stmt_permission = $conn->prepare($query_permission);
+if (!$stmt_permission) {
+    die("Error preparing permission query: " . $conn->error);
+}
+
+$user_id = $_SESSION['user_id'];
+$stmt_permission->bind_param("iii", $match_id, $user_id, $user_id);
+$stmt_permission->execute();
+$permission_result = $stmt_permission->get_result();
+
+if ($permission_result->num_rows === 0 && !is_admin()) {
+    die("You do not have permission to edit this match.");
+}
+
 // Handle form submission for editing the match
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $stage = $_POST['stage'];
+    $stage = trim($_POST['stage']);
     $match_date = $_POST['match_date'];
     $match_time = $_POST['match_time'];
     $set1_player1_points = $_POST['set1_player1_points'];
@@ -62,6 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $set2_player2_points = $_POST['set2_player2_points'];
     $set3_player1_points = $_POST['set3_player1_points'];
     $set3_player2_points = $_POST['set3_player2_points'];
+
+    // Predefined stages for validation
+    $valid_stages = ['Pre Quarter Finals', 'Quarter Finals', 'Semifinals', 'Finals', 'Preliminary'];
+    if (!in_array($stage, $valid_stages)) {
+        die("Error: Invalid stage value.");
+    }
 
     $update_query = "
         UPDATE matches
@@ -107,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Predefined stages for dropdown
-$stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final'];
+$stages = ['Pre Quarter Finals', 'Quarter Finals', 'Semifinals', 'Finals', 'Preliminary'];
 
 // Format match time for the input field
 $match_time_formatted = date("H:i", strtotime($match['match_time']));
