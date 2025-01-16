@@ -1,5 +1,7 @@
 <?php
 // register.php
+require_once 'admin_auth.php'; // Protects this script
+
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
