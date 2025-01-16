@@ -6,8 +6,7 @@ error_reporting(E_ALL);
 
 include 'header.php';
 require 'auth.php';
-require_once 'admin_auth.php';
-redirect_if_not_logged_in();
+ redirect_if_not_logged_in();
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
