@@ -1,6 +1,4 @@
 <?php
-require_once 'admin_auth.php'; // Protects this script
- 
 ob_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
