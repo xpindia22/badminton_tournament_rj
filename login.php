@@ -1,37 +1,63 @@
 <?php
-// login.php
+// Enable error reporting for debugging (remove in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-require 'auth.php';
-session_start();
+// Ensure session is only started once
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once 'auth.php';
+require_once 'conn.php'; // Ensure database connection is included
+
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = htmlspecialchars(trim($_POST['username'] ?? ''));
+    $password = trim($_POST['password'] ?? '');
 
-    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($user_id, $hashed_password, $role);
-    $stmt->fetch();
-    $stmt->close();
-
-    if ($user_id && verify_password($password, $hashed_password)) {
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-
-        header("Location: dashboard.php");
-        exit;
+    if (empty($username) || empty($password)) {
+        $error = "Username and password are required.";
     } else {
-        $error = "Invalid username or password.";
+        $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ?");
+        if (!$stmt) {
+            die("Database error: " . $conn->error);
+        }
+
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($user_id, $hashed_password, $role);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($user_id && verify_password($password, $hashed_password)) {
+            // Set session variables for user
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['username'] = $username;
+            $_SESSION['role'] = $role;
+
+            // Redirect to dashboard
+            header("Location: dashboard.php");
+            exit;
+        } else {
+            $error = "Invalid username or password.";
+        }
     }
 }
 
+/**
+ * Function to get images from a directory
+ */
 function get_images_from_directory($directory) {
     $images = [];
     $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
 
-    $dir_iterator = new RecursiveDirectoryIterator($directory);
+    if (!is_dir($directory)) {
+        return $images;
+    }
+
+    $dir_iterator = new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS);
     $iterator = new RecursiveIteratorIterator($dir_iterator);
 
     foreach ($iterator as $file) {
@@ -86,6 +112,7 @@ shuffle($images); // Randomize the image order
             flex: 1;
             padding: 20px;
             background: #fff;
+            text-align: center;
         }
         .error {
             color: red;
@@ -93,9 +120,26 @@ shuffle($images); // Randomize the image order
         form {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         form label, form input, form button {
             margin-bottom: 15px;
+            width: 80%;
+            max-width: 300px;
+        }
+        .player-login-btn {
+            margin-top: 10px;
+            padding: 10px;
+            width: 80%;
+            max-width: 300px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .player-login-btn:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -111,7 +155,7 @@ shuffle($images); // Randomize the image order
 
         <div class="right-section">
             <h1>Welcome to Badminton Tournament Login</h1>
-            <?php if (isset($error)): ?>
+            <?php if (!empty($error)): ?>
                 <p class="error"><?= htmlspecialchars($error) ?></p>
             <?php endif; ?>
             <form method="post">
@@ -122,6 +166,11 @@ shuffle($images); // Randomize the image order
                 <input type="password" name="password" id="password" required>
 
                 <button type="submit">Login</button>
+            </form>
+
+            <!-- Player Login Button -->
+            <form action="login_player.php" method="get">
+                <button type="submit" class="player-login-btn">Player Login</button>
             </form>
         </div>
     </div>
