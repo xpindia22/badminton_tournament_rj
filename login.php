@@ -134,7 +134,7 @@ shuffle($images);
             max-width: 300px;
         }
 
-        .player-login-btn, button {
+        .player-login-btn, .register-btn, button {
             padding: 10px;
             width: 80%;
             max-width: 300px;
@@ -147,7 +147,7 @@ shuffle($images);
             transition: background 0.3s ease-in-out;
         }
 
-        .player-login-btn:hover, button:hover {
+        .player-login-btn:hover, .register-btn:hover, button:hover {
             background-color: #0056b3;
         }
     </style>
@@ -182,6 +182,14 @@ shuffle($images);
 
             <form action="login_player.php" method="get">
                 <button type="submit" class="player-login-btn">Player Login</button>
+            </form>
+
+            <form action="register.php" method="get">
+                <button type="submit" class="register-btn">Register Tournament Manager</button>
+            </form>
+
+            <form action="register_player.php" method="get">
+                <button type="submit" class="register-btn">Register Player</button>
             </form>
         </div>
     </div>

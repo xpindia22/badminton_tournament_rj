@@ -102,6 +102,7 @@ if (isset($_SESSION['username'])) {
         <!-- Navigation Links -->
         <div class="links">
             <a href="dashboard.php">Dashboard</a>
+            <a href="register.php">Register Tournament Manager</a>
             <a href="register_player.php">Register Player</a>
 
             <!-- Dropdown: Admin Zone (Only Visible to Admins) -->
@@ -110,7 +111,7 @@ if (isset($_SESSION['username'])) {
                 <div class="dropdown-content">
                     <a href="register.php">Register Tournament Manager</a>
                     <a href="register_player.php">Register Player</a>
-                    <!-- <a href="insert_player.php">Insert Player</a> -->
+                    <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match.php">Insert Match</a> 
                     <a href="insert_category.php">Insert Category</a> 
                     <a href="add_moderator.php">Add Moderator</a>
