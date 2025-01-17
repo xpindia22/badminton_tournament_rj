@@ -108,9 +108,9 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Admin Zone</a>
                 <div class="dropdown-content">
-                    <a href="register.php">Register User</a>
-                    <a href="insert_tournament.php">Insert Tournaments</a>
-                    <a href="insert_player.php">Insert Player</a>
+                    <a href="register.php">Register Tournament Manager</a>
+                    <a href="register_player.php">Register Player</a>
+                    <!-- <a href="insert_player.php">Insert Player</a> -->
                     <a href="insert_match.php">Insert Match</a> 
                     <a href="insert_category.php">Insert Category</a> 
                     <a href="add_moderator.php">Add Moderator</a>
