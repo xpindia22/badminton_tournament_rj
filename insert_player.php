@@ -1,17 +1,19 @@
-<?php include 'header.php'; ?>
+<?php include 'header.php'; 
 
-<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 // insert_player.php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require 'auth.php';
 //require_once 'permissions.php';
 
 require_once 'conn.php'; // Use conn.php for database connection
 redirect_if_not_logged_in();
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 if (!is_admin() && !is_user()) {
     die("Access denied.");

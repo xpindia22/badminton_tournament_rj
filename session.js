@@ -1,4 +1,3 @@
-
 let sessionExpired = false;
 let focusLostTime = null;
 
