@@ -3,13 +3,11 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Ensure session is only started once
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once 'auth.php';
-require_once 'conn.php'; // Ensure database connection is included
+require_once 'conn.php';
 
 $error = '';
 
@@ -32,12 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         if ($user_id && verify_password($password, $hashed_password)) {
-            // Set session variables for user
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $role;
-
-            // Redirect to dashboard
             header("Location: dashboard.php");
             exit;
         } else {
@@ -46,9 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-/**
- * Function to get images from a directory
- */
 function get_images_from_directory($directory) {
     $images = [];
     $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
@@ -70,7 +62,7 @@ function get_images_from_directory($directory) {
 }
 
 $images = get_images_from_directory('images');
-shuffle($images); // Randomize the image order
+shuffle($images);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,69 +73,89 @@ shuffle($images); // Randomize the image order
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
         .container {
             display: flex;
-            width: 80%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 70%;
+            margin-top: 80px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
             overflow: hidden;
         }
+
         .left-section {
             flex: 1;
             position: relative;
         }
+
         .slideshow-container img {
             width: 100%;
-            height: auto;
+            height: 100%;
             display: none;
             position: absolute;
             top: 0;
             left: 0;
         }
+
         .slideshow-container img.active {
             display: block;
         }
+
         .right-section {
             flex: 1;
-            padding: 20px;
+            padding: 30px;
             background: #fff;
             text-align: center;
         }
+
         .error {
             color: red;
+            font-weight: bold;
         }
+
         form {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         form label, form input, form button {
             margin-bottom: 15px;
             width: 80%;
             max-width: 300px;
         }
-        .player-login-btn {
-            margin-top: 10px;
+
+        .player-login-btn, button {
             padding: 10px;
             width: 80%;
             max-width: 300px;
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            transition: background 0.3s ease-in-out;
         }
-        .player-login-btn:hover {
-            background-color: #218838;
+
+        .player-login-btn:hover, button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
+
+    <?php include 'header.php'; ?>
+
     <div class="container">
         <div class="left-section">
             <div class="slideshow-container">
@@ -154,7 +166,7 @@ shuffle($images); // Randomize the image order
         </div>
 
         <div class="right-section">
-            <h1>Welcome to Badminton Tournament Login</h1>
+            <h2>Login</h2>
             <?php if (!empty($error)): ?>
                 <p class="error"><?= htmlspecialchars($error) ?></p>
             <?php endif; ?>
@@ -168,12 +180,12 @@ shuffle($images); // Randomize the image order
                 <button type="submit">Login</button>
             </form>
 
-            <!-- Player Login Button -->
             <form action="login_player.php" method="get">
                 <button type="submit" class="player-login-btn">Player Login</button>
             </form>
         </div>
     </div>
+
     <script>
         let slideIndex = 0;
         const slides = document.querySelectorAll('.slideshow-container img');
@@ -186,13 +198,14 @@ shuffle($images); // Randomize the image order
                 }
             });
             slideIndex = (slideIndex + 1) % slides.length;
-            setTimeout(showSlides, 3000); // Change image every 3 seconds
+            setTimeout(showSlides, 3000);
         }
 
         if (slides.length > 0) {
-            slides[0].classList.add('active'); // Start with the first image
+            slides[0].classList.add('active');
             showSlides();
         }
     </script>
+
 </body>
 </html>

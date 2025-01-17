@@ -93,7 +93,7 @@ $is_visitor = is_visitor();
 </head>
 <body>
     <div class="container">
-        <h1>Dashboard</h1>
+        <!-- <h1>Dashboard</h1> -->
         <!-- <p style="text-align: center;">Welcome, <?= $username; ?>!</p> -->
         <div class="card-container">
             
