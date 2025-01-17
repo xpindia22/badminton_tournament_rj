@@ -1,5 +1,5 @@
 <?php
-require_once 'admin_auth.php'; // Protects this script
+// require_once 'admin_auth.php'; // Protects this script
  
 ob_start();
 ini_set('display_errors', 1);
@@ -14,27 +14,29 @@ redirect_if_not_logged_in();
 $currentUserId = $_SESSION['user_id'];
 $currentUserRole = $_SESSION['role'];
 
-function fetchTournaments($conn) {
+// Fetch tournaments: Admins see all, users see only their own
+function fetchTournaments($conn, $userId, $userRole) {
     $query = "
         SELECT 
             t.id AS tournament_id, 
             t.name AS tournament_name, 
-            u.username AS owner_name, 
             GROUP_CONCAT(DISTINCT c.name ORDER BY c.name SEPARATOR ', ') AS categories,
             GROUP_CONCAT(DISTINCT m.username ORDER BY m.username SEPARATOR ', ') AS moderators
         FROM tournaments t
-        LEFT JOIN users u ON t.created_by = u.id
         LEFT JOIN tournament_categories tc ON t.id = tc.tournament_id
         LEFT JOIN categories c ON tc.category_id = c.id
         LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
         LEFT JOIN users m ON tm.user_id = m.id
+        ". ($userRole === 'admin' ? "" : "WHERE t.created_by = ?") . "
         GROUP BY t.id
         ORDER BY t.name;
     ";
-    $result = $conn->query($query);
-    if (!$result) {
-        die("Error fetching tournaments: " . $conn->error);
+    $stmt = $conn->prepare($query);
+    if ($userRole !== 'admin') {
+        $stmt->bind_param('i', $userId);
     }
+    $stmt->execute();
+    $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -57,13 +59,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Assign a category to a tournament
+    // Restrict category assignment unless admin
     if (isset($_POST['add_category'])) {
         $tournament_id = intval($_POST['tournament_id']);
         $category_id = intval($_POST['category_id']);
 
-        if ($tournament_id === 0 || $category_id === 0) {
-            die("Please select a valid tournament and category.");
+        // Check if the tournament belongs to the current user unless admin
+        if ($currentUserRole !== 'admin') {
+            $checkQuery = "SELECT id FROM tournaments WHERE id = ? AND created_by = ?";
+            $stmt = $conn->prepare($checkQuery);
+            $stmt->bind_param('ii', $tournament_id, $currentUserId);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows === 0) {
+                die("Unauthorized access.");
+            }
+            $stmt->close();
         }
 
         $insertQuery = "INSERT INTO tournament_categories (tournament_id, category_id) VALUES (?, ?) 
@@ -79,13 +90,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
     }
 
-    // Assign a moderator to a tournament
+    // Restrict moderator assignment unless admin
     if (isset($_POST['add_moderator'])) {
         $tournament_id = intval($_POST['tournament_id']);
         $moderator_id = intval($_POST['moderator_id']);
 
-        if ($tournament_id === 0 || $moderator_id === 0) {
-            die("Please select a valid tournament and moderator.");
+        // Check if the tournament belongs to the current user unless admin
+        if ($currentUserRole !== 'admin') {
+            $checkQuery = "SELECT id FROM tournaments WHERE id = ? AND created_by = ?";
+            $stmt = $conn->prepare($checkQuery);
+            $stmt->bind_param('ii', $tournament_id, $currentUserId);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows === 0) {
+                die("Unauthorized access.");
+            }
+            $stmt->close();
         }
 
         $insertQuery = "INSERT INTO tournament_moderators (tournament_id, user_id) VALUES (?, ?) 
@@ -100,29 +120,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $stmt->close();
     }
-
-    // Remove a moderator from a tournament
-    if (isset($_POST['remove_moderator'])) {
-        $tournament_id = intval($_POST['tournament_id']);
-        $moderator_id = intval($_POST['moderator_id']);
-
-        $deleteQuery = "DELETE FROM tournament_moderators WHERE tournament_id = ? AND user_id = ?";
-        $stmt = $conn->prepare($deleteQuery);
-        $stmt->bind_param('ii', $tournament_id, $moderator_id);
-
-        if ($stmt->execute()) {
-            echo "<p style='color: green;'>Moderator removed successfully.</p>";
-        } else {
-            echo "<p style='color: red;'>Error removing moderator: " . htmlspecialchars($stmt->error) . "</p>";
-        }
-        $stmt->close();
-    }
 }
 
-$tournaments = fetchTournaments($conn);
+$tournaments = fetchTournaments($conn, $currentUserId, $currentUserRole);
 $categories_result = $conn->query("SELECT * FROM categories");
 $users_result = $conn->query("SELECT id, username FROM users ORDER BY username");
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">

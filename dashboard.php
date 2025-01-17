@@ -1,21 +1,25 @@
 <?php
 // Enable error reporting for debugging (remove in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Include required files
-require_once 'auth.php'; // Ensure this path is correct
-require_once 'permissions.php'; // Include permissions file
+// Ensure session is only started once
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once 'auth.php';
 redirect_if_not_logged_in();
 
 // Include the header after checking login status
 include 'header.php';
 
 // Fetch session information
-$username = htmlspecialchars($_SESSION['username']);
+$username = htmlspecialchars($_SESSION['username'] ?? $_SESSION['player_name'] ?? "Guest");
 $is_admin = is_admin();
 $is_user = is_user();
+$is_player = is_player();
+$is_visitor = is_visitor();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,50 +38,65 @@ $is_user = is_user();
             padding: 0;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 50px auto;
-            padding: 20px;
+            padding: 25px;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         h1, h2 {
             color: #007BFF;
+            text-align: center;
         }
         .card-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 25px; /* Added space between cards */
             justify-content: center;
+            padding: 20px; /* Extra padding */
         }
         .card {
             background: #fff;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 20px;
             text-align: center;
-            width: 300px;
+            width: 320px; /* Increased width */
+            min-height: 200px;
         }
         .btn-primary {
             display: inline-block;
-            margin-top: 10px;
-            padding: 10px 15px;
+            margin-top: 15px;
+            padding: 12px 18px; /* Increased padding */
+            font-size: 16px;
             color: #fff;
             background: #007BFF;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
         }
         .btn-primary:hover {
             background: #0056b3;
+        }
+        @media (max-width: 768px) {
+            .card-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 90%; /* Make cards full width on smaller screens */
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Dashboard</h1>
-        <p>Welcome, <?= $username; ?>!</p>
+        <!-- <h1>Dashboard</h1> -->
+        <!-- <p style="text-align: center;">Welcome, <?= $username; ?>!</p> -->
         <div class="card-container">
+            
             <!-- Admin Links -->
             <?php if ($is_admin): ?>
                 <div class="card">
@@ -133,6 +152,28 @@ $is_user = is_user();
                     <h2>View Your Data</h2>
                     <p>View and manage tournaments, categories, and matches you created.</p>
                     <a href="user_data.php" class="btn-primary">View Your Data</a>
+                </div>
+            <?php endif; ?>
+
+            <!-- Player Links -->
+            <?php if ($is_player): ?>
+                <div class="card">
+                    <h2>View Tournament Results</h2>
+                    <p>Check results of different tournament categories.</p>
+                    <a href="results_bd.php" class="btn-primary">Doubles Results</a>
+                    <a href="results_xd.php" class="btn-primary">Mixed Doubles Results</a>
+                    <a href="results_singles.php" class="btn-primary">Singles Results</a>
+                </div>
+                <div class="card">
+                    <h2>View Rankings</h2>
+                    <p>Check rankings of players in singles and doubles.</p>
+                    <a href="ranking_singles.php" class="btn-primary">Singles Rankings</a>
+                    <a href="ranking_doubles.php" class="btn-primary">Doubles Rankings</a>
+                </div>
+                <div class="card">
+                    <h2>Player Profile</h2>
+                    <p>View your registered details and update them if needed.</p>
+                    <a href="player_profile.php" class="btn-primary">View Profile</a>
                 </div>
             <?php endif; ?>
 

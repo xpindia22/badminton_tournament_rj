@@ -21,22 +21,35 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             padding: 10px 20px;
             border-bottom: 1px solid #ccc;
         }
-        .header .links {
+        
+        .welcome {
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-right: 50px; /* Adds space between "Welcome, Guest" and the links */
+        }
+
+        .links {
             display: flex;
             gap: 15px;
             position: relative;
+            flex-grow: 1; /* Pushes links to the right */
         }
-        .header .links a {
+
+        .links a {
             text-decoration: none;
             color: #333;
         }
-        .header .links a:hover {
+
+        .links a:hover {
             text-decoration: underline;
         }
+
         .dropdown {
             position: relative;
             display: inline-block;
         }
+
         .dropdown-content {
             display: none;
             position: absolute;
@@ -45,15 +58,18 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             z-index: 1;
             min-width: 160px;
         }
+
         .dropdown-content a {
             color: #333;
             text-decoration: none;
             display: block;
             padding: 8px 16px;
         }
+
         .dropdown-content a:hover {
             background-color: #f1f1f1;
         }
+
         .dropdown:hover .dropdown-content {
             display: block;
         }

@@ -4,6 +4,7 @@ include 'header.php';
 //require_once 'permissions.php';
 
 require 'auth.php';
+require_once 'admin_auth.php';
 redirect_if_not_logged_in();
 
 ini_set('display_errors', 1);

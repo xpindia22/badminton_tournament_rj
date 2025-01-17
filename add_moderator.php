@@ -1,8 +1,50 @@
 <?php
-//add_moderator_championship.php
-include 'header.php';
-require_once 'conn.php'; // Include database connection settings
+session_start();
+ob_start(); // Start output buffering
 
+include 'header.php'; // Ensure no output in header.php
+require_once 'conn.php'; // Database connection settings
+require_once 'admin_auth.php'; // Include admin authentication
+
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    die("Access denied: You must log in first.");
+}
+
+$username = $_SESSION['username'];
+
+// Check if the user is listed in the authentication file
+if (!array_key_exists($username, $adminAuth)) {
+    die("Access denied: You do not have the required permissions.");
+}
+
+// Secondary authentication
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_submit'])) {
+    $provided_password = $_POST['auth_password'];
+    $stored_password = $adminAuth[$username];
+
+    if ($provided_password === $stored_password) {
+        $_SESSION['double_authenticated'] = true;
+    } else {
+        die("<p style='color: red;'>Invalid secondary password. Access denied.</p>");
+    }
+}
+
+// Display secondary authentication form if not authenticated
+if (!isset($_SESSION['double_authenticated']) || $_SESSION['double_authenticated'] !== true) {
+    echo <<<HTML
+        <form method="POST" action="">
+            <h1>Admin Authentication</h1>
+            <label for="auth_password">Enter Secondary Password:</label>
+            <input type="password" id="auth_password" name="auth_password" required>
+            <button type="submit" name="auth_submit">Authenticate</button>
+        </form>
+    HTML;
+    ob_end_flush(); // Ensure output is flushed properly
+    exit;
+}
+
+// Authentication successful, proceed with the rest of the page
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -29,7 +71,7 @@ if (!$userResult) {
     die("Error fetching users: " . $conn->error);
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $tournamentId = $_POST['tournament_id'];
         $moderatorId = $_POST['moderator_id'];
@@ -60,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Refresh the page to reflect changes
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Refresh:0");
     exit;
 }
 ?>
@@ -90,7 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <h1>Assign a Moderator to a Tournament</h1>
+    <h1>Welcome, <?php echo htmlspecialchars($username); ?>! You have successfully authenticated.</h1>
+
+    <h2>Assign a Moderator to a Tournament</h2>
     <form action="" method="POST">
         <label for="tournament_id">Select Tournament:</label>
         <select name="tournament_id" id="tournament_id" required>
@@ -160,4 +204,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </html>
 <?php
 $conn->close();
+ob_end_flush();
 ?>
