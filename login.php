@@ -84,7 +84,7 @@ shuffle($images);
 
         .container {
             display: flex;
-            width: 70%;
+            width: 90%;
             margin-top: 80px;
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -99,7 +99,7 @@ shuffle($images);
 
         .slideshow-container img {
             width: 100%;
-            height: 100%;
+            height: 80%;
             display: none;
             position: absolute;
             top: 0;
@@ -112,7 +112,7 @@ shuffle($images);
 
         .right-section {
             flex: 1;
-            padding: 30px;
+            padding: 10px;
             background: #fff;
             text-align: center;
         }
@@ -131,13 +131,13 @@ shuffle($images);
         form label, form input, form button {
             margin-bottom: 15px;
             width: 80%;
-            max-width: 300px;
+            max-width: 200px;
         }
 
         .player-login-btn, .register-btn, button {
             padding: 10px;
             width: 80%;
-            max-width: 300px;
+            max-width: 200px;
             background-color: #007bff;
             color: white;
             border: none;
