@@ -1,4 +1,3 @@
- 
 <?php
 // login.php
 
@@ -87,7 +86,6 @@ shuffle($images); // Randomize the image order
             flex: 1;
             padding: 20px;
             background: #fff;
-            text-align: center;
         }
         .error {
             color: red;
@@ -95,26 +93,9 @@ shuffle($images); // Randomize the image order
         form {
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
         form label, form input, form button {
             margin-bottom: 15px;
-            width: 80%;
-            max-width: 300px;
-        }
-        .player-login-btn {
-            margin-top: 10px;
-            padding: 10px;
-            width: 80%;
-            max-width: 300px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .player-login-btn:hover {
-            background-color: #218838;
         }
     </style>
 </head>
@@ -141,11 +122,6 @@ shuffle($images); // Randomize the image order
                 <input type="password" name="password" id="password" required>
 
                 <button type="submit">Login</button>
-            </form>
-
-            <!-- Player Login Button -->
-            <form action="login_player.php" method="get">
-                <button type="submit" class="player-login-btn">Player Login</button>
             </form>
         </div>
     </div>

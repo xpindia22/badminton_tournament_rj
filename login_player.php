@@ -1,54 +1,19 @@
 <?php
-<<<<<<< HEAD
-session_start();
-require 'conn.php';
-=======
 // Enable error reporting for debugging (remove in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Start session before any output
+// Ensure session is only started once
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once 'conn.php';
 require_once 'auth.php'; // Ensure authentication functions are available
->>>>>>> f59479a23af9e500d49532d6110ee720122dbfad
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-<<<<<<< HEAD
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-
-    if (empty($username) || empty($password)) {
-        $message = "Both fields are required.";
-    } else {
-        $stmt = $conn->prepare("SELECT id, password FROM players WHERE username = ?");
-        if (!$stmt) {
-            die("Prepare failed: " . $conn->error);
-        }
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-        $stmt->bind_result($id, $hashed_password);
-        $stmt->fetch();
-
-        if ($stmt->num_rows > 0 && password_verify($password, $hashed_password)) {
-            $_SESSION['player_id'] = $id;
-            $_SESSION['username'] = $username;
-            header("Location: player_dashboard.php");
-            exit;
-        } else {
-            $message = "Invalid username or password.";
-        }
-        $stmt->close();
-    }
-}
-?>
-=======
     $uid = trim($_POST['uid'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
@@ -70,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Set session variables for the player
             $_SESSION['player_uid'] = $player_uid;
             $_SESSION['player_name'] = $player_name;
-            $_SESSION['user_role'] = 'visitor';
+            $_SESSION['user_role'] = 'visitor'; // Assign visitor role for read-only access
 
             // Debugging output to check session data
             error_log("Player Login Successful: UID = $player_uid, Name = $player_name");
 
-            // Redirect before sending any HTML output
+            // Redirect to dashboard.php
             header("Location: dashboard.php");
             exit;
         } else {
@@ -83,203 +48,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-// Include header after session and logic execution
-include 'header.php';
-
-/**
- * Function to get images from a directory
- */
-function get_images_from_directory($directory) {
-    $images = [];
-    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-
-    if (!is_dir($directory)) {
-        return $images;
-    }
-
-    $dir_iterator = new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS);
-    $iterator = new RecursiveIteratorIterator($dir_iterator);
-
-    foreach ($iterator as $file) {
-        if ($file->isFile() && in_array(strtolower($file->getExtension()), $allowed_extensions)) {
-            $images[] = $file->getPathname();
-        }
-    }
-
-    return $images;
-}
-
-$images = get_images_from_directory('images');
-shuffle($images); // Randomize the image order
 ?>
 
->>>>>>> f59479a23af9e500d49532d6110ee720122dbfad
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<<<<<<< HEAD
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player Login</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Player Login</h1>
-    <p><?= htmlspecialchars($message) ?></p>
-    <form method="post">
-        <label>Username:</label>
-        <input type="text" name="username" required>
-
-        <label>Password:</label>
-        <input type="password" name="password" required>
-
-        <button type="submit">Login</button>
-    </form>
-=======
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #f4f4f4;
-        }
-
-        .container {
-            display: flex;
-            width: 70%;
-            margin-top: 80px;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .left-section {
-            flex: 1;
-            position: relative;
-            max-height: 100%;
-            overflow: hidden;
-        }
-
-        .slideshow-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .slideshow-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .slideshow-container img.active {
-            opacity: 1;
-        }
-
-        .right-section {
-            flex: 1;
-            padding: 30px;
-            background: #fff;
-            text-align: center;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        form label, form input, form button {
-            margin-bottom: 15px;
-            width: 80%;
-            max-width: 300px;
-        }
-
-        .login-btn {
-            padding: 10px;
-            width: 80%;
-            max-width: 300px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease-in-out;
-        }
-
-        .login-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-
     <div class="container">
-        <div class="left-section">
-            <div class="slideshow-container">
-                <?php foreach ($images as $index => $image): ?>
-                    <img src="<?= htmlspecialchars($image) ?>" alt="Slideshow Image" class="<?= $index === 0 ? 'active' : '' ?>">
-                <?php endforeach; ?>
-            </div>
-        </div>
+        <h1>Player Login</h1>
+        <?php if ($message): ?>
+            <p class="error"><?= htmlspecialchars($message) ?></p>
+        <?php endif; ?>
+        <form method="post">
+            <label for="uid">Player UID:</label>
+            <input type="number" name="uid" id="uid" required>
 
-        <div class="right-section">
-            <h2>Player Login</h2>
-            <?php if (!empty($message)): ?>
-                <p class="error"><?= htmlspecialchars($message) ?></p>
-            <?php endif; ?>
-            <form method="post">
-                <label for="uid">Player UID:</label>
-                <input type="number" name="uid" id="uid" required>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
 
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="password" required>
-
-                <button type="submit" class="login-btn">Login</button>
-            </form>
-        </div>
+            <button type="submit">Login</button>
+        </form>
     </div>
-
-    <script>
-        let slideIndex = 0;
-        const slides = document.querySelectorAll('.slideshow-container img');
-
-        function showSlides() {
-            slides.forEach((slide, index) => {
-                slide.classList.remove('active');
-                if (index === slideIndex) {
-                    slide.classList.add('active');
-                }
-            });
-
-            slideIndex = (slideIndex + 1) % slides.length;
-            setTimeout(showSlides, 3000); // Change image every 3 seconds
-        }
-
-        if (slides.length > 0) {
-            slides[0].classList.add('active'); // Ensure the first image is visible
-            showSlides();
-        }
-    </script>
-
->>>>>>> f59479a23af9e500d49532d6110ee720122dbfad
 </body>
 </html>

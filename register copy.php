@@ -5,11 +5,7 @@
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
-<<<<<<< HEAD
-//require_once 'permissions.php';
-=======
  
->>>>>>> f59479a23af9e500d49532d6110ee720122dbfad
 
 $message = '';
 $username = '';
