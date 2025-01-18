@@ -1,6 +1,5 @@
 <?php
-ob_start(); // Start output buffering to prevent "headers already sent" errors
-
+// Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -13,6 +12,7 @@ if (isset($_SESSION['username'])) {
 } elseif (isset($_SESSION['player_name'])) {
     $logged_in_user = $_SESSION['player_name']; // For players
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,16 +95,82 @@ if (isset($_SESSION['username'])) {
 </head>
 <body>
     <div class="header">
+        <!-- Welcome Message -->
         <div class="welcome">
             <span>Welcome, <?= htmlspecialchars($logged_in_user) ?></span>
         </div>
+        <!-- Navigation Links -->
         <div class="links">
             <a href="dashboard.php">Dashboard</a>
             <a href="register.php">Register Tournament Manager</a>
             <a href="register_player.php">Register Player</a>
+
+            <!-- Dropdown: Admin Zone (Only Visible to Admins) -->
+            <div class="dropdown">
+                <a href="#">Admin Zone</a>
+                <div class="dropdown-content">
+                    <a href="register.php">Register Tournament Manager</a>
+                    <a href="register_player.php">Register Player</a>
+                    <a href="insert_player.php">Insert Player</a>
+                    <a href="insert_match.php">Insert Match</a> 
+                    <a href="insert_category.php">Insert Category</a> 
+                    <a href="add_moderator.php">Add Moderator</a>
+                    <a href="insert_tournament.php">Insert Tournament</a>
+                </div>
+            </div>
+
+            <!-- Dropdown: Singles Matches -->
+            <div class="dropdown">
+                <a href="#">Singles Matches</a>
+                <div class="dropdown-content">
+                    <a href="results_singles.php">Singles Results</a>
+                    <a href="edit_results_singles_link.php">Edit Singles Matches</a>
+                </div>
+            </div>
+
+            <!-- Dropdown: Boys Doubles -->
+            <div class="dropdown">
+                <a href="#">Boys Doubles</a>
+                <div class="dropdown-content">
+                    <a href="insert_match_bd.php">Insert Boys Doubles</a>
+                    <a href="results_bd.php">Result Boys Doubles</a>
+                    <a href="edit_results_bd.php">Edit Boys Doubles</a>
+                    <a href="edit_results_doubles.php">Edit All Doubles</a>
+                </div>
+            </div>
+
+            <!-- Dropdown: Girls Doubles -->
+            <div class="dropdown">
+                <a href="#">Girls Doubles</a>
+                <div class="dropdown-content">
+                    <a href="insert_match_gd.php">Insert Girls Doubles</a>
+                    <a href="results_gd.php">Result Girls Doubles</a>
+                    <a href="edit_results_gd.php">Edit Girls Doubles</a>
+                </div>
+            </div>
+
+            <!-- Dropdown: Mixed Doubles -->
+            <div class="dropdown">
+                <a href="#">Mixed Doubles</a>
+                <div class="dropdown-content">
+                    <a href="insert_match_xd.php">Create Mixed Doubles</a>
+                    <a href="results_xd.php">Results Mixed Doubles</a>
+                    <a href="edit_results_xd.php">Edit Mixed Doubles</a>
+                </div>
+            </div>
+
+            <!-- Dropdown: Player Ranking -->
+            <div class="dropdown">
+                <a href="#">Player Ranking</a>
+                <div class="dropdown-content">
+                    <a href="ranking_singles.php">Singles Ranking</a>
+                    <a href="ranking_doubles.php">Double & Mixed Doubles</a>
+                </div>
+            </div>
+
+            <!-- Logout -->
             <a href="logout.php">Logout</a>
         </div>
     </div>
 </body>
 </html>
-<?php ob_end_flush(); // Flush output buffer ?>
