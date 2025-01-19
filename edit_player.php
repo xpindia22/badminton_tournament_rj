@@ -1,43 +1,50 @@
-<?php include 'header.php'; ?>
-<!-- Rest of your page content -->
-
 <?php
-// edit_player.php
-//require_once 'permissions.php';
+ob_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
+include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
+
+// Ensure only logged-in users can access
 redirect_if_not_logged_in();
 
+// Check if the user is an admin
 if (!is_admin()) {
     die("Access denied.");
 }
 
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    die("<p class='error'>Invalid player ID.</p>");
+// Validate UID
+if (!isset($_GET['uid']) || !is_numeric($_GET['uid'])) {
+    die("<p class='error'>Invalid player UID.</p>");
 }
 
-$player_id = intval($_GET['id']);
+$player_uid = intval($_GET['uid']);
 $message = '';
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];
-    $dob = $_POST['dob'];
-    $age = $_POST['age'];
-    $sex = $_POST['sex'];
-    $uid = $_POST['uid'];
+    $name = trim($_POST['name']);
+    $dob = trim($_POST['dob']);
+    $sex = trim($_POST['sex']);
+    $new_uid = trim($_POST['uid']);
 
-    $stmt = $conn->prepare("
-        UPDATE players 
-        SET name = ?, dob = ?, age = ?, sex = ?, uid = ?
-        WHERE id = ?
-    ");
-    if (!$stmt) {
-        die("<p class='error'>Database error: " . $conn->error . "</p>");
-    }
-    $stmt->bind_param("ssissi", $name, $dob, $age, $sex, $uid, $player_id);
+    // Calculate Age from DOB
+    $stmt = $conn->prepare("SELECT TIMESTAMPDIFF(YEAR, ?, CURDATE()) AS age");
+    $stmt->bind_param("s", $dob);
+    $stmt->execute();
+    $stmt->bind_result($age);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Update player details, including UID change
+    $stmt = $conn->prepare("UPDATE players SET name = ?, dob = ?, age = ?, sex = ?, uid = ? WHERE uid = ?");
+    $stmt->bind_param("ssissi", $name, $dob, $age, $sex, $new_uid, $player_uid);
+    
     if ($stmt->execute()) {
-        header("Location: insert_player.php");
+        // Redirect to register_player.php after successful update
+        header("Location: register_player.php?success=1");
         exit;
     } else {
         $message = "Error updating player: " . $stmt->error;
@@ -45,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 }
 
-// Fetch player details
-$stmt = $conn->prepare("SELECT * FROM players WHERE id = ?");
-$stmt->bind_param("i", $player_id);
+// Fetch player details based on UID
+$stmt = $conn->prepare("SELECT * FROM players WHERE uid = ?");
+$stmt->bind_param("i", $player_uid);
 $stmt->execute();
 $result = $stmt->get_result();
 $player = $result->fetch_assoc();
@@ -56,16 +63,8 @@ $stmt->close();
 if (!$player) {
     die("<p class='error'>Player not found.</p>");
 }
-
-// Fetch all players
-$players = $conn->query("
-    SELECT p.*, GROUP_CONCAT(u.username) AS linked_users
-    FROM players p
-    LEFT JOIN player_access pa ON p.id = pa.player_id
-    LEFT JOIN users u ON pa.user_id = u.id
-    GROUP BY p.id
-");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,17 +90,12 @@ $players = $conn->query("
     </script>
 </head>
 <body>
-    <div class="top-bar">
-        <span>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
-        <a href="logout.php" class="logout-link">Logout</a>
-    </div>
-
     <div class="container">
         <h1>Edit Player</h1>
         <?php if ($message): ?>
             <p class="message"><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
-        <form method="post" class="form-styled">
+        <form method="post">
             <label for="name">Player Name:</label>
             <input type="text" name="name" id="name" value="<?= htmlspecialchars($player['name']) ?>" required>
 
@@ -120,36 +114,10 @@ $players = $conn->query("
             <label for="uid">Unique ID:</label>
             <input type="text" name="uid" id="uid" value="<?= htmlspecialchars($player['uid']) ?>" required>
 
-            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="submit">Save Changes</button>
         </form>
-
-        <h2>All Players</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Date of Birth</th>
-                    <th>Age</th>
-                    <th>Sex</th>
-                    <th>UID</th>
-                    <th>Linked Users</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($row = $players->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['id']) ?></td>
-                        <td><?= htmlspecialchars($row['name']) ?></td>
-                        <td><?= htmlspecialchars($row['dob']) ?></td>
-                        <td><?= htmlspecialchars($row['age']) ?></td>
-                        <td><?= htmlspecialchars($row['sex']) ?></td>
-                        <td><?= htmlspecialchars($row['uid']) ?></td>
-                        <td><?= htmlspecialchars($row['linked_users'] ?: 'No users linked') ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
     </div>
 </body>
 </html>
+
+<?php ob_end_flush(); ?>

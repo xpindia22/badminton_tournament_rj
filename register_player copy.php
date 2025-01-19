@@ -22,17 +22,21 @@ function getNextAvailableUID($conn) {
     $result = $conn->query("SELECT MAX(uid) + 1 AS next_uid FROM players");
     if ($result) {
         $row = $result->fetch_assoc();
-        $next_uid = $row['next_uid'] ?? 1; 
+        $next_uid = $row['next_uid'] ?? 1; // Default to 1 if table is empty
         $result->close();
         return $next_uid;
     }
-    return 1;
+    return 1; // Default UID if no entries exist
 }
 
 // Fetch the suggested UID before showing the form
 $next_uid = getNextAvailableUID($conn);
 
-// Handle form submission
+// Display success message
+if (isset($_GET['success'])) {
+    $message = "Player registration successful!";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $uid = trim($_POST['uid'] ?? '');
     $name = trim($_POST['name'] ?? '');
@@ -40,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sex = trim($_POST['sex'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // If UID is not set, use the next available UID
+    // If the user didn't edit UID, use the suggested one
     if (empty($uid)) {
         $uid = $next_uid;
     }
@@ -80,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("ississ", $uid, $name, $dob, $age, $sex, $hashed_password);
 
             if ($stmt->execute()) {
+                // Prevent form resubmission by redirecting after success
                 header("Location: register_player.php?success=1");
                 exit();
             } else {
@@ -92,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all registered players sorted by UID
+// Fetch all registered players sorted by UID (latest first)
 $players = [];
 $result = $conn->query("SELECT uid, name, dob, age, sex, created_at FROM players ORDER BY uid DESC");
 if ($result) {
@@ -173,4 +178,4 @@ if ($result) {
 </body>
 </html>
 
-<?php ob_end_flush(); ?>
+<?php ob_end_flush(); // Flush output buffer ?>
