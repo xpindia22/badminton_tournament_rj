@@ -1,9 +1,5 @@
 <?php
-// Enable error reporting for debugging (remove in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if (session_status() === PHP_SESSION_NONE) {
+ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once 'auth.php';
@@ -81,10 +77,9 @@ shuffle($images);
             flex-direction: column;
             align-items: center;
         }
-
         .container {
             display: flex;
-            width: 70%;
+            width: 90%;
             margin-top: 80px;
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -134,7 +129,7 @@ shuffle($images);
             max-width: 300px;
         }
 
-        .player-login-btn, button {
+        .player-login-btn, .register-btn, button {
             padding: 10px;
             width: 80%;
             max-width: 300px;
@@ -147,7 +142,7 @@ shuffle($images);
             transition: background 0.3s ease-in-out;
         }
 
-        .player-login-btn:hover, button:hover {
+        .player-login-btn:hover, .register-btn:hover, button:hover {
             background-color: #0056b3;
         }
     </style>
@@ -182,6 +177,14 @@ shuffle($images);
 
             <form action="login_player.php" method="get">
                 <button type="submit" class="player-login-btn">Player Login</button>
+            </form>
+
+            <form action="register.php" method="get">
+                <button type="submit" class="register-btn">Register Tournament Manager</button>
+            </form>
+
+            <form action="register_player.php" method="get">
+                <button type="submit" class="register-btn">Register Player</button>
             </form>
         </div>
     </div>
