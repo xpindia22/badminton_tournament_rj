@@ -1,9 +1,5 @@
 <?php
-// Enable error reporting for debugging (remove in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if (session_status() === PHP_SESSION_NONE) {
+ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once 'auth.php';
@@ -81,7 +77,6 @@ shuffle($images);
             flex-direction: column;
             align-items: center;
         }
-
         .container {
             display: flex;
             width: 90%;
@@ -99,7 +94,7 @@ shuffle($images);
 
         .slideshow-container img {
             width: 100%;
-            height: 80%;
+            height: 100%;
             display: none;
             position: absolute;
             top: 0;
@@ -112,7 +107,7 @@ shuffle($images);
 
         .right-section {
             flex: 1;
-            padding: 10px;
+            padding: 30px;
             background: #fff;
             text-align: center;
         }
@@ -131,13 +126,13 @@ shuffle($images);
         form label, form input, form button {
             margin-bottom: 15px;
             width: 80%;
-            max-width: 200px;
+            max-width: 300px;
         }
 
         .player-login-btn, .register-btn, button {
             padding: 10px;
             width: 80%;
-            max-width: 200px;
+            max-width: 300px;
             background-color: #007bff;
             color: white;
             border: none;

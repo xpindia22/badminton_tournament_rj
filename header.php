@@ -111,7 +111,7 @@ if (isset($_SESSION['username'])) {
                 <div class="dropdown-content">
                     <a href="register.php">Register Tournament Manager</a>
                     <a href="register_player.php">Register Player</a>
-                    <a href="insert_player.php">Insert Player</a>
+                    <a href="edit_register_player.php">Edit Player</a>
                     <a href="insert_match.php">Insert Match</a> 
                     <a href="insert_category.php">Insert Category</a> 
                     <a href="add_moderator.php">Add Moderator</a>
@@ -123,6 +123,7 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Singles Matches</a>
                 <div class="dropdown-content">
+                    <a href="insert_match.php">Add Singles</a>
                     <a href="results_singles.php">Singles Results</a>
                     <a href="edit_results_singles_link.php">Edit Singles Matches</a>
                 </div>

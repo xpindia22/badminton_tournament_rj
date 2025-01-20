@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 }
 
 // Define stages
-$stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
+$stages = ['Pre Quarter Finals','Quarter Finals','Semifinals','Finals','Preliminary'];
 
 // Redirect helper function
 function redirect_with_message($location, $message) {
