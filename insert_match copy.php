@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 //require_once 'permissions.php';
-require_once 'conn.php';
+// require_once 'conn.php';
 include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -74,18 +74,12 @@ $tournaments = $conn->query("SELECT id, name FROM tournaments");
 
 // Fetch categories for the locked tournament
 if ($lockedTournament) {
-$stmt = $conn->prepare("
-    SELECT c.id, c.name, c.age_group, c.sex 
-    FROM categories c
-    INNER JOIN tournament_categories tc ON c.id = tc.category_id
-    WHERE tc.tournament_id = ? 
-    AND c.name NOT LIKE '%Doubles%' 
-    AND c.name NOT LIKE '%Mixed%' 
-    AND c.name NOT LIKE '%XD%' 
-    AND c.name NOT LIKE '%BD%' 
-    AND c.name NOT LIKE '%GD%'
-");
-
+    $stmt = $conn->prepare("
+        SELECT c.id, c.name, c.age_group, c.sex 
+        FROM categories c
+        INNER JOIN tournament_categories tc ON c.id = tc.category_id
+        WHERE tc.tournament_id = ?
+    ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
     $categories = $stmt->get_result();

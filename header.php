@@ -123,6 +123,7 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Singles Matches</a>
                 <div class="dropdown-content">
+                    <a href="insert_match.php">Add Singles</a>
                     <a href="results_singles.php">Singles Results</a>
                     <a href="edit_results_singles_link.php">Edit Singles Matches</a>
                 </div>
