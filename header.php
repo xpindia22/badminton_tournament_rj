@@ -1,4 +1,6 @@
 <?php
+ob_start(); // Start output buffering to prevent header issues
+
 // Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
