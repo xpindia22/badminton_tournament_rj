@@ -47,12 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $set3_p2 = $_POST['set3_player2_points'] ?? 0;
 
         $stmt = $conn->prepare("
+ 
             INSERT INTO matches (
                 tournament_id, category_id, player1_id, player2_id, stage, 
-                date, match_time, set1_player1_points, set1_player2_points, 
+                match_date, match_time, set1_player1_points, set1_player2_points, 
                 set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
             ) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
         ");
         $stmt->bind_param(
             "iiiisssiiiiii",
