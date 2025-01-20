@@ -50,67 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['unlock_tournament'])) {
         unset($_SESSION['locked_tournament'], $_SESSION['locked_tournament_name']);
         $lockedTournament = null;
-    } else {
-        // Match Insertion
-        $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
-        $category_id = $_POST['category_id'];
-        $stage = $_POST['stage'];
-        $date = $_POST['date'];
-        $match_time = date("H:i", strtotime($_POST['time'])); // Convert to 24-hour format
-
-        // Check if the category is singles or doubles
-        $stmt = $conn->prepare("SELECT type FROM categories WHERE id = ?");
-        $stmt->bind_param("i", $category_id);
-        $stmt->execute();
-        $stmt->bind_result($categoryType);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($categoryType === 'singles') {
-            $player1_id = $_POST['player1_id'];
-            $player2_id = $_POST['player2_id'];
-            $team1_player1 = $team1_player2 = $team2_player1 = $team2_player2 = null;
-        } else {
-            $team1_player1 = $_POST['team1_player1_id'];
-            $team1_player2 = $_POST['team1_player2_id'];
-            $team2_player1 = $_POST['team2_player1_id'];
-            $team2_player2 = $_POST['team2_player2_id'];
-            $player1_id = $player2_id = null;
-        }
-
-        // Set Scores
-        $set1_p1 = $_POST['set1_player1_points'];
-        $set1_p2 = $_POST['set1_player2_points'];
-        $set2_p1 = $_POST['set2_player1_points'];
-        $set2_p2 = $_POST['set2_player2_points'];
-        $set3_p1 = $_POST['set3_player1_points'] ?? 0;
-        $set3_p2 = $_POST['set3_player2_points'] ?? 0;
-
-        $stmt = $conn->prepare("
-            INSERT INTO matches (
-                tournament_id, category_id, stage, match_date, match_time, 
-                player1_id, player2_id, team1_player1_id, team1_player2_id, 
-                team2_player1_id, team2_player2_id,
-                set1_player1_points, set1_player2_points, 
-                set2_player1_points, set2_player2_points,
-                set3_player1_points, set3_player2_points
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-
-        $stmt->bind_param(
-            "iisssiiiiiiiiiiii",
-            $tournament_id, $category_id, $stage, $date, $match_time,
-            $player1_id, $player2_id, $team1_player1, $team1_player2,
-            $team2_player1, $team2_player2,
-            $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
-        );
-
-        if ($stmt->execute()) {
-            $message = "Match added successfully!";
-        } else {
-            $message = "Error adding match: " . $stmt->error;
-        }
-        $stmt->close();
     }
 }
 
@@ -129,60 +68,170 @@ if ($lockedTournament) {
     $stmt->close();
 }
 
+// Fetch all players
+$players = [];
+$playerQuery = "SELECT id, name, dob, sex FROM players";
+$playerResult = $conn->query($playerQuery);
+while ($row = $playerResult->fetch_assoc()) {
+    $players[] = $row;
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Match</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            padding: 12px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div>
-        <h1>Insert Match</h1>
-        <?php if ($message): ?>
-            <p><?= htmlspecialchars($message) ?></p>
-        <?php endif; ?>
 
-        <form method="post">
-            <label for="tournament_id">Select Tournament:</label>
-            <select name="tournament_id" id="tournament_id" required>
-                <option value="">Select Tournament</option>
-                <?php while ($row = $tournamentResult->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                <?php endwhile; ?>
-            </select>
-            <button type="submit" name="lock_tournament">Lock Tournament</button>
-        </form>
+<div class="container">
+    <h1>Insert Match</h1>
+    <?php if ($message): ?>
+        <p class="message"><?= htmlspecialchars($message) ?></p>
+    <?php endif; ?>
 
-        <form method="post">
-            <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" required>
-                <option value="">Select Category</option>
-                <?php while ($row = $categories->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>" data-type="<?= $row['type'] ?>">
-                        <?= htmlspecialchars($row['name']) ?>
-                    </option>
-                <?php endwhile; ?>
-            </select>
+    <form method="post">
+        <label for="tournament_id">Select Tournament:</label>
+        <select name="tournament_id" id="tournament_id" required>
+            <option value="">Select Tournament</option>
+            <?php while ($row = $tournamentResult->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
+            <?php endwhile; ?>
+        </select>
+        <button type="submit" name="lock_tournament">Lock Tournament</button>
+    </form>
 
-            <div id="singles_players">
-                <label for="player1_id">Player 1:</label>
-                <select name="player1_id" required></select>
+    <form method="post">
+        <label for="category_id">Category:</label>
+        <select name="category_id" id="category_id" onchange="updatePlayerDropdown()" required>
+            <option value="">Select Category</option>
+            <?php while ($row = $categories->fetch_assoc()): ?>
+                <option value="<?= $row['id'] ?>" data-type="<?= $row['type'] ?>" data-sex="<?= $row['sex'] ?>" data-age="<?= $row['age_group'] ?>">
+                    <?= htmlspecialchars($row['name']) ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
 
-                <label for="player2_id">Player 2:</label>
-                <select name="player2_id" required></select>
-            </div>
+        <div id="singles_players">
+            <label for="player1_id">Player 1:</label>
+            <select name="player1_id" required></select>
 
-            <div id="doubles_players" style="display:none;">
-                <label>Team 1 Players:</label>
-                <select name="team1_player1_id" required></select>
-                <select name="team1_player2_id" required></select>
+            <label for="player2_id">Player 2:</label>
+            <select name="player2_id" required></select>
+        </div>
 
-                <label>Team 2 Players:</label>
-                <select name="team2_player1_id" required></select>
-                <select name="team2_player2_id" required></select>
-            </div>
-        </form>
-    </div>
+        <div id="doubles_players" style="display:none;">
+            <label>Team 1 Players:</label>
+            <select name="team1_player1_id" required></select>
+            <select name="team1_player2_id" required></select>
+
+            <label>Team 2 Players:</label>
+            <select name="team2_player1_id" required></select>
+            <select name="team2_player2_id" required></select>
+        </div>
+
+        <button type="submit">Add Match</button>
+    </form>
+</div>
+
+<script>
+    const players = <?= json_encode($players) ?>;
+
+    function updatePlayerDropdown() {
+        const categoryElement = document.getElementById('category_id');
+        const categoryType = categoryElement.selectedOptions[0].dataset.type;
+        const categorySex = categoryElement.selectedOptions[0].dataset.sex;
+        const categoryAge = categoryElement.selectedOptions[0].dataset.age;
+
+        const singlesSection = document.getElementById('singles_players');
+        const doublesSection = document.getElementById('doubles_players');
+        
+        if (categoryType === 'singles') {
+            singlesSection.style.display = 'block';
+            doublesSection.style.display = 'none';
+            populatePlayers(['player1_id', 'player2_id'], categorySex, categoryAge);
+        } else {
+            singlesSection.style.display = 'none';
+            doublesSection.style.display = 'block';
+            let team1 = ['team1_player1_id', 'team1_player2_id'];
+            let team2 = ['team2_player1_id', 'team2_player2_id'];
+
+            if (categoryType === 'mixed doubles') {
+                populatePlayersMixed(team1, team2, categoryAge);
+            } else {
+                populatePlayers([...team1, ...team2], categorySex, categoryAge);
+            }
+        }
+    }
+
+    function populatePlayers(dropdownIds, sex, age) {
+        dropdownIds.forEach(id => {
+            let dropdown = document.getElementsByName(id)[0];
+            dropdown.innerHTML = '<option value="">Select Player</option>';
+            players.forEach(player => {
+                if (player.sex === sex) {
+                    dropdown.innerHTML += `<option value="${player.id}">${player.name}</option>`;
+                }
+            });
+        });
+    }
+
+    function populatePlayersMixed(team1, team2, age) {
+        populatePlayers(team1, 'M', age);
+        populatePlayers(team2, 'F', age);
+    }
+</script>
+
 </body>
 </html>
