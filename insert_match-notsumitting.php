@@ -52,56 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lockedTournament = null;
     }
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
-    $categoryId = intval($_POST['category_id']);
-    $player1Id = intval($_POST['player1_id']);
-    $player2Id = intval($_POST['player2_id']);
-    $stage = $_POST['stage'];
-    $matchDate = $_POST['date'];
-    $matchTime = $_POST['match_time'];
-    $set1P1 = intval($_POST['set1_player1_points']);
-    $set1P2 = intval($_POST['set1_player2_points']);
-    $set2P1 = intval($_POST['set2_player1_points']);
-    $set2P2 = intval($_POST['set2_player2_points']);
-    $set3P1 = isset($_POST['set3_player1_points']) ? intval($_POST['set3_player1_points']) : null;
-    $set3P2 = isset($_POST['set3_player2_points']) ? intval($_POST['set3_player2_points']) : null;
-
-    if ($categoryId && $player1Id && $player2Id && $stage && $matchDate && $matchTime) {
-        // Ensure players are not the same
-        if ($player1Id === $player2Id) {
-            $message = "Players cannot be the same.";
-        } else {
-            $stmt = $conn->prepare("
-                INSERT INTO matches 
-                (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, 
-                set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, 
-                set3_player1_points, set3_player2_points) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-
-            if ($stmt) {
-                $stmt->bind_param("iiiissiiiiiii", 
-                    $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
-                    $matchDate, $matchTime, 
-                    $set1P1, $set1P2, $set2P1, $set2P2, 
-                    $set3P1, $set3P2
-                );
-
-                if ($stmt->execute()) {
-                    $message = "Match successfully added!";
-                } else {
-                    $message = "Error inserting match: " . $stmt->error;
-                }
-                $stmt->close();
-            } else {
-                $message = "SQL Prepare Error: " . $conn->error;
-            }
-        }
-    } else {
-        $message = "All fields are required!";
-    }
-}
-
 
 // Fetch only BS & GS categories from the locked tournament
 $categories = [];
