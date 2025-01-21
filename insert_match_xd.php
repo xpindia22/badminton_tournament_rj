@@ -52,7 +52,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $match_date = $match_date->format('Y-m-d'); 
         }
 
-        $match_time = $_POST['time'];
+        $match_time = $_POST['time'] ?? null;
+        if (empty($match_time)) {
+            $message = "Match time is required!";
+        } else {
+            // Validate and format the time to 24-hour format
+            $timeObject = DateTime::createFromFormat('H:i', $match_time);
+            if ($timeObject === false) {
+                $message = "Invalid match time format!";
+            } else {
+                $match_time = $timeObject->format('H:i'); // Store in 24-hour format
+            }
+        }
+
         $set1_team1 = $_POST['set1_team1_points'];
         $set1_team2 = $_POST['set1_team2_points'];
         $set2_team1 = $_POST['set2_team1_points'];
@@ -60,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $set3_team1 = $_POST['set3_team1_points'] ?? 0;
         $set3_team2 = $_POST['set3_team2_points'] ?? 0;
 
-        if ($match_date !== false) { 
+        if ($match_date !== false && $match_time !== null) { 
             $stmt = $conn->prepare("INSERT INTO matches (
                 tournament_id, category_id, team1_player1_id, team1_player2_id,
                 team2_player1_id, team2_player2_id, stage, match_date, match_time,
@@ -105,8 +117,8 @@ if ($lockedTournament) {
 } else {
     $categories = [];
 }
-
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>

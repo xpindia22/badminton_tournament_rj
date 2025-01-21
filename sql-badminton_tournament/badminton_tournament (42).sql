@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 19, 2025 at 07:49 AM
+-- Generation Time: Jan 21, 2025 at 05:38 PM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -187,7 +187,16 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (40, 1, 26, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 'Pre Quarter Finals', '2025-01-15', '13', NULL, 2, 3, 3, 2, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
 (41, 14, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Finals', '2025-01-01', '12:00', NULL, 3, 21, 11, 20, 3, 21, 12, 2, 2, 21, NULL, NULL, NULL),
 (42, 17, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-16', '10:52', NULL, 19, 12, 14, 20, 21, 2, 2, 21, 21, 5, NULL, NULL, NULL),
-(43, 17, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-16', '10:52', NULL, 16, 18, 1, 19, 21, 2, 2, 21, 21, 3, NULL, NULL, NULL);
+(43, 17, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-16', '10:52', NULL, 16, 18, 1, 19, 21, 2, 2, 21, 21, 3, NULL, NULL, NULL),
+(44, 1, 1, NULL, 2, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 12, NULL, 'Quarter Finals', '2025-01-20', '0', '2025-01-20', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
+(45, 1, 20, NULL, 22, 22, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, 'Pre Quarter Finals', NULL, '06:42', '2025-01-20', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
+(46, 1, 1, NULL, 3, 2, 0, 0, 0, 0, 12, 21, 21, 12, 12, 21, NULL, 'Pre Quarter Finals', '2025-01-21', '21', NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
+(47, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-21', '21', NULL, 2, 21, 6, 10, 2, 21, 2, 2, 21, 21, NULL, NULL, NULL),
+(48, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Quarter Finals', '2025-01-21', '21', NULL, 4, 1, 14, 17, 21, 13, 13, 21, 1, 21, NULL, NULL, NULL),
+(49, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-21', '22:14', NULL, 2, 19, 17, 11, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
+(50, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-21', '22', NULL, 20, 16, 4, 13, 21, 12, 12, 21, 21, 2, NULL, NULL, NULL),
+(51, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-21', '22', NULL, 21, 16, 3, 9, 21, 1, 1, 21, 21, 1, NULL, NULL, NULL),
+(52, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Pre Quarter Finals', '2025-01-21', '13', NULL, 16, 12, 1, 2, 21, 2, 2, 21, 2, 21, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -214,7 +223,7 @@ CREATE TABLE `players` (
   `dob` date NOT NULL,
   `age` int(11) NOT NULL,
   `sex` enum('M','F') NOT NULL,
-  `uid` varchar(100) NOT NULL,
+  `uid` int(11) NOT NULL,
   `password` varchar(255) NOT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -227,25 +236,28 @@ CREATE TABLE `players` (
 --
 
 INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `password`, `created_by`, `updated_at`, `category_id`, `created_at`) VALUES
-(1, 'Sreesha', '2008-01-01', 16, 'F', '3', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
-(2, 'Eric James', '2009-05-02', 15, 'M', '1', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
-(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
-(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
-(6, 'Lee Chong Wei', '1980-01-03', 44, 'M', '5', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
-(9, 'Lakshaya', '2010-01-01', 15, 'F', '10', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(10, 'Gokulan', '1990-01-01', 35, 'M', '9', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(11, 'Zanpear', '1978-05-01', 46, 'M', '6', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(12, 'Pandyraj', '1968-01-01', 57, 'M', '7', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 20, '2025-01-19 07:43:12'),
-(13, 'Vijay', '1970-01-30', 54, 'M', '8', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', '11', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(15, 'An Se Young', '2000-01-01', 25, 'F', '13', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(16, 'Okuhara', '1998-01-01', 27, 'F', '14', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(17, 'Anitha Anthony', '2008-01-01', 17, 'F', '15', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(18, 'Carolina', '1995-06-06', 29, 'F', '16', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(19, 'PV Sindhu', '1995-06-07', 29, 'F', '12', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(20, 'Victor Axelsen', '1995-05-07', 29, 'M', '17', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(21, 'Lin Dan', '1986-02-06', 38, 'M', '18', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
-(22, 'Player', '2025-01-17', 0, 'M', '19', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', NULL, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12');
+(1, 'Sreesha', '2008-01-01', 16, 'F', 3, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
+(2, 'Eric James', '2009-05-02', 15, 'M', 1, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
+(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', 2, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
+(4, 'Lakshmita', '2011-01-01', 13, 'F', 4, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
+(6, 'Lee Chong Wei', '1980-01-03', 44, 'M', 5, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-19 07:43:12'),
+(9, 'Lakshaya', '2010-01-01', 15, 'F', 10, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(10, 'Gokulan', '1990-01-01', 35, 'M', 9, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(11, 'Zanpear', '1978-05-01', 46, 'M', 6, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(12, 'Pandyraj', '1968-01-01', 57, 'M', 7, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 20, '2025-01-19 07:43:12'),
+(13, 'Vijay', '1970-01-30', 54, 'M', 8, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', 11, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(15, 'An Se Young', '2000-01-01', 25, 'F', 13, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(16, 'Okuhara', '1998-01-01', 27, 'F', 14, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(17, 'Anitha Anthony', '2008-01-01', 17, 'F', 15, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(18, 'Carolina', '1995-06-06', 29, 'F', 16, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(19, 'PV Sindhu', '1995-06-07', 29, 'F', 12, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(20, 'Victor Axelsen', '1995-05-07', 29, 'M', 17, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(21, 'Lin Dan', '1986-02-06', 38, 'M', 18, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-19 07:43:12'),
+(22, 'Player', '2000-06-06', 24, 'M', 19, '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', NULL, '2025-01-19 10:05:07', 1, '2025-01-19 07:43:12'),
+(25, 'Playertwo', '1994-05-09', 30, 'M', 100, '$2y$10$d5IWpbP2No9zZsgA2n.4vOiuGXIPeT3YTyPMr4GmBnKS7xhR9SPFq', NULL, '2025-01-19 10:08:26', 1, '2025-01-19 10:08:26'),
+(26, 'pthree', '1998-05-04', 26, 'M', 101, '$2y$10$YWuR5YIwt8VpQqhIYK2l8.E0LMz2wVwfkAp1ar2hVoXg5VDlda4.y', NULL, '2025-01-19 10:29:49', 1, '2025-01-19 10:29:49'),
+(27, 'pfive', '1999-12-27', 25, 'M', 102, '$2y$10$vHXgPAeJUKD1UCevkXIAwOeyTC7SrSwp.C9rLBDiZi52YUe2QD8DS', NULL, '2025-01-19 12:18:31', 1, '2025-01-19 10:35:46');
 
 -- --------------------------------------------------------
 
@@ -381,7 +393,7 @@ CREATE TABLE `tournament_moderators` (
 --
 
 INSERT INTO `tournament_moderators` (`id`, `tournament_id`, `user_id`) VALUES
-(2, 1, 4),
+(18, 1, 4),
 (1, 1, 6),
 (7, 2, 6),
 (5, 6, 4),
@@ -487,7 +499,9 @@ ALTER TABLE `match_details`
 --
 ALTER TABLE `players`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uid` (`uid`);
+  ADD UNIQUE KEY `uid` (`uid`),
+  ADD UNIQUE KEY `uid_2` (`uid`),
+  ADD UNIQUE KEY `uid_3` (`uid`);
 
 --
 -- Indexes for table `player_access`
@@ -561,7 +575,7 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `match_details`
@@ -573,7 +587,7 @@ ALTER TABLE `match_details`
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `player_access`
@@ -597,7 +611,7 @@ ALTER TABLE `tournament_categories`
 -- AUTO_INCREMENT for table `tournament_moderators`
 --
 ALTER TABLE `tournament_moderators`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `users`
