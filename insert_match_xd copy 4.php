@@ -5,13 +5,12 @@ error_reporting(E_ALL);
 
 include 'header.php';
 require 'auth.php';
-redirect_if_not_logged_in();
+ redirect_if_not_logged_in();
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-$userId = $_SESSION['user_id']; // Assuming user_id is stored in the session after login
 $message = '';
 $lockedTournament = $_SESSION['locked_tournament'] ?? null;
 
@@ -20,17 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lockedTournament = intval($_POST['tournament_id']);
         $_SESSION['locked_tournament'] = $lockedTournament;
 
-        $stmt = $conn->prepare("SELECT name FROM tournaments WHERE id = ? AND (created_by = ? OR id IN (SELECT tournament_id FROM tournament_moderators WHERE user_id = ?))");
-        $stmt->bind_param("iii", $lockedTournament, $userId, $userId);
+        $stmt = $conn->prepare("SELECT name FROM tournaments WHERE id = ?");
+        $stmt->bind_param("i", $lockedTournament);
         $stmt->execute();
         $stmt->bind_result($lockedTournamentName);
-        if ($stmt->fetch()) {
-            $_SESSION['locked_tournament_name'] = $lockedTournamentName;
-            $message = "Tournament locked: " . htmlspecialchars($lockedTournamentName);
-        } else {
-            $message = "Unauthorized access to the selected tournament.";
-            unset($_SESSION['locked_tournament']);
-        }
+        $stmt->fetch();
+        $_SESSION['locked_tournament_name'] = $lockedTournamentName;
         $stmt->close();
     } elseif (isset($_POST['unlock_tournament'])) {
         unset($_SESSION['locked_tournament'], $_SESSION['locked_tournament_name']);
@@ -85,32 +79,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$tournaments = $conn->prepare("SELECT id, name FROM tournaments 
-    WHERE created_by = ? OR id IN (SELECT tournament_id FROM tournament_moderators WHERE user_id = ?)");
-$tournaments->bind_param("ii", $userId, $userId);
-$tournaments->execute();
-$tournamentResults = $tournaments->get_result();
+$tournaments = $conn->query("SELECT id, name FROM tournaments");
 
 if ($lockedTournament) {
     $stmt = $conn->prepare("
         SELECT c.id, c.name, c.age_group, c.sex 
         FROM categories c 
         INNER JOIN tournament_categories tc ON c.id = tc.category_id 
-        WHERE tc.tournament_id = ? AND c.name LIKE '%XD%'
+        WHERE tc.tournament_id = ? 
+        AND c.name LIKE '%XD%'
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
     $categories = $stmt->get_result();
     $stmt->close();
 } else {
-    $categories = [];
+    $categories = $conn->query("
+        SELECT id, name, age_group, sex 
+        FROM categories 
+        WHERE name LIKE '%XD%'
+    ");
 }
 
+$players = $conn->query("SELECT id, name, dob, sex FROM players");
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Insert Girls Doubles Match</title>
+    <title>Insert Doubles Match</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -180,32 +177,10 @@ if ($lockedTournament) {
             color: #721c24;
         }
     </style>
-    <script>
-        function loadPlayers(categoryId) {
-            if (!categoryId) return;
-
-            fetch(`get_players.php?category_id=${categoryId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const playerSelects = ['team1_player1_id', 'team1_player2_id', 'team2_player1_id', 'team2_player2_id'];
-                    playerSelects.forEach(selectId => {
-                        const select = document.getElementById(selectId);
-                        select.innerHTML = '<option value="">Select Player</option>';
-                        data.forEach(player => {
-                            const option = document.createElement('option');
-                            option.value = player.id;
-                            option.textContent = `${player.name} (${player.age} years, ${player.sex})`;
-                            select.appendChild(option);
-                        });
-                    });
-                })
-                .catch(error => console.error('Error fetching players:', error));
-        }
-    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Insert Girls Doubles Match</h1>
+        <h1>Insert Doubles Match</h1>
         <?php if ($message): ?>
             <p class="message <?= strpos($message, 'success') !== false ? 'success' : 'error' ?>">
                 <?= htmlspecialchars($message) ?>
@@ -217,7 +192,7 @@ if ($lockedTournament) {
                 <label for="tournament_id">Select Tournament:</label>
                 <select name="tournament_id" id="tournament_id" required>
                     <option value="">Select Tournament</option>
-                    <?php while ($row = $tournamentResults->fetch_assoc()): ?>
+                    <?php while ($row = $tournaments->fetch_assoc()): ?>
                         <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
                     <?php endwhile; ?>
                 </select>
@@ -230,10 +205,9 @@ if ($lockedTournament) {
             </form>
         <?php endif; ?>
 
-        <?php if ($lockedTournament): ?>
         <form method="post">
             <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" required onchange="loadPlayers(this.value)">
+            <select name="category_id" id="category_id" required>
                 <option value="">Select Category</option>
                 <?php while ($row = $categories->fetch_assoc()): ?>
                     <option value="<?= $row['id'] ?>">
@@ -243,16 +217,64 @@ if ($lockedTournament) {
             </select>
 
             <label for="team1_player1_id">Team 1 - Player 1:</label>
-            <select name="team1_player1_id" id="team1_player1_id" required></select>
+            <select name="team1_player1_id" id="team1_player1_id" required>
+                <option value="">Select Player</option>
+                <?php 
+                $currentYear = date('Y');
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
             <label for="team1_player2_id">Team 1 - Player 2:</label>
-            <select name="team1_player2_id" id="team1_player2_id" required></select>
+            <select name="team1_player2_id" id="team1_player2_id" required>
+                <option value="">Select Player</option>
+                <?php 
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
             <label for="team2_player1_id">Team 2 - Player 1:</label>
-            <select name="team2_player1_id" id="team2_player1_id" required></select>
+            <select name="team2_player1_id" id="team2_player1_id" required>
+                <option value="">Select Player</option>
+                <?php 
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
             <label for="team2_player2_id">Team 2 - Player 2:</label>
-            <select name="team2_player2_id" id="team2_player2_id" required></select>
+            <select name="team2_player2_id" id="team2_player2_id" required>
+                <option value="">Select Player</option>
+                <?php 
+                $players->data_seek(0);
+                while ($player = $players->fetch_assoc()): 
+                    $dobYear = date('Y', strtotime($player['dob']));
+                    $age = $currentYear - $dobYear;
+                ?>
+                    <option value="<?= $player['id'] ?>">
+                        <?= htmlspecialchars($player['name']) ?> (<?= $age ?> years, <?= ucfirst($player['sex']) ?>)
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
             <label for="stage">Match Stage:</label>
             <select name="stage" id="stage" required>
@@ -288,7 +310,6 @@ if ($lockedTournament) {
 
             <button type="submit">Add Match</button>
         </form>
-        <?php endif; ?>
     </div>
 </body>
 </html>
