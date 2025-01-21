@@ -105,7 +105,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch tournaments created or moderated by the logged-in user
-$tournaments = $conn->prepare("SELECT id, name FROM tournaments 
+$tournaments = $conn->prepare("
+    SELECT id, name 
+    FROM tournaments 
     WHERE created_by = ? OR id IN (SELECT tournament_id FROM tournament_moderators WHERE user_id = ?)
 ");
 $tournaments->bind_param("ii", $userId, $userId);
@@ -117,7 +119,7 @@ if ($lockedTournament) {
         SELECT c.id, c.name, c.age_group, c.sex 
         FROM categories c 
         INNER JOIN tournament_categories tc ON c.id = tc.category_id 
-        WHERE tc.tournament_id = ? AND c.name LIKE '%GD%'
+        WHERE tc.tournament_id = ? AND c.name LIKE '%BD%'
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
@@ -130,7 +132,7 @@ if ($lockedTournament) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Insert Girls Doubles Match</title>
+    <title>Insert Boys Doubles Match</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -208,7 +210,7 @@ if ($lockedTournament) {
 </head>
 <body>
     <div class="container">
-        <h1>Insert Girls Doubles Match</h1>
+        <h1>Insert Boys Doubles Match</h1>
         <?php if ($message): ?>
             <p><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
