@@ -3,12 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-<<<<<<< HEAD
-require_once 'conn.php';
-=======
 //require_once 'permissions.php';
 // require_once 'conn.php';
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
 include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -19,31 +15,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 $message = '';
 $lockedTournament = $_SESSION['locked_tournament'] ?? null;
-<<<<<<< HEAD
-$username = $_SESSION['username'];
 
-// Get logged-in user's ID
-$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$stmt->bind_result($loggedInUserId);
-$stmt->fetch();
-$stmt->close();
-
-// Fetch tournaments where the user is either the **creator** or **moderator**
-$tournaments = $conn->prepare("
-    SELECT id, name FROM tournaments 
-    WHERE created_by = ? OR moderated_by = ?
-");
-$tournaments->bind_param("ii", $loggedInUserId, $loggedInUserId);
-$tournaments->execute();
-$tournamentResult = $tournaments->get_result();
-$tournaments->close();
-
-// Handle tournament locking and match insertions
-=======
-
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['lock_tournament'])) {
         $lockedTournament = intval($_POST['tournament_id']);
@@ -60,25 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['locked_tournament'], $_SESSION['locked_tournament_name']);
         $lockedTournament = null;
     } else {
-<<<<<<< HEAD
-        // **Match Insertion**
-=======
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
         $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
         $category_id = $_POST['category_id'];
         $player1_id = $_POST['player1_id'];
         $player2_id = $_POST['player2_id'];
-<<<<<<< HEAD
-        $stage = $_POST['stage'] ?? 'Pre Quarter Finals';
-        $date = $_POST['date'];
-        $match_time = $_POST['time'];
-
-        // Prevent Undefined Array Key Warnings
-        $set1_p1 = $_POST['set1_player1_points'] ?? 0;
-        $set1_p2 = $_POST['set1_player2_points'] ?? 0;
-        $set2_p1 = $_POST['set2_player1_points'] ?? 0;
-        $set2_p2 = $_POST['set2_player2_points'] ?? 0;
-=======
         $stage = $_POST['stage'];
         $date = $_POST['date'];
         $match_time = $_POST['time'];
@@ -86,18 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $set1_p2 = $_POST['set1_player2_points'];
         $set2_p1 = $_POST['set2_player1_points'];
         $set2_p2 = $_POST['set2_player2_points'];
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
         $set3_p1 = $_POST['set3_player1_points'] ?? 0;
         $set3_p2 = $_POST['set3_player2_points'] ?? 0;
 
         $stmt = $conn->prepare("
             INSERT INTO matches (
                 tournament_id, category_id, player1_id, player2_id, stage, 
-<<<<<<< HEAD
-                match_date, match_time, set1_player1_points, set1_player2_points, 
-=======
                 date, match_time, set1_player1_points, set1_player2_points, 
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
                 set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
             ) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -117,15 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-<<<<<<< HEAD
-// Fetch categories for the locked tournament
-$categories = [];
-=======
 // Fetch tournaments
 $tournaments = $conn->query("SELECT id, name FROM tournaments");
 
 // Fetch categories for the locked tournament
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
 if ($lockedTournament) {
     $stmt = $conn->prepare("
         SELECT c.id, c.name, c.age_group, c.sex 
@@ -137,19 +84,12 @@ if ($lockedTournament) {
     $stmt->execute();
     $categories = $stmt->get_result();
     $stmt->close();
-<<<<<<< HEAD
-}
-
-// Fetch players
-$players = $conn->query("SELECT id, name FROM players");
-=======
 } else {
     $categories = $conn->query("SELECT id, name, age_group, sex FROM categories");
 }
 
 // Fetch players
 $players = $conn->query("SELECT id, name, dob, sex FROM players");
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
 ?>
 
 <!DOCTYPE html>
@@ -159,20 +99,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
     <style>
         body {
             font-family: Arial, sans-serif;
-<<<<<<< HEAD
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-=======
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
@@ -186,7 +112,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
         }
 
         h1 {
@@ -195,17 +120,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
         }
 
         label {
-<<<<<<< HEAD
-            font-weight: bold;
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-=======
             display: block;
             margin: 10px 0 5px;
             font-weight: bold;
@@ -215,27 +129,15 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
             border: 1px solid #ccc;
             border-radius: 5px;
         }
 
         button {
-<<<<<<< HEAD
-            width: 100%;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-=======
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
         }
 
         button:hover {
@@ -244,14 +146,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 
         .message {
             text-align: center;
-<<<<<<< HEAD
-            font-weight: bold;
-            color: green;
-        }
-    </style>
-</head>
-<body>
-=======
             margin-bottom: 20px;
             color: #28a745;
             font-weight: bold;
@@ -341,7 +235,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 </head>
 <body>
  
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
     <div class="container">
         <h1>Insert Match</h1>
         <?php if ($message): ?>
@@ -353,11 +246,7 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
                 <label for="tournament_id">Select Tournament:</label>
                 <select name="tournament_id" id="tournament_id" required>
                     <option value="">Select Tournament</option>
-<<<<<<< HEAD
-                    <?php while ($row = $tournamentResult->fetch_assoc()): ?>
-=======
                     <?php while ($row = $tournaments->fetch_assoc()): ?>
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
                         <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
                     <?php endwhile; ?>
                 </select>
@@ -365,44 +254,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
             </form>
         <?php else: ?>
             <form method="post">
-<<<<<<< HEAD
-                <p>Locked Tournament: <strong><?= htmlspecialchars($_SESSION['locked_tournament_name'] ?? '') ?></strong></p>
-                <button type="submit" name="unlock_tournament">Unlock Tournament</button>
-            </form>
-
-            <form method="post">
-                <label for="category_id">Category:</label>
-                <select name="category_id" required>
-                    <option value="">Select Category</option>
-                    <?php while ($row = $categories->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                    <?php endwhile; ?>
-                </select>
-
-                <label for="player1_id">Player 1:</label>
-                <select name="player1_id" required>
-                    <?php while ($row = $players->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                    <?php endwhile; ?>
-                </select>
-
-                <label for="player2_id">Player 2:</label>
-                <select name="player2_id" required>
-                    <?php $players->data_seek(0); while ($row = $players->fetch_assoc()): ?>
-                        <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></option>
-                    <?php endwhile; ?>
-                </select>
-
-                <label for="date">Match Date:</label>
-                <input type="date" name="date" required>
-
-                <label for="match_time">Match Time:</label>
-                <input type="time" name="time" required>
-
-                <button type="submit">Add Match</button>
-            </form>
-        <?php endif; ?>
-=======
                 <p>Locked Tournament: <?= htmlspecialchars($_SESSION['locked_tournament_name'] ?? '') ?></p>
                 <button type="submit" name="unlock_tournament">Unlock Tournament</button>
             </form>
@@ -463,7 +314,6 @@ $players = $conn->query("SELECT id, name, dob, sex FROM players");
 
             <button type="submit">Add Match</button>
         </form>
->>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
     </div>
 </body>
 </html>
