@@ -27,8 +27,12 @@ $stmt->close();
 
 // Fetch tournaments where the user is either the creator or moderator
 $tournamentsQuery = "
-    SELECT id, name FROM tournaments 
-    WHERE created_by = ? OR moderated_by = ?";
+ 
+    SELECT t.id, t.name 
+    FROM tournaments t
+    LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
+    WHERE t.created_by = ? OR tm.user_id = ?";
+
 $tournaments = $conn->prepare($tournamentsQuery);
 $tournaments->bind_param("ii", $loggedInUserId, $loggedInUserId);
 $tournaments->execute();
@@ -58,7 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
     $player2Id = intval($_POST['player2_id']);
     $stage = $_POST['stage'];
     $matchDate = $_POST['date'];
-    $matchTime = $_POST['match_time'];
+    // $matchTime = $_POST['match_time'];
+    $matchTime = date("H:i:s", strtotime($_POST['match_time']));
     $set1P1 = intval($_POST['set1_player1_points']);
     $set1P2 = intval($_POST['set1_player2_points']);
     $set2P1 = intval($_POST['set2_player1_points']);
