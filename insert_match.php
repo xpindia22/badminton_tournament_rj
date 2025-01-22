@@ -57,13 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
+    
     $categoryId = intval($_POST['category_id']);
     $player1Id = intval($_POST['player1_id']);
     $player2Id = intval($_POST['player2_id']);
     $stage = $_POST['stage'];
     $matchDate = $_POST['date'];
-    // $matchTime = !empty($_POST['match_time']) ? date("H:i", strtotime($_POST['match_time'])) : NULL;
-    $matchTime = !empty($_POST['match_time']) ? date("H:i", strtotime($_POST['match_time'])) : NULL;
+    $matchTime = !empty($_POST['match_time']) ? date("H:i:s", strtotime($_POST['match_time'])) : NULL;
+
+
 
     // Debugging
     error_log("DEBUG: match_time = " . $matchTime);
@@ -82,30 +84,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
             $message = "Players cannot be the same.";
         } else {
             $stmt = $conn->prepare("
-                INSERT INTO matches 
-                (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, 
-                set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, 
-                set3_player1_points, set3_player2_points) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-
-            if ($stmt) {
-                $stmt->bind_param("iiiissiiiiiii", 
-                    $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
-                    $matchDate, $matchTime, 
-                    $set1P1, $set1P2, $set2P1, $set2P2, 
-                    $set3P1, $set3P2
-                );
-
-                if ($stmt->execute()) {
-                    $message = "Match successfully added!";
-                } else {
-                    $message = "Error inserting match: " . $stmt->error;
-                }
-                $stmt->close();
+            INSERT INTO matches 
+            (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, 
+            set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, 
+            set3_player1_points, set3_player2_points) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        
+        if ($stmt) {
+            $stmt->bind_param("iiiissiiiiiii", 
+                $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
+                $matchDate, $matchTime, 
+                $set1P1, $set1P2, $set2P1, $set2P2, 
+                $set3P1, $set3P2
+            );
+        
+            if ($stmt->execute()) {
+                $message = "Match successfully added!";
             } else {
-                $message = "SQL Prepare Error: " . $conn->error;
+                $message = "Error inserting match: " . $stmt->error;
             }
+            $stmt->close();
+        } else {
+            $message = "SQL Prepare Error: " . $conn->error;
+        }
+        
         }
     } else {
         $message = "All fields are required!";
@@ -136,13 +139,13 @@ while ($row = $playerResult->fetch_assoc()) {
     $players[] = $row;
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Singles Match</title>
+ 
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -243,7 +246,7 @@ while ($row = $playerResult->fetch_assoc()) {
         <select name="stage" required>
             <option value="Pre Quarter Finals">Pre Quarter Finals</option>
             <option value="Quarter Finals">Quarter Finals</option>
-            <option value="Semi Finals">Semi Finals</option>
+            <option value="Semifinals">Semi Finals</option>
             <option value="Finals">Finals</option>
         </select>
 
@@ -251,7 +254,8 @@ while ($row = $playerResult->fetch_assoc()) {
         <input type="date" name="date" required>
 
         <label for="match_time">Match Time (24-hour format HH:MM):</label>
-        <input type="time" name="match_time" step="60" required>
+        <input type="time" name="match_time" value="<?= isset($_POST['match_time']) ? $_POST['match_time'] : '' ?>" required>
+
 
 
         <label>Set 1:</label>

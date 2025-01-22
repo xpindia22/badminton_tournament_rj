@@ -47,18 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $set3_p2 = $_POST['set3_player2_points'] ?? 0;
 
         $stmt = $conn->prepare("
-            INSERT INTO matches (
-                tournament_id, category_id, player1_id, player2_id, stage, 
-                date, match_time, set1_player1_points, set1_player2_points, 
-                set2_player1_points, set2_player2_points, set3_player1_points, set3_player2_points
-            ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->bind_param(
-            "iiiisssiiiiii",
-            $tournament_id, $category_id, $player1_id, $player2_id, $stage,
-            $date, $match_time, $set1_p1, $set1_p2, $set2_p1, $set2_p2, $set3_p1, $set3_p2
-        );
+        INSERT INTO matches 
+        (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, 
+        set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, 
+        set3_player1_points, set3_player2_points) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    
+    $stmt->bind_param("iiiissiiiiiii", 
+        $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
+        $matchDate, $matchTime, 
+        $set1P1, $set1P2, $set2P1, $set2P2, 
+        $set3P1, $set3P2
+    );
+    
 
         if ($stmt->execute()) {
             $message = "Match added successfully!";
