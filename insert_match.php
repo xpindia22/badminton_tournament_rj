@@ -27,12 +27,10 @@ $stmt->close();
 
 // Fetch tournaments where the user is either the creator or moderator
 $tournamentsQuery = "
- 
     SELECT t.id, t.name 
     FROM tournaments t
     LEFT JOIN tournament_moderators tm ON t.id = tm.tournament_id
     WHERE t.created_by = ? OR tm.user_id = ?";
-
 $tournaments = $conn->prepare($tournamentsQuery);
 $tournaments->bind_param("ii", $loggedInUserId, $loggedInUserId);
 $tournaments->execute();
@@ -56,20 +54,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lockedTournament = null;
     }
 }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
-    
     $categoryId = intval($_POST['category_id']);
     $player1Id = intval($_POST['player1_id']);
     $player2Id = intval($_POST['player2_id']);
     $stage = $_POST['stage'];
     $matchDate = $_POST['date'];
-    $matchTime = !empty($_POST['match_time']) ? date("H:i:s", strtotime($_POST['match_time'])) : NULL;
 
+    // FIX: Append ":00" to ensure "HH:MM:SS" format
+    $matchTime = !empty($_POST['match_time']) 
+        ? $_POST['match_time'] . ':00' 
+        : NULL;
 
-
-    // Debugging
-    error_log("DEBUG: match_time = " . $matchTime);
-
+    // Debugging logs
+    error_log("DEBUG: Raw match_time input = '" . $_POST['match_time'] . "'");
+    error_log("DEBUG: Processed match_time for DB = '" . $matchTime . "'");
 
     $set1P1 = intval($_POST['set1_player1_points']);
     $set1P2 = intval($_POST['set1_player2_points']);
@@ -84,37 +84,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
             $message = "Players cannot be the same.";
         } else {
             $stmt = $conn->prepare("
-            INSERT INTO matches 
-            (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, 
-            set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, 
-            set3_player1_points, set3_player2_points) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        
-        if ($stmt) {
-            $stmt->bind_param("iiiissiiiiiii", 
-                $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
-                $matchDate, $matchTime, 
-                $set1P1, $set1P2, $set2P1, $set2P2, 
-                $set3P1, $set3P2
-            );
-        
-            if ($stmt->execute()) {
-                $message = "Match successfully added!";
+                INSERT INTO matches 
+                (tournament_id, category_id, player1_id, player2_id, stage, match_date, match_time, 
+                 set1_player1_points, set1_player2_points, set2_player1_points, set2_player2_points, 
+                 set3_player1_points, set3_player2_points) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+
+            if ($stmt) {
+                $stmt->bind_param("iiiissiiiiiii", 
+                    $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
+                    $matchDate, $matchTime, 
+                    $set1P1, $set1P2, $set2P1, $set2P2, 
+                    $set3P1, $set3P2
+                );
+
+                // Debug the exact query
+                error_log("DEBUG: SQL Query => INSERT INTO matches (...) VALUES 
+                ($lockedTournament, $categoryId, $player1Id, $player2Id, '$stage', '$matchDate', '$matchTime', 
+                 $set1P1, $set1P2, $set2P1, $set2P2, $set3P1, $set3P2)");
+
+                if ($stmt->execute()) {
+                    $message = "Match successfully added!";
+                } else {
+                    $message = "Error inserting match: " . $stmt->error;
+                }
+                $stmt->close();
             } else {
-                $message = "Error inserting match: " . $stmt->error;
+                $message = "SQL Prepare Error: " . $conn->error;
             }
-            $stmt->close();
-        } else {
-            $message = "SQL Prepare Error: " . $conn->error;
-        }
-        
         }
     } else {
         $message = "All fields are required!";
     }
 }
-
 
 // Fetch only BS & GS categories from the locked tournament
 $categories = [];
@@ -123,7 +126,8 @@ if ($lockedTournament) {
         SELECT c.id, c.name, c.age_group, c.sex 
         FROM categories c
         INNER JOIN tournament_categories tc ON c.id = tc.category_id
-        WHERE tc.tournament_id = ? AND (c.name LIKE '%BS%' OR c.name LIKE '%GS%')
+        WHERE tc.tournament_id = ? 
+          AND (c.name LIKE '%BS%' OR c.name LIKE '%GS%')
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
@@ -145,57 +149,35 @@ while ($row = $playerResult->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Singles Match</title>
- 
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
         .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
+            max-width: 600px; margin: 20px auto; padding: 20px;
+            background: white; border-radius: 8px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            text-align: center;
-            color: #444;
-        }
+        h1 { text-align: center; color: #444; }
         label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
+            display: block; margin: 10px 0 5px; font-weight: bold;
         }
         select, input, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            width: 100%; padding: 10px; margin-bottom: 15px;
+            border: 1px solid #ccc; border-radius: 5px;
         }
         button {
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
+            background-color: #007bff; color: white;
+            font-size: 16px; border: none; cursor: pointer;
             padding: 12px;
         }
-        button.locked {
-            background-color: #28a745;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+        button.locked { background-color: #28a745; }
+        button:hover { background-color: #0056b3; }
         .message {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #28a745;
-            font-weight: bold;
+            text-align: center; margin-bottom: 20px;
+            color: #28a745; font-weight: bold;
         }
     </style>
 </head>
@@ -230,7 +212,9 @@ while ($row = $playerResult->fetch_assoc()) {
         <select name="category_id" id="category_id" onchange="updatePlayerDropdown()" required>
             <option value="">Select Category</option>
             <?php while ($row = $categories->fetch_assoc()): ?>
-                <option value="<?= $row['id'] ?>" data-sex="<?= $row['sex'] ?>" data-age="<?= $row['age_group'] ?>">
+                <option value="<?= $row['id'] ?>" 
+                        data-sex="<?= $row['sex'] ?>" 
+                        data-age="<?= $row['age_group'] ?>">
                     <?= htmlspecialchars($row['name']) ?>
                 </option>
             <?php endwhile; ?>
@@ -254,9 +238,9 @@ while ($row = $playerResult->fetch_assoc()) {
         <input type="date" name="date" required>
 
         <label for="match_time">Match Time (24-hour format HH:MM):</label>
-        <input type="time" name="match_time" value="<?= isset($_POST['match_time']) ? $_POST['match_time'] : '' ?>" required>
-
-
+        <input type="time" name="match_time" 
+               value="<?= isset($_POST['match_time']) ? $_POST['match_time'] : '' ?>"
+               required>
 
         <label>Set 1:</label>
         <input type="number" name="set1_player1_points" placeholder="Player 1 Score" required>
@@ -271,7 +255,6 @@ while ($row = $playerResult->fetch_assoc()) {
         <input type="number" name="set3_player2_points" placeholder="Player 2 Score">
 
         <button type="submit" name="add_match">Add Match</button>
- 
     </form>
     <?php endif; ?>
 </div>
