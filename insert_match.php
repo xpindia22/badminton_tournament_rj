@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
             ");
 
             if ($stmt) {
-                $stmt->bind_param("iiiissiiiiiii", 
+                $stmt->bind_param("iiiisssiiiiii",
                     $lockedTournament, $categoryId, $player1Id, $player2Id, $stage, 
                     $matchDate, $matchTime, 
                     $set1P1, $set1P2, $set2P1, $set2P2, 
