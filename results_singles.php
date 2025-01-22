@@ -41,7 +41,8 @@ $tournaments = $conn->query("SELECT id, name FROM tournaments");
 $categories = $conn->query("SELECT id, name FROM categories");
 $players = $conn->query("SELECT id, name FROM players");
 $dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
-$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
+$datetimes = $conn->query("SELECT DISTINCT TIME_FORMAT(match_time, '%h:%i %p') AS formatted_time FROM matches ORDER BY match_time");
+
 
 // Build the query with optional filters
 $query = "
@@ -167,8 +168,9 @@ $result = $conn->query($query);
             <option value="">All Times</option>
             <?php while ($row = $datetimes->fetch_assoc()): ?>
                 <option value="<?= $row['match_time'] ?>" <?= $datetime == $row['match_time'] ? 'selected' : '' ?>>
-                    <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
-                </option>
+                <?= $row['match_time'] ? date("h:i A", strtotime($row['match_time'])) : 'N/A' ?>
+            </option>
+
             <?php endwhile; ?>
         </select>
 

@@ -62,14 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_match'])) {
     $player2Id = intval($_POST['player2_id']);
     $stage = $_POST['stage'];
     $matchDate = $_POST['date'];
-    // $matchTime = $_POST['match_time'];
-    $matchTime = date("H:i:s", strtotime($_POST['match_time']));
+    // $matchTime = !empty($_POST['match_time']) ? date("H:i", strtotime($_POST['match_time'])) : NULL;
+    $matchTime = !empty($_POST['match_time']) ? date("H:i", strtotime($_POST['match_time'])) : NULL;
+
+    // Debugging
+    error_log("DEBUG: match_time = " . $matchTime);
+
+
     $set1P1 = intval($_POST['set1_player1_points']);
     $set1P2 = intval($_POST['set1_player2_points']);
     $set2P1 = intval($_POST['set2_player1_points']);
     $set2P2 = intval($_POST['set2_player2_points']);
-    $set3P1 = isset($_POST['set3_player1_points']) ? intval($_POST['set3_player1_points']) : null;
-    $set3P2 = isset($_POST['set3_player2_points']) ? intval($_POST['set3_player2_points']) : null;
+    $set3P1 = isset($_POST['set3_player1_points']) ? intval($_POST['set3_player1_points']) : NULL;
+    $set3P2 = isset($_POST['set3_player2_points']) ? intval($_POST['set3_player2_points']) : NULL;
 
     if ($categoryId && $player1Id && $player2Id && $stage && $matchDate && $matchTime) {
         // Ensure players are not the same
@@ -245,8 +250,9 @@ while ($row = $playerResult->fetch_assoc()) {
         <label for="date">Match Date:</label>
         <input type="date" name="date" required>
 
-        <label for="match_time">Match Time (12-hour format AM/PM):</label>
-        <input type="time" name="match_time" required>
+        <label for="match_time">Match Time (24-hour format HH:MM):</label>
+        <input type="time" name="match_time" step="60" required>
+
 
         <label>Set 1:</label>
         <input type="number" name="set1_player1_points" placeholder="Player 1 Score" required>
