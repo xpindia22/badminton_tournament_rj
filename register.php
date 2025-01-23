@@ -5,7 +5,7 @@
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
- 
+require_once 'permissions.php'; 
 
 $message = '';
 $username = '';
@@ -102,6 +102,7 @@ if ($is_admin) {
     $users = $result->fetch_all(MYSQLI_ASSOC);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
