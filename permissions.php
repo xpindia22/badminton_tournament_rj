@@ -42,9 +42,9 @@ if (!function_exists('is_player')) {
  *
  * @return bool True if the user is a visitor, false otherwise.
  */
-if (!function_exists('is_visitor')) {
-    function is_visitor() {
-        return !is_admin() && !is_user() && is_player(); // Players are treated as visitors
-    }
-}
+// if (!function_exists('is_visitor')) {
+//     function is_visitor() {
+//         return !is_admin() && !is_user() && is_player(); // Players are treated as visitors
+//     }
+// }
 ?>
