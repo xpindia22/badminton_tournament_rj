@@ -9,20 +9,12 @@ if (session_status() === PHP_SESSION_NONE) {
 // Determine the logged-in user's name or default to 'Guest'
 $logged_in_user = 'Guest';
 
-// Initialize role
-$user_role = 'guest'; // Default role
-
 if (isset($_SESSION['username'])) {
     $logged_in_user = $_SESSION['username']; // For admins and users
-    
-    // Check if role is set in session
-    if (isset($_SESSION['role'])) {
-        $user_role = $_SESSION['role'];
-    }
 } elseif (isset($_SESSION['player_name'])) {
     $logged_in_user = $_SESSION['player_name']; // For players
-    $user_role = 'player'; // Assign a role for players if necessary
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -115,21 +107,19 @@ if (isset($_SESSION['username'])) {
             <a href="register.php">Register Tournament Manager</a>
             <a href="register_player.php">Register Player</a>
 
-            <?php if ($user_role === 'admin'): ?>
-                <!-- Dropdown: Admin Zone (Only Visible to Admins) -->
-                <div class="dropdown">
-                    <a href="#">Admin Zone</a>
-                    <div class="dropdown-content">
-                        <a href="register_user_adminaccess.php">Register Tournament Manager</a>
-                        <a href="register_player.php">Register Player</a>
-                        <a href="edit_register_player.php">Edit Player</a>
-                        <a href="insert_match.php">Insert Match</a> 
-                        <a href="insert_category.php">Insert Category</a> 
-                        <a href="add_moderator.php">Add Moderator</a>
-                        <a href="insert_tournament.php">Insert Tournament</a>
-                    </div>
+            <!-- Dropdown: Admin Zone (Only Visible to Admins) -->
+            <div class="dropdown">
+                <a href="#">Admin Zone</a>
+                <div class="dropdown-content">
+                    <a href="register_user_adminaccess.php">Register Tournament Manager</a>
+                    <a href="register_player.php">Register Player</a>
+                    <a href="edit_register_player.php">Edit Player</a>
+                    <a href="insert_match.php">Insert Match</a> 
+                    <a href="insert_category.php">Insert Category</a> 
+                    <a href="add_moderator.php">Add Moderator</a>
+                    <a href="insert_tournament.php">Insert Tournament</a>
                 </div>
-            <?php endif; ?>
+            </div>
 
             <!-- Dropdown: Singles Matches -->
             <div class="dropdown">
