@@ -99,31 +99,6 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doubles Rankings</title>
-    <style>
-        body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    line-height: 1.5;
-}
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
     <h1>Doubles Rankings</h1>

@@ -94,14 +94,6 @@ $result = $conn->query($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Tournament Results</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        form { margin-bottom: 20px; }
-        label, select, button { margin-right: 10px; }
-    </style>
 </head>
 <body>
     <h1>All Tournament Results</h1>

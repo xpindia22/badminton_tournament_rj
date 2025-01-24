@@ -4,7 +4,6 @@
 // edit_results_doubles.php
 include 'header.php';
 require_once 'conn.php';
-////require_once 'permissions.php';
 
 require 'auth.php';
 redirect_if_not_logged_in();
@@ -135,42 +134,7 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doubles Match Results</title>
-    <style>
-    body { 
-        font-family: Arial, sans-serif; 
-        margin: 0px; 
-    }
-    table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        margin: 20px 0; 
-    }
-    th, td { 
-        border: 1px solid #ddd; 
-        padding: 8px; 
-        text-align: center; 
-        vertical-align: middle; 
-    }
-    th { 
-        background-color: #f4f4f4; 
-    }
-    form { 
-        margin-bottom: 20px; 
-    }
-    label, select, button { 
-        margin-right: 10px; 
-    }
-    td.team-column { 
-        width: 25%; /* Wider column for Team 1 and Team 2 */
-        text-align: left; /* Align text to the left */
-    }
-    td.set-column { 
-        width: 5px; /* Narrow columns for Set 1, Set 2, and Set 3 */
-        text-align: center; /* Center-align text for better appearance */
-    }
-</style>
-
-</head>
+    </head>
 <body>
     <h1>Doubles Match Results</h1>
 

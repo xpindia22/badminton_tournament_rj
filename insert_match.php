@@ -149,37 +149,6 @@ while ($row = $playerResult->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert Singles Match</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0; padding: 0;
-        }
-        .container {
-            max-width: 600px; margin: 20px auto; padding: 20px;
-            background: white; border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 { text-align: center; color: #444; }
-        label {
-            display: block; margin: 10px 0 5px; font-weight: bold;
-        }
-        select, input, button {
-            width: 100%; padding: 10px; margin-bottom: 15px;
-            border: 1px solid #ccc; border-radius: 5px;
-        }
-        button {
-            background-color: #007bff; color: white;
-            font-size: 16px; border: none; cursor: pointer;
-            padding: 12px;
-        }
-        button.locked { background-color: #28a745; }
-        button:hover { background-color: #0056b3; }
-        .message {
-            text-align: center; margin-bottom: 20px;
-            color: #28a745; font-weight: bold;
-        }
-    </style>
 </head>
 <body>
 

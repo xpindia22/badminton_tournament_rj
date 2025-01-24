@@ -131,59 +131,7 @@ if ($lockedTournament) {
 <html>
 <head>
     <title>Insert Girls Doubles Match</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f9fc;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        label, p {
-            font-size: 16px;
-            color: #555;
-        }
-        select, input, button {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 100%;
-        }
-        select:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-    <script>
+       <script>
         function loadPlayers(categoryId) {
             if (!categoryId) return;
 

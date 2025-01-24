@@ -102,6 +102,8 @@ if (isset($_SESSION['username'])) {
             display: block;
         }
     </style>
+        <link rel="stylesheet" type="text/css" href="styles1.css">
+
 </head>
 <body>
     <div class="header">

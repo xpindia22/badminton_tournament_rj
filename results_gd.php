@@ -7,8 +7,6 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'conn.php';
-////require_once 'permissions.php';
-
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
@@ -89,15 +87,7 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Girls Doubles Match Results</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        form { margin-bottom: 20px; }
-        label, select, button { margin-right: 10px; }
-    </style>
-</head>
+    </head>
 <body>
     <h1>Girls Doubles Match Results</h1>
 

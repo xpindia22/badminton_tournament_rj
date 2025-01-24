@@ -28,69 +28,7 @@ $is_visitor = is_visitor();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 900px;
-            margin: 50px auto;
-            padding: 25px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #007BFF;
-            text-align: center;
-        }
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px; /* Added space between cards */
-            justify-content: center;
-            padding: 20px; /* Extra padding */
-        }
-        .card {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 320px; /* Increased width */
-            min-height: 200px;
-        }
-        .btn-primary {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 12px 18px; /* Increased padding */
-            font-size: 16px;
-            color: #fff;
-            background: #007BFF;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background 0.3s ease;
-        }
-        .btn-primary:hover {
-            background: #0056b3;
-        }
-        @media (max-width: 768px) {
-            .card-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            .card {
-                width: 90%; /* Make cards full width on smaller screens */
-            }
-        }
-    </style>
-</head>
+    </head>
 <body>
     <div class="container">
         <!-- <h1>Dashboard</h1> -->
