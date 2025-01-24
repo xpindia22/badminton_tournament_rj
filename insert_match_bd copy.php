@@ -53,14 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $match_date = $match_date ? $match_date->format('Y-m-d') : null;
         }
 
-        // Improved time handling
-        $match_time = !empty($_POST['match_time']) 
-            ? $_POST['match_time'] . ':00' 
-            : NULL;
-
-        error_log("DEBUG: Raw match_time input = '" . $_POST['match_time'] . "'");
-        error_log("DEBUG: Processed match_time for DB = '" . $match_time . "'");
-
+        $match_time = $_POST['time'] ?? null;
         $set1_team1 = $_POST['set1_team1_points'] ?? null;
         $set1_team2 = $_POST['set1_team2_points'] ?? null;
         $set2_team1 = $_POST['set2_team1_points'] ?? null;
@@ -94,12 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 
                 $stmt->bind_param(
-                    "iiiiissssiiiiii",
+                    "iiiiisssiiiiiii",
                     $tournament_id, $category_id, $team1_player1_id, $team1_player2_id,
                     $team2_player1_id, $team2_player2_id, $stage, $match_date, $match_time,
                     $set1_team1, $set1_team2, $set2_team1, $set2_team2, $set3_team1, $set3_team2
                 );
                 
+
                 if ($stmt->execute()) {
                     $message = "Match added successfully!";
                 } else {
@@ -110,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 
 // Fetch tournaments created or moderated by the logged-in user
 $tournaments = $conn->prepare("
@@ -223,9 +216,8 @@ if ($lockedTournament) {
                 <label for="date">Match Date:</label>
                 <input type="date" name="date" id="date" required>
 
-                <label for="match_time">Match Time:</label>
-                <input type="time" name="match_time" id="match_time" required>
-
+                <label for="time">Match Time:</label>
+                <input type="time" name="time" id="time" required>
 
                 <label for="set1_team1_points">Set 1 Team 1 Points:</label>
                 <input type="number" name="set1_team1_points" id="set1_team1_points" required>
