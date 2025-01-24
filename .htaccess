@@ -1,10 +1,26 @@
-# Block direct access to multiple files
+# Enable RewriteEngine
+RewriteEngine On
+
+# Block access to specific PHP files
 <FilesMatch "^(auth\.php|permissions\.php|file2\.php|file3\.php)$">
     Require all denied
 </FilesMatch>
 
-# Block access to multiple folders (zzz, images, zbackup)
-RewriteEngine On
+# Block access to specific directories: zzz, images, zbackup
 RewriteRule ^(zzz|images|zbackup)/ - [F,L]
 
- 
+# RewriteEngine On
+
+# # Redirect /register to register_player.php
+# RewriteRule ^register$ /badminton_tournament/register_player.php [L]
+
+
+RewriteEngine On
+# path tool tip will be not shown
+# Redirect /register to /badminton_tournament/register_player.php
+RewriteRule ^register-player$ /badminton_tournament/register_player.php [L,QSA]
+
+# Redirect /about to /badminton_tournament/about.php
+RewriteRule ^about$ /badminton_tournament/about.php [L,QSA]
+
+# Add more rules as needed
