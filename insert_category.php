@@ -1,7 +1,7 @@
 <?php
 // insert_category.php
 include 'header.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 require 'auth.php';
 require_once 'admin_auth.php';

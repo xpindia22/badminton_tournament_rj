@@ -13,7 +13,7 @@ include 'header.php'; // Ensure no output in header.php
 require_once 'conn.php'; // Database connection settings
 require_once 'admin_auth.php'; // Include admin authentication
 require_once 'auth.php';
-require_once 'permissions.php'; 
+// //require_once 'permissions.php'; 
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {

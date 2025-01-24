@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once 'conn.php';
-require_once 'permissions.php';
+//require_once 'permissions.php';
 
 function redirect_if_not_logged_in() {
     if (!isset($_SESSION['user_id'])) {

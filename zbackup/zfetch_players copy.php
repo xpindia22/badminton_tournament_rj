@@ -1,6 +1,6 @@
 <?php
 //fetch_player.php
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 header('Content-Type: application/json');
 

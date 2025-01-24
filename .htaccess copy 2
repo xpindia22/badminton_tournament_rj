@@ -1,0 +1,8 @@
+# Block direct access to multiple files
+<FilesMatch "^(auth\.php|permissions\.php|file2\.php|file3\.php)$">
+    Require all denied
+</FilesMatch>
+
+# Block access to multiple folders (zzz, images, backups)
+RewriteEngine On
+RewriteRule ^(zzz|images|backups)/ - [F,L]

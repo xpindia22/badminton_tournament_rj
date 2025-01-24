@@ -1,7 +1,7 @@
 <?php
 // matches.php
 include 'header.php';
-require_once 'permissions.php';
+//require_once 'permissions.php';
 
 require_once 'conn.php';
 require 'auth.php';

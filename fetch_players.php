@@ -1,6 +1,6 @@
 <?php
 include 'conn.php'; // Adjust to your database connection file
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 header('Content-Type: application/json');
 

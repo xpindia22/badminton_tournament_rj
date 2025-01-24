@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 =======
 // login.php
 include 'header.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];

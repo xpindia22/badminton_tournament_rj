@@ -4,7 +4,7 @@ include 'header.php';
 require 'fetch_tournaments.php'; // Include the reusable fetch logic
 
 require_once 'conn.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 require 'auth.php';
 redirect_if_not_logged_in();

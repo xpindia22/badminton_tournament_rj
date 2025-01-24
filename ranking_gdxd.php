@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 // Include database connection
 require_once 'conn.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 // Fetch filter data
 $tournaments = $conn->query("SELECT id, name FROM tournaments ORDER BY name ASC");

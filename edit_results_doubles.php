@@ -4,7 +4,7 @@
 // edit_results_doubles.php
 include 'header.php';
 require_once 'conn.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 require 'auth.php';
 redirect_if_not_logged_in();

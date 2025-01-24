@@ -1,5 +1,5 @@
 <?php
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 session_start();
 require 'conn.php';

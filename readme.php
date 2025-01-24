@@ -1,6 +1,6 @@
 <?php
 include 'header.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 // This is a simple README page for your PHP application.
 ?>

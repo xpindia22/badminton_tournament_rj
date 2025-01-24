@@ -4,7 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once 'conn.php'; // Database connection
-require_once 'permissions.php'; // Permissions handling
+// //require_once 'permissions.php'; // Permissions handling
+require_once 'auth.php'; // Permissions handling after merge of permissions> auth
 
 // Ensure user is logged in (primary authentication)
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
@@ -16,7 +17,7 @@ $username = $_SESSION['username'];
 
 // Define admin credentials for secondary authentication
 $adminAuth = [
-    'admin1' => 'securepass1',
+    'admin' => 'xxxx',
     'xxx' => 'xxxx',
 ];
 

@@ -1,7 +1,7 @@
 <?php
 
 require_once 'conn.php'; // Database connection
-require_once 'permissions.php'; // Include permissions
+//require_once 'permissions.php'; // Include permissions
 
 function redirect_if_not_logged_in() {
     if (!isset($_SESSION['user_id']) && !isset($_SESSION['player_uid'])) {

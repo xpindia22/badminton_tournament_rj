@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 <<<<<<< HEAD
 require_once 'conn.php';
 =======
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 // require_once 'conn.php';
 >>>>>>> 4162827b0e5e015dd9b2e37d7a2c485e4c864b0b
 include 'header.php';

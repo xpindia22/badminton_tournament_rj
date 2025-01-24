@@ -1,6 +1,6 @@
 <?php
 require 'auth.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'])) {
     $category_id = intval($_POST['category_id']);

@@ -1,6 +1,6 @@
 <?php
 require 'conn.php'; // Include the database connection file
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['tournament_id'])) {
     $tournament_id = intval($_GET['tournament_id']); // Sanitize the tournament ID

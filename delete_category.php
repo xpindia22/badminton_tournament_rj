@@ -1,7 +1,7 @@
 <?php
 // delete_category.php
 require 'auth.php';
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 redirect_if_not_logged_in();
 
