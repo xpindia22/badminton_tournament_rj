@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
                 $stmt->bind_param(
-                    "iiiiisssiiiiiii",
+                    "iiiiissssiiiiii",
                     $tournament_id, $category_id, $team1_player1_id, $team1_player2_id,
                     $team2_player1_id, $team2_player2_id, $stage, $match_date, $match_time,
                     $set1_team1, $set1_team2, $set2_team1, $set2_team2, $set3_team1, $set3_team2
