@@ -8,7 +8,7 @@
 
 /* General Page Layout */
 body {
-    background-color: #f4f4f4;
+    background-color: #e7e1e1;
     color: #333;
     line-height: 1.6;
     margin: 20px;
@@ -99,7 +99,7 @@ nav a:hover {
 
 /* Content Container */
 .container {
-    width: 80%;
+    width: 90%;
     margin: auto;
     overflow: hidden;
     background: white;

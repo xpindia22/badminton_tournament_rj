@@ -66,7 +66,7 @@ shuffle($images);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
+    <!-- <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -145,7 +145,141 @@ shuffle($images);
         .player-login-btn:hover, .register-btn:hover, button:hover {
             background-color: #0056b3;
         }
-    </style>
+    </style> -->
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .container {
+        display: flex;
+        width: 80%;
+        max-width: 1000px;
+        margin-top: 80px;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Left Section */
+    .left-section {
+        flex: 0.6; /* 40% width */
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Centers content vertically */
+        align-items: center; /* Centers content horizontally */
+        padding: 20px;
+    }
+
+    .slideshow-container {
+        width: 100%;
+        height: 300px; /* Adjusted height */
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center; /* Center images vertically */
+        justify-content: center; /* Center images horizontally */
+    }
+
+    .slideshow-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .slideshow-container img.active {
+        display: block;
+    }
+
+    /* Buttons under slideshow in a row */
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .buttons-container form {
+        flex: 1;
+        max-width: 200px;
+    }
+
+    .buttons-container button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .buttons-container button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Right Section */
+    .right-section {
+        flex: 0.6; /* 60% width */
+        padding: 30px;
+        background: #fff;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    form label, form input, form button {
+        margin-bottom: 10px;
+        width: 50%;
+        max-width: 200px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+
+        .buttons-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .buttons-container button {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
+
 </head>
 <body>
 
