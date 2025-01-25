@@ -6,18 +6,15 @@ RewriteEngine On
     Require all denied
 </FilesMatch>
 
-# Block access to specific directories: zzz, images, zbackup
-RewriteRule ^(zzz|images|zbackup)/ - [F,L]
+# # Block access to specific directories: zzz, images, zbackup
+# RewriteRule ^(zzz|images|zbackup)/ - [F,L]
 
-# RewriteEngine On
+# Disable directory indexing to prevent directory listings
+Options -Indexes
 
-# # Redirect /register to register_player.php
-# RewriteRule ^register$ /badminton_tournament/register_player.php [L]
-
-
-RewriteEngine On
-# path tool tip will be not shown
-# Redirect /register to /badminton_tournament/register_player.php
+# Rewrite rules for URL redirection
+# path tool tip will not be shown
+# Redirect /register-player to /badminton_tournament/register_player.php
 RewriteRule ^register-player$ /badminton_tournament/register_player.php [L,QSA]
 
 # Redirect /about to /badminton_tournament/about.php
