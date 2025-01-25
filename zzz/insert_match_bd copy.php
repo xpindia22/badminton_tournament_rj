@@ -85,13 +85,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     set1_team1_points, set1_team2_points, set2_team1_points, 
                     set2_team2_points, set3_team1_points, set3_team2_points
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
+                
                 $stmt->bind_param(
                     "iiiiisssiiiiiii",
                     $tournament_id, $category_id, $team1_player1_id, $team1_player2_id,
                     $team2_player1_id, $team2_player2_id, $stage, $match_date, $match_time,
                     $set1_team1, $set1_team2, $set2_team1, $set2_team2, $set3_team1, $set3_team2
                 );
+                
 
                 if ($stmt->execute()) {
                     $message = "Match added successfully!";
@@ -133,59 +134,7 @@ if ($lockedTournament) {
 <html>
 <head>
     <title>Insert Boys Doubles Match</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f9fc;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        label, p {
-            font-size: 16px;
-            color: #555;
-        }
-        select, input, button {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 100%;
-        }
-        select:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-    <script>
+       <script>
         function loadPlayers(categoryId) {
             if (!categoryId) return;
 
