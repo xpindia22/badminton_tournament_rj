@@ -1,7 +1,4 @@
 <?php
-// Enable error reporting for debugging (remove in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 // Ensure session is only started once
 if (session_status() === PHP_SESSION_NONE) {
