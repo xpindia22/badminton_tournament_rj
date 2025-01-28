@@ -5,7 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Determine the logged-in user's name or default to 'Guest'
-$logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
+$logged_in_user = 'Guest';
+
+if (isset($_SESSION['username'])) {
+    $logged_in_user = $_SESSION['username']; // For admins and users
+} elseif (isset($_SESSION['player_name'])) {
+    $logged_in_user = $_SESSION['player_name']; // For players
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,18 +102,27 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
         <!-- Navigation Links -->
         <div class="links">
             <a href="dashboard.php">Dashboard</a>
-            <a href="readme.php">Help-Readme</a>
-            <a href="results.php">Singles Match Results</a>
-            <a href="ranking_singles.php">Ranking Singles</a>
+            <a href="register.php">Register Tournament Manager</a>
+            <a href="register_player.php">Register Player</a>
+
+            <!-- Dropdown: Admin Zone (Only Visible to Admins) -->
+            <div class="dropdown">
+                <a href="#">Admin Zone</a>
+                <div class="dropdown-content">
+                    <a href="register.php">Register Tournament Manager</a>
+                    <a href="register_player.php">Register Player</a>
+                    <a href="insert_player.php">Insert Player</a>
+                    <a href="insert_match.php">Insert Match</a> 
+                    <a href="insert_category.php">Insert Category</a> 
+                    <a href="add_moderator.php">Add Moderator</a>
+                    <a href="insert_tournament.php">Insert Tournament</a>
+                </div>
+            </div>
 
             <!-- Dropdown: Singles Matches -->
             <div class="dropdown">
                 <a href="#">Singles Matches</a>
                 <div class="dropdown-content">
-                    <a href="register.php">Register User</a>
-                    <a href="insert_tournament.php">Insert Tournaments</a>
-                    <a href="insert_player.php">Insert Player</a>
-                    <a href="insert_match.php">Insert Match</a>
                     <a href="results_singles.php">Singles Results</a>
                     <a href="edit_results_singles_link.php">Edit Singles Matches</a>
                 </div>
@@ -116,8 +132,6 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <div class="dropdown">
                 <a href="#">Boys Doubles</a>
                 <div class="dropdown-content">
-                    <a href="register.php">Register User</a>
-                    <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match_bd.php">Insert Boys Doubles</a>
                     <a href="results_bd.php">Result Boys Doubles</a>
                     <a href="edit_results_bd.php">Edit Boys Doubles</a>
@@ -129,8 +143,6 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <div class="dropdown">
                 <a href="#">Girls Doubles</a>
                 <div class="dropdown-content">
-                    <a href="register.php">Register User</a>
-                    <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match_gd.php">Insert Girls Doubles</a>
                     <a href="results_gd.php">Result Girls Doubles</a>
                     <a href="edit_results_gd.php">Edit Girls Doubles</a>
@@ -141,8 +153,6 @@ $logged_in_user = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'
             <div class="dropdown">
                 <a href="#">Mixed Doubles</a>
                 <div class="dropdown-content">
-                    <a href="register.php">Register User</a>
-                    <a href="insert_player.php">Insert Player</a>
                     <a href="insert_match_xd.php">Create Mixed Doubles</a>
                     <a href="results_xd.php">Results Mixed Doubles</a>
                     <a href="edit_results_xd.php">Edit Mixed Doubles</a>

@@ -1,18 +1,25 @@
 <?php
-//edit_results_xd.php
 include 'header.php';
+require_once 'permissions.php';
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'conn.php';
-require 'auth.php';
-//require_once 'permissions.php';
-
-
-redirect_if_not_logged_in();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
+
+// Ensure the user is logged in
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    die("Access denied. Please log in.");
+}
+$user_id = $_SESSION['user_id']; // Retrieve the logged-in user's ID
 
 // Define stages
 $stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
@@ -21,6 +28,8 @@ $stages = ['Preliminary', 'Quarterfinal', 'Semifinal', 'Final', 'Champion'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['edit_match'])) {
         $match_id = $_POST['match_id'];
+        enforceRecordOwnership($conn, 'matches', $match_id, 'created_by'); // Ensure ownership
+
         $stage = $_POST['stage'];
         $match_date = $_POST['match_date'];
         $match_time = $_POST['match_time'];
@@ -49,18 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['delete_match'])) {
         $match_id = $_POST['match_id'];
+        enforceRecordOwnership($conn, 'matches', $match_id, 'created_by'); // Ensure ownership
+
         $delete_query = "DELETE FROM matches WHERE id = $match_id";
         $conn->query($delete_query);
     }
 }
 
-// Fetch data for dropdowns
-$tournaments = $conn->query("SELECT id, name FROM tournaments");
-$players = $conn->query("SELECT id, name FROM players");
-$dates = $conn->query("SELECT DISTINCT match_date FROM matches ORDER BY match_date");
-$datetimes = $conn->query("SELECT DISTINCT match_time FROM matches ORDER BY match_time");
-
-// Fetch Mixed Doubles matches
+// Fetch matches for the logged-in user
 $query = "
     SELECT 
         m.id AS match_id,
@@ -86,11 +91,15 @@ $query = "
     LEFT JOIN players p2 ON m.team1_player2_id = p2.id
     LEFT JOIN players p3 ON m.team2_player1_id = p3.id
     LEFT JOIN players p4 ON m.team2_player2_id = p4.id
-    WHERE c.type = 'mixed doubles'
+    WHERE c.type = 'doubles' AND c.sex = 'M' AND m.created_by = $user_id
     ORDER BY m.id
 ";
 
 $result = $conn->query($query);
+
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 ?>
 
 <!DOCTYPE html>
@@ -98,7 +107,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mixed Doubles Match Results</title>
+    <title>Boys Doubles Match Results</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -111,10 +120,10 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Mixed Doubles Match Results</h1>
+    <h1>Boys Doubles Match Results</h1>
 
     <!-- Results Table -->
-    <?php if ($result->num_rows > 0): ?>
+    <?php if ($result && $result->num_rows > 0): ?>
         <table>
             <tr>
                 <th>Match ID</th>

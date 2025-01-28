@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 // Include required files
 require_once 'auth.php'; // Ensure this path is correct
-//require_once 'permissions.php'; // Include permissions file
+require_once 'permissions.php'; // Include permissions file
 redirect_if_not_logged_in();
 
 // Include the header after checking login status

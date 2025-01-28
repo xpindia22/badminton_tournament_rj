@@ -31,31 +31,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['locked_tournament'], $_SESSION['locked_tournament_name']);
         $lockedTournament = null;
     } else {
-        $tournament_id = $lockedTournament ?? $_POST['tournament_id'];
-        $category_id = $_POST['category_id'];
-        $team1_player1_id = $_POST['team1_player1_id'];
-        $team1_player2_id = $_POST['team1_player2_id'];
-        $team2_player1_id = $_POST['team2_player1_id'];
-        $team2_player2_id = $_POST['team2_player2_id'];
-        $stage = $_POST['stage'];
+        // Fetch inputs with default values to avoid warnings
+        $tournament_id = $lockedTournament ?? ($_POST['tournament_id'] ?? null);
+        $category_id = $_POST['category_id'] ?? null;
+        $team1_player1_id = $_POST['team1_player1_id'] ?? null;
+        $team1_player2_id = $_POST['team1_player2_id'] ?? null;
+        $team2_player1_id = $_POST['team2_player1_id'] ?? null;
+        $team2_player2_id = $_POST['team2_player2_id'] ?? null;
+        $stage = $_POST['stage'] ?? null;
 
-        $dateInput = $_POST['date'];
-        $match_date = DateTime::createFromFormat('Y-m-d', $dateInput);
+        $dateInput = $_POST['date'] ?? null;
+        $match_date = $dateInput ? DateTime::createFromFormat('Y-m-d', $dateInput) : null;
         if ($match_date === false) {
             $message = "Invalid date format!";
         } else {
-            $match_date = $match_date->format('Y-m-d'); 
+            $match_date = $match_date ? $match_date->format('Y-m-d') : null; 
         }
 
-        $match_time = $_POST['time'];
-        $set1_team1 = $_POST['set1_team1_points'];
-        $set1_team2 = $_POST['set1_team2_points'];
-        $set2_team1 = $_POST['set2_team1_points'];
-        $set2_team2 = $_POST['set2_team2_points'];
+        $match_time = $_POST['time'] ?? null;
+        $set1_team1 = $_POST['set1_team1_points'] ?? null;
+        $set1_team2 = $_POST['set1_team2_points'] ?? null;
+        $set2_team1 = $_POST['set2_team1_points'] ?? null;
+        $set2_team2 = $_POST['set2_team2_points'] ?? null;
         $set3_team1 = $_POST['set3_team1_points'] ?? 0;
         $set3_team2 = $_POST['set3_team2_points'] ?? 0;
 
-        if ($match_date !== false) { 
+        // Validate required fields
+        if (empty($tournament_id) || empty($category_id) || empty($stage) || empty($match_date) || empty($match_time)) {
+            $message = "Please fill in all required fields.";
+        } else {
+            // Insert match details into the database
             $stmt = $conn->prepare("INSERT INTO matches (
                 tournament_id, category_id, team1_player1_id, team1_player2_id,
                 team2_player1_id, team2_player2_id, stage, match_date, match_time,
@@ -88,7 +93,7 @@ if ($lockedTournament) {
         FROM categories c 
         INNER JOIN tournament_categories tc ON c.id = tc.category_id 
         WHERE tc.tournament_id = ? 
-        AND c.name LIKE '%BD%'
+        AND c.name LIKE '%GD%'
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
@@ -98,7 +103,7 @@ if ($lockedTournament) {
     $categories = $conn->query("
         SELECT id, name, age_group, sex 
         FROM categories
-        WHERE name LIKE '%BD%'
+        WHERE name LIKE '%GD%'
     ");
 }
 ?>
@@ -208,6 +213,39 @@ if ($lockedTournament) {
 
             <label for="team2_player2_id">Team 2 - Player 2:</label>
             <select name="team2_player2_id" id="team2_player2_id" required></select>
+
+            <label for="stage">Match Stage:</label>
+            <select name="stage" id="stage" required>
+                <option value="">Select Stage</option>
+                <option value="Pre Quarter Finals">Pre Quarter Finals</option>
+                <option value="Quarter Finals">Quarter Finals</option>
+                <option value="Semi Finals">Semi Finals</option>
+                <option value="Finals">Finals</option>
+            </select>
+
+            <label for="date">Match Date:</label>
+            <input type="date" name="date" id="date" required>
+
+            <label for="time">Match Time:</label>
+            <input type="time" name="time" id="time" required>
+
+            <label for="set1_team1_points">Set 1 Team 1 Points:</label>
+            <input type="number" name="set1_team1_points" id="set1_team1_points" required>
+
+            <label for="set1_team2_points">Set 1 Team 2 Points:</label>
+            <input type="number" name="set1_team2_points" id="set1_team2_points" required>
+
+            <label for="set2_team1_points">Set 2 Team 1 Points:</label>
+            <input type="number" name="set2_team1_points" id="set2_team1_points" required>
+
+            <label for="set2_team2_points">Set 2 Team 2 Points:</label>
+            <input type="number" name="set2_team2_points" id="set2_team2_points" required>
+
+            <label for="set3_team1_points">Set 3 Team 1 Points:</label>
+            <input type="number" name="set3_team1_points" id="set3_team1_points">
+
+            <label for="set3_team2_points">Set 3 Team 2 Points:</label>
+            <input type="number" name="set3_team2_points" id="set3_team2_points">
 
             <button type="submit">Add Match</button>
         </form>
