@@ -100,23 +100,7 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Tournament Results</title>
-    <style>
-         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* body { font-family: Arial, sans-serif; margin: 20px;  } */
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        form { margin-bottom: 20px; }
-        label, select, button { margin-right: 10px; }
-    </style>
+ 
 </head>
 <body>
     <h1>All Tournament Results</h1>

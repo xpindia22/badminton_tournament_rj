@@ -123,6 +123,8 @@ if (isset($_SESSION['username'])) {
                     <a href="#">Admin Zone</a>
                     <div class="dropdown-content">
                         <a href="register_user_adminaccess.php">Register Tournament Manager</a>
+                        <li><a href="register-player">Register Player</a></li>
+
                         <a href="register_player.php">Register Player</a>
                         <a href="edit_register_player.php">Edit Player</a>
                         <a href="insert_match.php">Insert Match</a> 

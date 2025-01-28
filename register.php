@@ -112,7 +112,7 @@ if ($is_admin) {
 </head>
 <body>
     <div class="container">
-        <h1>Register Tournament Manager</h1>
+        <h1>Register</h1>
         <?php if ($message): ?>
             <p class="message"><?= htmlspecialchars($message) ?></p>
         <?php endif; ?>
@@ -140,7 +140,7 @@ if ($is_admin) {
                     <option value="user" <?= $role === 'user' ? 'selected' : '' ?>>User</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Register Tournament Manager</button>
+            <button type="submit" class="btn-primary">Register</button>
         </form>
 
         <?php if ($is_admin): ?>
