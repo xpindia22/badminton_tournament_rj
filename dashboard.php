@@ -68,11 +68,11 @@ $is_visitor = is_visitor();
                     <p>Create and manage your tournaments.</p>
                     <a href="insert_tournament.php" class="btn-primary">Create Tournament</a>
                 </div>
-                <div class="card">
+                <!-- <div class="card">
                     <h2>Create Categories</h2>
                     <p>Add categories for your tournaments.</p>
                     <a href="insert_category.php" class="btn-primary">Add Categories</a>
-                </div>
+                </div> -->
                 <div class="card">
                     <h2>Enter Matches</h2>
                     <p>Enter match scores for your tournaments.</p>

@@ -10,7 +10,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require 'auth.php';
-//require_once 'permissions.php';
 
 require_once 'conn.php'; // Use conn.php for database connection
 redirect_if_not_logged_in();
