@@ -136,9 +136,9 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Singles Matches</a>
                 <div class="dropdown-content">
-                    <?php if ($user_role !== 'player'): ?><a href="insert_match.php">Add Singles</a><?php endif; ?>
+                    <a href="insert_match.php">Add Singles</a>
                     <a href="results_singles.php">Singles Results</a>
-                    <?php if ($user_role !== 'player'): ?><a href="edit_results_singles_link.php">Edit Singles Matches</a><?php endif; ?>
+                    <a href="edit_results_singles_link.php">Edit Singles Matches</a>
                 </div>
             </div>
 
@@ -146,10 +146,10 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Boys Doubles</a>
                 <div class="dropdown-content">
-                <?php if ($user_role !== 'player'): ?><a href="insert_match_bd.php">Insert Boys Doubles</a><?php endif; ?>
+                    <a href="insert_match_bd.php">Insert Boys Doubles</a>
                     <a href="results_bd.php">Result Boys Doubles</a>
-                    <?php if ($user_role !== 'player'): ?><a href="edit_results_bd.php">Edit Boys Doubles</a><?php endif; ?>
-                        <?php if ($user_role !== 'player'): ?><a href="edit_results_doubles.php">Edit All Doubles</a><?php endif; ?>
+                    <a href="edit_results_bd.php">Edit Boys Doubles</a>
+                    <a href="edit_results_doubles.php">Edit All Doubles</a>
                 </div>
             </div>
 
@@ -157,9 +157,9 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Girls Doubles</a>
                 <div class="dropdown-content">
-                <?php if ($user_role !== 'player'): ?><a href="insert_match_gd.php">Insert Girls Doubles</a><?php endif; ?>
+                    <a href="insert_match_gd.php">Insert Girls Doubles</a>
                     <a href="results_gd.php">Result Girls Doubles</a>
-                    <?php if ($user_role !== 'player'): ?><a href="edit_results_gd.php">Edit Girls Doubles</a><?php endif; ?>
+                    <a href="edit_results_gd.php">Edit Girls Doubles</a>
                 </div>
             </div>
 
@@ -167,9 +167,9 @@ if (isset($_SESSION['username'])) {
             <div class="dropdown">
                 <a href="#">Mixed Doubles</a>
                 <div class="dropdown-content">
-                <?php if ($user_role !== 'player'): ?><a href="insert_match_xd.php">Create Mixed Doubles</a><?php endif; ?>
+                    <a href="insert_match_xd.php">Create Mixed Doubles</a>
                     <a href="results_xd.php">Results Mixed Doubles</a>
-                    <?php if ($user_role !== 'player'): ?><a href="edit_results_xd.php">Edit Mixed Doubles</a><?php endif; ?>
+                    <a href="edit_results_xd.php">Edit Mixed Doubles</a>
                 </div>
             </div>
 
