@@ -8,7 +8,8 @@ error_reporting(E_ALL);
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
-//require_once 'permissions.php'; 
+require_non_player();
+
 
 $message = '';
 $username = '';

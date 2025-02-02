@@ -4,6 +4,7 @@ require 'auth.php';
 ////require_once 'permissions.php';
 
 redirect_if_not_logged_in();
+require_non_player();
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

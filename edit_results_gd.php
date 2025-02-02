@@ -4,7 +4,7 @@ ob_start();
 
 include 'header.php';
 require_once 'conn.php';
-
+require_non_player();
 // Ensure the user is logged in
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

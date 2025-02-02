@@ -10,7 +10,7 @@ include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
-
+require_non_player();
 $currentUserId = $_SESSION['user_id'];
 $currentUserRole = $_SESSION['role'];
 

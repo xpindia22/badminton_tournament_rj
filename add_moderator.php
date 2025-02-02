@@ -5,6 +5,7 @@ ob_start(); // Start output buffering
 include 'header.php'; // Ensure no output in header.php
 require_once 'conn.php'; // Database connection settings
 require_once 'admin_auth.php'; // Include admin authentication
+require_non_player();
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {

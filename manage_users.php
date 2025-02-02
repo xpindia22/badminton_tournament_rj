@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 require_once 'conn.php';
 require 'auth.php';
 redirect_if_not_logged_in();
-
+require_non_player();
 if (!is_admin()) {
     die("Access denied.");
 }

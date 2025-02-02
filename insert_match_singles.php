@@ -11,7 +11,7 @@ redirect_if_not_logged_in();
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
+require_non_player();
 $message = '';
 $lockedTournament = $_SESSION['locked_tournament'] ?? null;
 $username = $_SESSION['username'];

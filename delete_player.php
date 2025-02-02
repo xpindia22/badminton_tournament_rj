@@ -6,6 +6,7 @@ ini_set('display_errors', 1);
 include 'header.php';
 require 'auth.php';
 redirect_if_not_logged_in();
+require_non_player();
 
 // Ensure only admins or owners can delete
 if (!is_admin() && !isset($_SESSION['user_id'])) {

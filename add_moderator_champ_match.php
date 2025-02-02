@@ -8,6 +8,7 @@ error_reporting(E_ALL);
 require_once 'conn.php'; // Database connection
 require_once 'auth.php'; // Authentication functions
 //require_once 'permissions.php'; // Permissions functions
+require_non_player();
 
 // Ensure the user is logged in
 redirect_if_not_logged_in();
