@@ -4,6 +4,7 @@ require 'auth.php';
 ////require_once 'permissions.php';
 
 redirect_if_not_logged_in();
+require_non_player();
 
 if (!is_admin()) die("Access denied.");
 

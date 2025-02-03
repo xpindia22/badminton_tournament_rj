@@ -1,7 +1,8 @@
 <?php
 // Include database connection
+////require_once 'permissions.php';
+
 require_once 'conn.php';
-//require_once 'permissions.php';
 
 // Fetch singles rankings based on total points scored by players across all matches
 $query = "
@@ -10,13 +11,21 @@ $query = "
         players.uid AS player_uid,
         players.sex AS player_sex,
         players.age AS player_age,
-        SUM(match_details.points_scored) AS total_points
+        SUM(
+            CASE WHEN matches.player1_id = players.id THEN 
+                (matches.set1_player1_points + matches.set2_player1_points + matches.set3_player1_points)
+            WHEN matches.player2_id = players.id THEN
+                (matches.set1_player2_points + matches.set2_player2_points + matches.set3_player2_points)
+            ELSE 0 END
+        ) AS total_points
     FROM 
-        match_details
+        players
     JOIN 
-        players ON match_details.player_id = players.id
+        matches ON matches.player1_id = players.id OR matches.player2_id = players.id
+    JOIN 
+        categories ON matches.category_id = categories.id
     WHERE 
-        match_details.match_type = 'singles'
+        categories.type = 'singles'
     GROUP BY 
         players.id
     ORDER BY 
@@ -51,7 +60,7 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <h1>Singles Rankings</h1>
+    <h1>Overall Singles Rankings</h1>
     <p>Date: <?php echo date('Y-m-d'); ?></p>
     <p>Time: <?php echo date('H:i:s'); ?></p>
     <?php

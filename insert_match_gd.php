@@ -5,12 +5,14 @@ error_reporting(E_ALL);
 
 include 'header.php';
 require 'auth.php';
+// require_once 'admin_auth.php';
+
 redirect_if_not_logged_in();
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
+require_non_player();
 $userId = $_SESSION['user_id']; // Assuming user_id is stored in the session after login
 $message = '';
 $lockedTournament = $_SESSION['locked_tournament'] ?? null;

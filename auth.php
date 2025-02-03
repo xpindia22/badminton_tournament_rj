@@ -1,5 +1,4 @@
 <?php
-
 require_once 'conn.php'; // Database connection
 
 // Start session only if not already started
@@ -83,4 +82,14 @@ function is_visitor() {
     return !is_admin() && !is_user() && !is_player();
 }
 
+/**
+ * Require non-player access.
+ * Redirects to unauthorized.php if the logged-in user is a player.
+ */
+function require_non_player() {
+    if (is_player()) {
+        header("Location: login.php");
+        exit;
+    }
+}
 ?>

@@ -7,7 +7,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'auth.php';
 redirect_if_not_logged_in();
-
 // Include the header after checking login status
 include 'header.php';
 
@@ -24,7 +23,7 @@ $is_visitor = is_visitor();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <link rel="stylesheet" href="styles.css">
     </head>
 <body>
     <div class="container">
@@ -68,11 +67,11 @@ $is_visitor = is_visitor();
                     <p>Create and manage your tournaments.</p>
                     <a href="insert_tournament.php" class="btn-primary">Create Tournament</a>
                 </div>
-                <div class="card">
+                <!-- <div class="card">
                     <h2>Create Categories</h2>
                     <p>Add categories for your tournaments.</p>
                     <a href="insert_category.php" class="btn-primary">Add Categories</a>
-                </div>
+                </div> -->
                 <div class="card">
                     <h2>Enter Matches</h2>
                     <p>Enter match scores for your tournaments.</p>

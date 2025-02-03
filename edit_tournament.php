@@ -1,7 +1,8 @@
 <?php
 include 'header.php';
-////require_once 'permissions.php';
+require_once 'auth.php';
 redirect_if_not_logged_in();
+require_non_player();
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

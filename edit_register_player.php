@@ -6,7 +6,8 @@ ini_set('display_errors', 1);
 include 'header.php';
 require_once 'conn.php';
 require 'auth.php';
-
+require_once 'admin_auth.php';
+require_non_player();
 // Ensure only logged-in users can access
 redirect_if_not_logged_in();
 

@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 require_once 'auth.php';
 //require_once 'permissions.php';
 redirect_if_not_logged_in();
+require_non_player();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {

@@ -9,10 +9,8 @@ if (session_status() === PHP_SESSION_NONE) {
  *
  * @return bool True if the user is an admin, false otherwise.
  */
-if (!function_exists('is_admin')) {
-    function is_admin() {
-        return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
-    }
+function is_admin() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
 
 /**
@@ -20,31 +18,27 @@ if (!function_exists('is_admin')) {
  *
  * @return bool True if the user is a regular user, false otherwise.
  */
-if (!function_exists('is_user')) {
-    function is_user() {
-        return isset($_SESSION['role']) && ($_SESSION['role'] === 'user' || $_SESSION['role'] === 'moderator');
-    }
+function is_user() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'user';
 }
 
 /**
- * Check if the logged-in user is a player.
+ * Check if the logged-in user is the owner of a specific match.
  *
- * @return bool True if the session belongs to a player, false otherwise.
+ * @param int $match_owner_id The ID of the match owner.
+ * @return bool True if the logged-in user is the match owner, false otherwise.
  */
-if (!function_exists('is_player')) {
-    function is_player() {
-        return isset($_SESSION['player_uid']); // Check if player session exists
-    }
+function is_match_owner($match_owner_id) {
+    return isset($_SESSION['user_id']) && $_SESSION['user_id'] == $match_owner_id;
 }
 
 /**
- * Check if the logged-in user is a visitor (players & guests).
+ * Check if the user has moderator rights for a match (admin or match owner).
  *
- * @return bool True if the user is a visitor, false otherwise.
+ * @param int $match_owner_id The ID of the match owner.
+ * @return bool True if the user is an admin or the match owner, false otherwise.
  */
-// if (!function_exists('is_visitor')) {
-//     function is_visitor() {
-//         return !is_admin() && !is_user() && is_player(); // Players are treated as visitors
-//     }
-// }
+function has_moderator_rights($match_owner_id) {
+    return is_admin() || is_match_owner($match_owner_id);
+}
 ?>

@@ -1,19 +1,3 @@
-<?php if (isset($_GET['error'])): ?>
-    <p style="color: red;">
-        <?php
-        if ($_GET['error'] === 'invalid_id') {
-            echo "Invalid match ID provided.";
-        } elseif ($_GET['error'] === 'match_not_found') {
-            echo "Match not found.";
-        }
-        ?>
-    </p>
-<?php endif; ?>
-
-<?php if (isset($_GET['success']) && $_GET['success'] === 'updated'): ?>
-    <p style="color: green;">Match updated successfully!</p>
-<?php endif; ?>
-
 <?php
 // results.php
 include 'header.php';
@@ -22,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'conn.php';
-////require_once 'permissions.php';
+//require_once 'permissions.php';
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {

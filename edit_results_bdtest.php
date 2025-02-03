@@ -5,7 +5,7 @@ require_once 'permissions.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
+require_non_player();
 require_once 'conn.php';
 
 $conn = new mysqli($servername, $username, $password, $dbname);

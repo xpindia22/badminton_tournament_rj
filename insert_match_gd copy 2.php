@@ -2,7 +2,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-//require_once 'permissions.php';
+////require_once 'permissions.php';
 
 include 'header.php';
 require 'auth.php';
@@ -93,7 +93,7 @@ if ($lockedTournament) {
         FROM categories c 
         INNER JOIN tournament_categories tc ON c.id = tc.category_id 
         WHERE tc.tournament_id = ? 
-        AND c.name LIKE '%BD%'
+        AND c.name LIKE '%GD%'
     ");
     $stmt->bind_param("i", $lockedTournament);
     $stmt->execute();
@@ -103,7 +103,7 @@ if ($lockedTournament) {
     $categories = $conn->query("
         SELECT id, name, age_group, sex 
         FROM categories
-        WHERE name LIKE '%BD%'
+        WHERE name LIKE '%GD%'
     ");
 }
 ?>
