@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 03, 2025 at 04:36 AM
+-- Generation Time: Feb 24, 2025 at 05:02 AM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.2.24
 
@@ -41,6 +41,30 @@ CREATE TABLE `audit_logs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cache`
+--
+
+CREATE TABLE `cache` (
+  `key` varchar(255) NOT NULL,
+  `value` mediumtext NOT NULL,
+  `expiration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache_locks`
+--
+
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) NOT NULL,
+  `owner` varchar(255) NOT NULL,
+  `expiration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `categories`
 --
 
@@ -51,7 +75,7 @@ CREATE TABLE `categories` (
   `age_group` varchar(255) DEFAULT NULL,
   `sex` varchar(10) DEFAULT NULL,
   `type` enum('singles','doubles','mixed doubles') DEFAULT 'singles',
-  `tournament_id` int(11) NOT NULL
+  `tournament_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -99,6 +123,57 @@ CREATE TABLE `category_access` (
   `category_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jobs`
+--
+
+CREATE TABLE `jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint(3) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_batches`
+--
+
+CREATE TABLE `job_batches` (
+  `id` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `total_jobs` int(11) NOT NULL,
+  `pending_jobs` int(11) NOT NULL,
+  `failed_jobs` int(11) NOT NULL,
+  `failed_job_ids` longtext NOT NULL,
+  `options` mediumtext DEFAULT NULL,
+  `cancelled_at` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `finished_at` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -175,12 +250,12 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (32, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Preliminary', '2025-01-06', '00:00:00', 4, 14, 1, 15, 21, 13, 12, 21, 19, 21, NULL, NULL, NULL),
 (33, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Pre Quarter Finals', '2025-01-06', '00:00:00', 19, 9, 17, 15, 21, 12, 13, 21, 21, 2, NULL, NULL, NULL),
 (34, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Pre Quarter Finals', '2025-01-07', '00:00:00', 1, 6, 21, 4, 24, 3, 4, 21, 21, 3, NULL, NULL, NULL),
-(35, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Pre Quarter Finals', '2025-01-07', '00:00:00', 19, 17, 18, 13, 21, 3, 3, 21, 21, 2, NULL, NULL, NULL),
+(35, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Pre Quarter Finals', '2025-01-07', '11:00:00', 19, 17, 18, 13, 21, 3, 3, 21, 21, 2, NULL, NULL, NULL),
 (36, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Finals', '2025-01-07', '00:00:00', 4, 9, 14, 19, 26, 24, 22, 24, 21, 2, NULL, NULL, NULL),
 (37, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Finals', '2025-01-07', '00:00:00', 16, 9, 14, 1, 21, 3, 2, 21, 2, 21, NULL, NULL, NULL),
 (38, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Quarter Finals', '2025-01-11', '00:00:00', 21, 12, 6, 11, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
 (39, 14, 11, NULL, 3, 20, 0, 0, 0, 0, 21, 2, 2, 21, 21, 11, 1, NULL, 'Pre Quarter Finals', '2025-01-01', '00:00:00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
-(40, 1, 26, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Pre Quarter Finals', '2025-01-15', '06:00:00', 2, 3, 3, 2, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
+(40, 1, 26, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, 'Pre Quarter Finals', '2025-01-15', '00:00:00', 2, 3, 3, 2, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
 (41, 14, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Semifinals', '2025-01-01', '00:00:00', 3, 21, 11, 20, 3, 21, 12, 2, 2, 21, NULL, NULL, NULL),
 (42, 17, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Preliminary', '2025-01-16', '00:00:00', 19, 12, 14, 20, 21, 2, 2, 21, 21, 5, NULL, NULL, NULL),
 (43, 17, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Preliminary', '2025-01-16', '00:00:00', 16, 18, 1, 19, 21, 2, 2, 21, 21, 3, NULL, NULL, NULL),
@@ -271,17 +346,7 @@ INSERT INTO `matches` (`id`, `tournament_id`, `category_id`, `pool`, `player1_id
 (130, 1, 11, NULL, 20, 10, 0, 0, 0, 0, 21, 2, 2, 21, 2, 21, NULL, NULL, 'Pre Quarter Finals', '2025-01-22', '16:35:00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
 (131, 1, 11, NULL, 3, 6, 0, 0, 0, 0, 3, 21, 21, 2, 12, 21, NULL, NULL, 'Pre Quarter Finals', '2025-01-22', '16:35:00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
 (132, 1, 11, NULL, 21, 20, 0, 0, 0, 0, 21, 19, 5, 21, 21, 5, NULL, NULL, 'Quarter Finals', '2025-01-22', '00:00:20', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
-(133, 1, 11, NULL, 12, 3, 0, 0, 0, 0, 21, 2, 2, 21, 21, 2, NULL, NULL, 'Pre Quarter Finals', '2025-01-22', '21:12:00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL),
-(146, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Finals', '2025-01-24', '00:00:11', 11, 21, 3, 2, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(147, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Finals', '2025-01-24', '00:00:11', 11, 21, 3, 2, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(148, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Finals', '2025-01-24', '00:00:11', 11, 21, 3, 2, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(149, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '00:00:11', 2, 3, 12, 20, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(150, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '00:00:11', 13, 21, 2, 3, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(151, 1, 14, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '11:58:00', 2, 3, 11, 13, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(152, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '00:00:11', 1, 4, 16, 18, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(153, 1, 15, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '11:59:00', 1, 4, 16, 18, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(154, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '00:00:12', 21, 9, 13, 19, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL),
-(155, 1, 13, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 'Pre Quarter Finals', '2025-01-24', '15:03:00', 21, 9, 4, 20, 21, 2, 2, 21, 21, 2, NULL, NULL, NULL);
+(133, 1, 11, NULL, 21, 6, 0, 0, 0, 0, 21, 2, 21, 2, 21, 2, NULL, NULL, 'Pre Quarter Finals', '2025-01-22', '14:25:00', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -295,6 +360,30 @@ CREATE TABLE `match_details` (
   `match_type` enum('singles','doubles','mixed') NOT NULL,
   `points_scored` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -313,7 +402,7 @@ CREATE TABLE `players` (
   `created_by` int(11) DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `category_id` int(11) DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -321,25 +410,26 @@ CREATE TABLE `players` (
 --
 
 INSERT INTO `players` (`id`, `name`, `dob`, `age`, `sex`, `uid`, `password`, `created_by`, `updated_at`, `category_id`, `created_at`) VALUES
-(1, 'Sreesha', '2008-01-01', 16, 'F', '3', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-24 03:01:50'),
-(2, 'Eric James', '2009-05-02', 15, 'M', '1', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-24 03:01:50'),
-(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-24 03:01:50'),
-(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-24 03:01:50'),
-(6, 'Lee Chong Wei', '1980-01-03', 44, 'M', '5', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-24 03:01:50'),
-(9, 'Lakshaya', '2010-01-01', 15, 'F', '10', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(10, 'Gokulan', '1990-01-01', 35, 'M', '9', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(11, 'Zanpear', '1978-05-01', 46, 'M', '6', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(12, 'Pandyraj', '1968-01-01', 57, 'M', '7', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 20, '2025-01-24 03:01:50'),
-(13, 'Vijay', '1970-01-30', 54, 'M', '8', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', '11', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(15, 'An Se Young', '2000-01-01', 25, 'F', '13', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(16, 'Okuhara', '1998-01-01', 27, 'F', '14', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(17, 'Anitha Anthony', '2008-01-01', 17, 'F', '15', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(18, 'Carolina', '1995-06-06', 29, 'F', '16', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(19, 'PV Sindhu', '1995-06-07', 29, 'F', '12', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(20, 'Victor Axelsen', '1995-05-07', 29, 'M', '17', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(21, 'Lin Dan', '1986-02-06', 38, 'M', '18', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50'),
-(22, 'Player', '2025-01-17', 0, 'M', '19', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', NULL, '2025-01-17 04:14:30', 1, '2025-01-24 03:01:50');
+(1, 'Sreesha', '2008-01-01', 16, 'F', '3', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-23 21:45:04'),
+(2, 'Eric James', '2009-05-02', 15, 'M', '1', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-23 21:45:04'),
+(3, 'Akshaj Tiwari', '2012-01-01', 12, 'M', '2', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-23 21:45:04'),
+(4, 'Lakshmita', '2011-01-01', 13, 'F', '4', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-23 21:45:04'),
+(6, 'Lee Chong Wei', '1980-01-03', 44, 'M', '5', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 1, '2025-01-17 04:14:30', 0, '2025-01-23 21:45:04'),
+(9, 'Lakshaya', '2010-01-01', 15, 'F', '10', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(10, 'Gokulan', '1990-01-01', 35, 'M', '9', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(11, 'Zanpear', '1978-05-01', 46, 'M', '6', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(12, 'Pandyraj', '1968-01-01', 57, 'M', '7', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 20, '2025-01-23 21:45:04'),
+(13, 'Vijay', '1970-01-30', 54, 'M', '8', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(14, 'Tai Tzu Ying', '1998-01-01', 27, 'F', '11', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(15, 'An Se Young', '2000-01-01', 25, 'F', '13', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(16, 'Okuhara', '1998-01-01', 27, 'F', '14', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(17, 'Anitha Anthony', '2008-01-01', 17, 'F', '15', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(18, 'Carolina', '1995-06-06', 29, 'F', '16', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(19, 'PV Sindhu', '1995-06-07', 29, 'F', '12', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(20, 'Victor Axelsen', '1995-05-07', 29, 'M', '17', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(21, 'Lin Dan', '1986-02-06', 38, 'M', '18', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', 4, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(22, 'Player', '2025-01-17', 0, 'M', '19', '$2y$10$2lIVZTjOymQ2m2mqgVHd8OW4KDQmS.pdH5ysk7aGrsL1X6zHNh7Ea', NULL, '2025-01-17 04:14:30', 1, '2025-01-23 21:45:04'),
+(23, 'bbbbb', '2002-06-04', 22, 'M', '20', '$2y$10$EguxAl59eaIjRi..YEbGIur8fwFrQsu1Uw3.0Zfpgu8ZMy.9A817m', NULL, '2025-01-23 16:17:04', 1, '2025-01-23 21:47:04');
 
 -- --------------------------------------------------------
 
@@ -376,6 +466,28 @@ INSERT INTO `player_access` (`id`, `player_id`, `user_id`, `created_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sessions`
+--
+
+CREATE TABLE `sessions` (
+  `id` varchar(255) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` longtext NOT NULL,
+  `last_activity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('Z5BbLEJRJn8fuH5ereh2wMN0QtiClYOSnPN06cpY', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYlVCTDJLN0lVNUI4TTdobGljdjN6Q3JEN2FHMnBwV1g5WlBTem5GZiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4MCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1737872206);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tournaments`
 --
 
@@ -401,7 +513,8 @@ INSERT INTO `tournaments` (`id`, `name`, `created_by`, `year`, `moderated_by`) V
 (14, 'xxxxaa', 4, 2025, NULL),
 (15, 'xxdds', 4, 2025, NULL),
 (17, 'zzz', 7, 2025, NULL),
-(18, 'zzzz', 7, 2025, NULL);
+(18, 'zzzz', 7, 2025, NULL),
+(19, 'testtournament', 4, 2025, NULL);
 
 -- --------------------------------------------------------
 
@@ -457,7 +570,8 @@ INSERT INTO `tournament_categories` (`id`, `tournament_id`, `category_id`) VALUE
 (110, 17, 15),
 (111, 17, 15),
 (112, 18, 11),
-(113, 1, 11);
+(113, 1, 11),
+(114, 19, 1);
 
 -- --------------------------------------------------------
 
@@ -478,7 +592,6 @@ CREATE TABLE `tournament_moderators` (
 INSERT INTO `tournament_moderators` (`id`, `tournament_id`, `user_id`) VALUES
 (18, 1, 4),
 (1, 1, 6),
-(17, 1, 7),
 (7, 2, 6),
 (5, 6, 4),
 (3, 13, 6),
@@ -494,30 +607,34 @@ INSERT INTO `tournament_moderators` (`id`, `tournament_id`, `user_id`) VALUES
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `username` varchar(255) NOT NULL,
+  `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
-  `mobile_no` varchar(20) DEFAULT NULL,
+  `mobile_no` varchar(20) DEFAULT '0000000000',
   `notes` text DEFAULT NULL,
   `role` enum('admin','user','visitor','moderator') NOT NULL DEFAULT 'visitor',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `email` varchar(255) DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
-  `profile_picture` varchar(255) DEFAULT 'default.png'
+  `profile_picture` varchar(255) DEFAULT 'default.png',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `remember_token` varchar(333) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `mobile_no`, `notes`, `role`, `created_at`, `email`, `last_login`, `profile_picture`) VALUES
-(1, 'user', '$2y$10$q0I/ctXI5pI0oUUcaTsqV.mTNeYf8evE0xKimNAvhSEooL7CIFjAW', '1111111111', 'First user', 'user', '2024-12-29 03:50:28', 'user@user.com', NULL, 'uploads/profiles/1737177818_WhatsApp Image 2025-01-18 at 08.59.27.jpeg'),
-(2, 'admin', '$2y$10$Vzemd6vNZoJ7tsir9lxqKuBfkPhks/ZL3mB6YRRNKRLg3H8THFdba', '7432001215', 'Admin account', 'admin', '2024-12-29 04:11:42', 'admin@admin.com', NULL, 'default.png'),
-(4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com', NULL, 'default.png'),
-(5, 'user2', '$2y$10$h2N1Jb3tCQ72X.KWuQaB8eUfBfJa61DULmbLDzMArIlUdtpj4im.m', '2222222222', NULL, 'user', '2024-12-31 15:28:19', 'user2@jdjdj.com', NULL, 'default.png'),
-(6, 'user1', '$2y$10$630Wk4DbeWyToUcclXn66.2YMBCpUb8/ZwAvZwsbMU72PF3nNWdB2', '2222222222', NULL, 'user', '2025-01-10 05:55:38', 'asda@sd.asda', NULL, 'default.png'),
-(7, 'zzz', '$2y$10$jm1Bobqhw9.TxO8.u6bC8urfHloJHZJH9bqhyRfuaSZ7HixBj.xHS', '1111111111', NULL, 'user', '2025-01-11 03:53:39', 'xxxaa@sdad.dsa', NULL, 'default.png'),
-(8, 'usernnn', '$2y$10$iN/RiIEqGmxmgHcz.xHgAOBS051B5b9yS.K676o3U4KdgvqikeRfC', '1111111111', NULL, 'visitor', '2025-01-23 12:50:46', 'user@user.com', NULL, 'default.png'),
-(9, 'qqq', '$2y$10$PrtZw4bPL/smtwHz3a.cDe32BW1SDYaeVg5pw..Bsi2e6HvrUXOWO', '1111111111', NULL, 'visitor', '2025-01-27 06:48:13', 'qqq@qqq.com', NULL, 'default.png');
+INSERT INTO `users` (`id`, `username`, `password`, `mobile_no`, `notes`, `role`, `created_at`, `email`, `last_login`, `profile_picture`, `updated_at`, `remember_token`) VALUES
+(1, 'user', '$2y$10$q0I/ctXI5pI0oUUcaTsqV.mTNeYf8evE0xKimNAvhSEooL7CIFjAW', '2222222222', 'First user', 'user', '2024-12-29 03:50:28', 'user@user.com', NULL, 'uploads/profiles/1737177818_WhatsApp Image 2025-01-18 at 08.59.27.jpeg', '0000-00-00 00:00:00', ''),
+(2, 'admin', '$2y$10$Vzemd6vNZoJ7tsir9lxqKuBfkPhks/ZL3mB6YRRNKRLg3H8THFdba', '7432001215', 'Admin account', 'admin', '2024-12-29 04:11:42', 'admin@admin.com', NULL, 'default.png', '0000-00-00 00:00:00', ''),
+(4, 'xxx', '$2y$10$gv7QhzSUciynNAlwFyLSaOgPqgw9IE8jIHZn5qWhDK03QXYWNV6bm', '333', 'Hello...', 'admin', '2024-12-29 12:10:35', 'xxx@xxxx.com', NULL, 'default.png', '0000-00-00 00:00:00', ''),
+(5, 'user2', '$2y$10$h2N1Jb3tCQ72X.KWuQaB8eUfBfJa61DULmbLDzMArIlUdtpj4im.m', '2222222222', NULL, 'user', '2024-12-31 15:28:19', 'user2@jdjdj.com', NULL, 'default.png', '0000-00-00 00:00:00', ''),
+(6, 'user1', '$2y$10$630Wk4DbeWyToUcclXn66.2YMBCpUb8/ZwAvZwsbMU72PF3nNWdB2', '2222222222', NULL, 'user', '2025-01-10 05:55:38', 'asda@sd.asda', NULL, 'default.png', '0000-00-00 00:00:00', ''),
+(7, 'zzz', '$2y$10$jm1Bobqhw9.TxO8.u6bC8urfHloJHZJH9bqhyRfuaSZ7HixBj.xHS', '1111111111', NULL, 'user', '2025-01-11 03:53:39', 'xxxaa@sdad.dsa', NULL, 'default.png', '0000-00-00 00:00:00', ''),
+(9, 'laravelreg', '$2y$12$Jdfh3niHmM5LO9PPlWkOCOYkY1DbhbACOP2ITvtqOGuQdQFw9iCF2', '0000000000', NULL, 'visitor', '2025-01-26 02:37:37', 'llll@lll.lll', NULL, 'default.png', '2025-01-26 08:07:37', NULL),
+(10, 'fff', '$2y$12$SxNUlwDVWZlwQOc2mrbBwOwieDgwpx5g5huR6xKqEmguvU3m.QDCW', '2222222222', NULL, 'visitor', '2025-01-26 08:12:33', 'fff@fff.fff', NULL, 'default.png', '2025-01-26 08:14:20', NULL),
+(11, 'aaa', '$2y$12$Kw/gx5EzhcukvwRUl16HmuOa2BRIDKTeQlCgE06CdGb3HmrxKTC4e', '0000000000', NULL, 'visitor', '2025-01-26 02:45:47', 'aaa@aaa.aaa', NULL, 'default.png', '2025-01-26 08:15:47', NULL),
+(12, 'ninepmxx', '$2y$12$dgEXN4/1HtB6SeHBwvdwEO1iN5SHARd2qcjd/735XGyusQgJasORy', '0000000000', NULL, 'visitor', '2025-01-26 09:49:56', 'nine@nine.com', NULL, 'default.png', '2025-01-26 15:36:05', NULL);
 
 -- --------------------------------------------------------
 
@@ -582,6 +699,18 @@ ALTER TABLE `match_details`
   ADD KEY `player_id` (`player_id`);
 
 --
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`email`);
+
+--
 -- Indexes for table `players`
 --
 ALTER TABLE `players`
@@ -595,6 +724,14 @@ ALTER TABLE `player_access`
   ADD PRIMARY KEY (`id`),
   ADD KEY `player_id` (`player_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `sessions`
+--
+ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sessions_user_id_index` (`user_id`),
+  ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
 -- Indexes for table `tournaments`
@@ -648,7 +785,7 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `category_access`
@@ -660,7 +797,7 @@ ALTER TABLE `category_access`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
 
 --
 -- AUTO_INCREMENT for table `match_details`
@@ -669,10 +806,16 @@ ALTER TABLE `match_details`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `player_access`
@@ -684,13 +827,13 @@ ALTER TABLE `player_access`
 -- AUTO_INCREMENT for table `tournaments`
 --
 ALTER TABLE `tournaments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `tournament_categories`
 --
 ALTER TABLE `tournament_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
 
 --
 -- AUTO_INCREMENT for table `tournament_moderators`
@@ -702,7 +845,7 @@ ALTER TABLE `tournament_moderators`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `user_notes`
