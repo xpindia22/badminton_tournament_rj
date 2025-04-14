@@ -1,23 +1,23 @@
 # Enable RewriteEngine
 RewriteEngine On
 
-# Block access to specific PHP files
+# Set base URL for rewrite rules
+RewriteBase /badminton_tournament/
+
+# Block access to sensitive PHP files
 <FilesMatch "^(auth\.php|permissions\.php|file2\.php|file3\.php)$">
     Require all denied
 </FilesMatch>
 
-# # Block access to specific directories: zzz, images, zbackup
+# Optional: Block access to specific folders (uncomment to activate)
 # RewriteRule ^(zzz|images|zbackup)/ - [F,L]
 
-# Disable directory indexing to prevent directory listings
+# Disable directory indexing to prevent file tree listing
 Options -Indexes
 
-# Rewrite rules for URL redirection
-# path tool tip will not be shown
-# Redirect /register-player to /badminton_tournament/register_player.php
-RewriteRule ^register-player$ /badminton_tournament/register_player.php [L,QSA]
+# Custom URL rewrites for cleaner paths
+RewriteRule ^register-player$ register_player.php [L,QSA]
+RewriteRule ^about$ about.php [L,QSA]
 
-# Redirect /about to /badminton_tournament/about.php
-RewriteRule ^about$ /badminton_tournament/about.php [L,QSA]
-
-# Add more rules as needed
+# Add more clean URLs below as needed:
+# RewriteRule ^tournament/([0-9]+)$ view_tournament.php?id=$1 [L,QSA]
